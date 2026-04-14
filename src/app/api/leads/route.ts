@@ -1,79 +1,47 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-interface LeadSubmission {
-  labName?: string;
-  contactName?: string;
-  phone?: string;
-  email?: string;
-  productInterest?: string;
-  message?: string;
-}
+import { prisma } from '@/lib/prisma';
 
 export async function POST(request: NextRequest) {
   try {
-    const body: LeadSubmission = await request.json();
+    const body = await request.json();
 
-    // Validate required fields
     const errors: string[] = [];
-
     if (!body.contactName || body.contactName.trim().length === 0) {
-      errors.push('Ten lien he la bat buoc');
+      errors.push('Tên liên hệ là bắt buộc');
     }
-
     if (!body.phone || body.phone.trim().length === 0) {
-      errors.push('So dien thoai la bat buoc');
+      errors.push('Số điện thoại là bắt buộc');
     }
 
     if (errors.length > 0) {
       return NextResponse.json(
-        {
-          success: false,
-          errors,
-          message: 'Du lieu khong hop le',
-        },
+        { success: false, errors, message: 'Dữ liệu không hợp lệ' },
         { status: 400 }
       );
     }
 
-    // TODO: Save to database via Prisma when Supabase is configured
-    // const lead = await prisma.lead.create({
-    //   data: {
-    //     labName: body.labName?.trim() || null,
-    //     contactName: body.contactName!.trim(),
-    //     phone: body.phone!.trim(),
-    //     email: body.email?.trim() || null,
-    //     productInterest: body.productInterest?.trim() || null,
-    //     message: body.message?.trim() || null,
-    //     source: 'website',
-    //     status: 'new',
-    //   },
-    // });
+    const lead = await prisma.lead.create({
+      data: {
+        labName: body.labName?.trim() || null,
+        contactName: body.contactName!.trim(),
+        phone: body.phone!.trim(),
+        email: body.email?.trim() || null,
+        productInterest: body.productInterest?.trim() || null,
+        message: body.message?.trim() || null,
+        source: 'website',
+        status: 'new',
+      },
+    });
 
     return NextResponse.json(
-      {
-        success: true,
-        message: 'Da gui yeu cau thanh cong',
-      },
+      { success: true, message: 'Đã gửi yêu cầu thành công', id: lead.id },
       { status: 200 }
     );
   } catch (error) {
     console.error('Lead submission error:', error);
     return NextResponse.json(
-      {
-        success: false,
-        message: 'Loi he thong. Vui long thu lai sau.',
-      },
+      { success: false, message: 'Lỗi hệ thống. Vui lòng thử lại sau.' },
       { status: 500 }
     );
   }
-}
-
-export async function GET() {
-  return NextResponse.json(
-    {
-      success: false,
-      message: 'Phuong thuc khong duoc ho tro',
-    },
-    { status: 405 }
-  );
 }

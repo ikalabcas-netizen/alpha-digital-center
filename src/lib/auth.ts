@@ -1,9 +1,9 @@
 import NextAuth from 'next-auth';
 import Google from 'next-auth/providers/google';
 import { PrismaAdapter } from '@auth/prisma-adapter';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
-const prisma = new PrismaClient();
+const SUPER_ADMIN_EMAIL = 'vuvanthanh1986@gmail.com';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma) as any,
@@ -17,6 +17,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   pages: {
     signIn: '/admin/login',
     error: '/admin/login',
+  },
+  events: {
+    async createUser({ user }) {
+      // Auto-assign super_admin role on first login
+      if (user.email === SUPER_ADMIN_EMAIL) {
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { role: 'super_admin' },
+        });
+      }
+    },
   },
   callbacks: {
     async signIn({ user }) {
@@ -33,12 +44,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async session({ session, user }: any) {
       if (session.user && user) {
         session.user.id = user.id;
-        try {
-          const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
-          session.user.role = dbUser?.role || 'viewer';
-        } catch {
-          session.user.role = 'viewer';
-        }
+        session.user.role = user.role || 'viewer';
       }
       return session;
     },
