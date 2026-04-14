@@ -16,7 +16,7 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Generate Prisma client + push schema
+# Generate Prisma client for build
 RUN npx prisma generate
 RUN npm run build
 
@@ -32,17 +32,9 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 
-# Standalone output includes only the necessary files
+# Standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma schema + start script for runtime migrations
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder /app/docker/start.sh ./start.sh
-RUN chmod +x ./start.sh
 
 USER nextjs
 
@@ -51,4 +43,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["sh", "./start.sh"]
+CMD ["node", "server.js"]
