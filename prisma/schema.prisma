@@ -1,0 +1,286 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== SITE SETTINGS ====================
+
+model SiteSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  group     String   // "hero", "stats", "contact", "about", "general"
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}
+
+// ==================== PRODUCT CATALOG ====================
+
+model ProductCategory {
+  id          String    @id @default(uuid())
+  nameVi      String    @map("name_vi")
+  nameEn      String?   @map("name_en")
+  slug        String    @unique
+  descriptionVi String? @map("description_vi")
+  descriptionEn String? @map("description_en")
+  displayOrder  Int     @default(0) @map("display_order")
+  imageUrl    String?   @map("image_url")
+  isActive    Boolean   @default(true) @map("is_active")
+  parentId    String?   @map("parent_category_id")
+  parent      ProductCategory? @relation("CategoryParent", fields: [parentId], references: [id])
+  children    ProductCategory[] @relation("CategoryParent")
+  products    Product[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("product_categories")
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  categoryId    String    @map("category_id")
+  category      ProductCategory @relation(fields: [categoryId], references: [id])
+  sku           String?   @unique
+  nameVi        String    @map("name_vi")
+  nameEn        String?   @map("name_en")
+  slug          String    @unique
+  descriptionVi String?   @map("description_vi") @db.Text
+  descriptionEn String?   @map("description_en") @db.Text
+  material      String?
+  origin        String?
+  warrantyYears Int?      @map("warranty_years")
+  displayOrder  Int       @default(0) @map("display_order")
+  isActive      Boolean   @default(true) @map("is_active")
+  isFeatured    Boolean   @default(false) @map("is_featured")
+  seoTitle      String?   @map("seo_title")
+  seoDescription String?  @map("seo_description")
+  variants      ProductVariant[]
+  images        ProductImage[]
+  warranties    WarrantyRecord[]
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id          String    @id @default(uuid())
+  productId   String    @map("product_id")
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  nameVi      String    @map("variant_name_vi")
+  nameEn      String?   @map("variant_name_en")
+  unit        String    // "Cái", "Hàm", "Khung"
+  priceVnd    BigInt    @map("price_vnd")
+  priceNote   String?   @map("price_note")
+  isActive    Boolean   @default(true) @map("is_active")
+  warranties  WarrantyRecord[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("product_variants")
+}
+
+model ProductImage {
+  id          String    @id @default(uuid())
+  productId   String    @map("product_id")
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl    String    @map("image_url")
+  altTextVi   String?   @map("alt_text_vi")
+  displayOrder Int      @default(0) @map("display_order")
+  isPrimary   Boolean   @default(false) @map("is_primary")
+
+  @@map("product_images")
+}
+
+// ==================== WARRANTY ====================
+
+model WarrantyRecord {
+  id              String    @id @default(uuid())
+  warrantyCode    String    @unique @map("warranty_code")
+  patientName     String?   @map("patient_name")
+  dentistName     String?   @map("dentist_name")
+  labName         String?   @map("lab_name")
+  productId       String?   @map("product_id")
+  product         Product?  @relation(fields: [productId], references: [id])
+  variantId       String?   @map("product_variant_id")
+  variant         ProductVariant? @relation(fields: [variantId], references: [id])
+  teethPositions  String?   @map("teeth_positions")
+  shade           String?
+  productionDate  DateTime  @map("production_date")
+  warrantyExpiry  DateTime  @map("warranty_expiry")
+  status          String    @default("active") // active, claimed, expired
+  notes           String?   @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("warranty_records")
+}
+
+// ==================== BLOG / CONTENT ====================
+
+model BlogPost {
+  id              String    @id @default(uuid())
+  titleVi         String    @map("title_vi")
+  titleEn         String?   @map("title_en")
+  slug            String    @unique
+  excerptVi       String?   @map("excerpt_vi") @db.Text
+  contentVi       String    @map("content_vi") @db.Text
+  contentEn       String?   @map("content_en") @db.Text
+  featuredImageUrl String?  @map("featured_image_url")
+  category        String?   // "tin-tuc", "kien-thuc", "cong-nghe", "tuyen-dung"
+  tags            String[]
+  status          String    @default("draft") // draft, scheduled, published
+  publishedAt     DateTime? @map("published_at")
+  scheduledAt     DateTime? @map("scheduled_at")
+  seoTitle        String?   @map("seo_title")
+  seoDescription  String?   @map("seo_description")
+  viewCount       Int       @default(0) @map("view_count")
+  aiGenerated     Boolean   @default(false) @map("ai_generated")
+  aiProvider      String?   @map("ai_provider") // "claude", "gemini", "deepseek"
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("blog_posts")
+}
+
+// ==================== LEADS ====================
+
+model Lead {
+  id              String    @id @default(uuid())
+  source          String    // "website", "facebook", "phone", "zalo"
+  labName         String?   @map("lab_name")
+  contactName     String    @map("contact_name")
+  phone           String?
+  email           String?
+  city            String?
+  message         String?   @db.Text
+  productInterest String?   @map("product_interest")
+  status          String    @default("new") // new, contacted, qualified, converted
+  assignedTo      String?   @map("assigned_to")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("leads")
+}
+
+// ==================== RECRUITMENT ====================
+
+model JobPosting {
+  id              String    @id @default(uuid())
+  titleVi         String    @map("title_vi")
+  slug            String    @unique
+  department      String?
+  location        String    @default("TP.HCM")
+  employmentType  String?   @map("employment_type") // "full-time", "part-time"
+  descriptionVi   String    @map("description_vi") @db.Text
+  requirementsVi  String?   @map("requirements_vi") @db.Text
+  benefitsVi      String?   @map("benefits_vi") @db.Text
+  salaryRange     String?   @map("salary_range")
+  isActive        Boolean   @default(true) @map("is_active")
+  publishedAt     DateTime? @map("published_at")
+  applications    JobApplication[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  @@map("job_postings")
+}
+
+model JobApplication {
+  id            String    @id @default(uuid())
+  jobId         String?   @map("job_id")
+  job           JobPosting? @relation(fields: [jobId], references: [id])
+  applicantName String    @map("applicant_name")
+  phone         String
+  email         String?
+  cvUrl         String?   @map("cv_url")
+  coverLetter   String?   @map("cover_letter") @db.Text
+  status        String    @default("received") // received, reviewing, interview, hired, rejected
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@map("job_applications")
+}
+
+// ==================== MARKETING CAMPAIGNS ====================
+
+model Campaign {
+  id              String    @id @default(uuid())
+  name            String
+  type            String    // "blog_post", "fb_page_post", "fb_ad", "fb_group_post"
+  status          String    @default("draft") // draft, scheduled, active, completed, paused
+  contentVi       String?   @map("content_vi") @db.Text
+  imageUrls       String[]  @map("image_urls")
+  targetAudience  String?   @map("target_audience") @db.Text
+  budgetVnd       BigInt?   @map("budget_vnd")
+  scheduledAt     DateTime? @map("scheduled_at")
+  publishedAt     DateTime? @map("published_at")
+  fbPostId        String?   @map("fb_post_id")
+  fbAdId          String?   @map("fb_ad_id")
+  metrics         Json?     // {impressions, clicks, leads, cost}
+  calendarEntries ContentCalendar[]
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("campaigns")
+}
+
+model ContentCalendar {
+  id          String    @id @default(uuid())
+  date        DateTime
+  campaignId  String?   @map("campaign_id")
+  campaign    Campaign? @relation(fields: [campaignId], references: [id])
+  contentType String    @map("content_type") // "blog", "fb_page", "fb_group", "fb_ad"
+  title       String?
+  notes       String?   @db.Text
+  status      String    @default("planned") // planned, content_ready, published
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("content_calendar")
+}
+
+// ==================== TESTIMONIALS ====================
+
+model Testimonial {
+  id            String    @id @default(uuid())
+  labName       String    @map("lab_name")
+  contactPerson String?   @map("contact_person")
+  contentVi     String    @map("content_vi") @db.Text
+  rating        Int?      // 1-5
+  imageUrl      String?   @map("image_url")
+  isFeatured    Boolean   @default(false) @map("is_featured")
+  isApproved    Boolean   @default(false) @map("is_approved")
+  displayOrder  Int       @default(0) @map("display_order")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@map("testimonials")
+}
+
+// ==================== AI CONTENT GENERATION ====================
+
+model AiGeneration {
+  id          String    @id @default(uuid())
+  provider    String    // "claude", "gemini", "deepseek"
+  model       String    // "claude-sonnet-4-6", "gemini-2.0-flash", "deepseek-chat"
+  contentType String    @map("content_type") // "blog", "fb_post", "product_desc", "recruitment"
+  prompt      String    @db.Text
+  output      String    @db.Text
+  inputTokens Int?      @map("input_tokens")
+  outputTokens Int?     @map("output_tokens")
+  costUsd     Float?    @map("cost_usd")
+  status      String    @default("generated") // generated, approved, rejected, published
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("ai_generations")
+}
+
+model AiSetting {
+  id          String    @id @default(uuid())
+  provider    String    @unique // "claude", "gemini", "deepseek"
+  apiKey      String    @map("api_key")
+  model       String    @default("")
+  isActive    Boolean   @default(true) @map("is_active")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("ai_settings")
+}
