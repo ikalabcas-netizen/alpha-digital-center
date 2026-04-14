@@ -13,6 +13,7 @@ import {
   Users,
   Briefcase,
   Settings,
+  UserCog,
   LogOut,
 } from 'lucide-react';
 import { signOut } from 'next-auth/react';
@@ -28,6 +29,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: '/admin/leads', icon: Users, label: 'Khách hàng' },
   { to: '/admin/recruitment', icon: Briefcase, label: 'Tuyển dụng' },
   { to: '/admin/settings', icon: Settings, label: 'Cài đặt' },
+  { to: '/admin/users', icon: UserCog, label: 'Hệ thống' },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
