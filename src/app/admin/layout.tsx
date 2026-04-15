@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { ResponsiveShell, NavItem } from '@/components/layout/ResponsiveShell';
 import {
@@ -14,9 +14,7 @@ import {
   Briefcase,
   Settings,
   UserCog,
-  LogOut,
 } from 'lucide-react';
-import { signOut } from 'next-auth/react';
 import { colors, fonts } from '@/lib/styles';
 
 const ADMIN_NAV: NavItem[] = [
@@ -72,48 +70,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       navItems={ADMIN_NAV}
       accentColor="#06b6d4"
       roleLabel={(session.user as any)?.role === 'super_admin' ? 'Super Admin' : 'Quản trị viên'}
+      userName={session.user?.name || undefined}
+      userEmail={session.user?.email || undefined}
+      userImage={session.user?.image || undefined}
+      onSignOut={() => signOut({ callbackUrl: '/admin/login' })}
     >
-      {/* User info bar */}
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-          gap: 12,
-          marginBottom: 20,
-          paddingBottom: 12,
-          borderBottom: `1px solid ${colors.border}`,
-        }}
-      >
-        {session.user?.image && (
-          <img
-            src={session.user.image}
-            alt=""
-            style={{ width: 28, height: 28, borderRadius: '50%' }}
-          />
-        )}
-        <span style={{ fontSize: 13, color: colors.textSecondary }}>
-          {session.user?.name || session.user?.email}
-        </span>
-        <button
-          onClick={() => signOut({ callbackUrl: '/admin/login' })}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 4,
-            padding: '4px 10px',
-            background: 'none',
-            border: `1px solid ${colors.border}`,
-            borderRadius: 6,
-            fontSize: 12,
-            color: colors.textMuted,
-            cursor: 'pointer',
-            fontFamily: fonts.body,
-          }}
-        >
-          <LogOut size={12} /> Đăng xuất
-        </button>
-      </div>
       {children}
     </ResponsiveShell>
   );
