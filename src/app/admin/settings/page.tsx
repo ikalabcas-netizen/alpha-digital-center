@@ -62,7 +62,7 @@ export default function SettingsPage() {
     name: 'Alpha Digital Center',
     phone: '0378 422 496',
     email: 'info@alphacenter.vn',
-    address: '242/12 Pham Van Hai, Q. Tan Binh, TP.HCM',
+    address: '242/12 Phạm Văn Hai, Q. Tân Bình, TP.HCM',
     workingHours: 'T2 - T7: 8:00 - 17:30',
     zaloLink: '',
   });
@@ -99,9 +99,9 @@ export default function SettingsPage() {
   });
 
   const [seo, setSeo] = useState<SeoConfig>({
-    defaultTitle: 'Alpha Digital Center - Labo Nha Khoa Ky Thuat So',
+    defaultTitle: 'Alpha Digital Center - Labo Nha Khoa Kỹ Thuật Số',
     defaultDescription:
-      'Alpha Digital Center - Trung tam gia cong rang su va phuc hinh nha khoa ky thuat so hang dau tai TP.HCM. Cong nghe CAD/CAM, in 3D hien dai.',
+      'Alpha Digital Center - Trung tâm gia công răng sứ và phục hình nha khoa kỹ thuật số hàng đầu tại TP.HCM. Công nghệ CAD/CAM, in 3D hiện đại.',
   });
 
   const [showApiKeys, setShowApiKeys] = useState<Record<string, boolean>>({});
@@ -148,8 +148,8 @@ export default function SettingsPage() {
     <div style={{ padding: 0 }}>
       {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={pageTitle}>Cai dat</h1>
-        <p style={pageSubtitle}>Quan ly cau hinh he thong</p>
+        <h1 style={pageTitle}>Cài đặt</h1>
+        <p style={pageSubtitle}>Quản lý cấu hình hệ thống</p>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 800 }}>
@@ -159,17 +159,17 @@ export default function SettingsPage() {
             <div style={sectionIconStyle}>
               <Building2 size={18} color={colors.primary} />
             </div>
-            <h2 style={sectionTitleStyle}>Thong tin cong ty</h2>
+            <h2 style={sectionTitleStyle}>Thông tin công ty</h2>
           </div>
 
           <Input
-            label="Ten cong ty"
+            label="Tên công ty"
             value={company.name}
             onChange={(e) => setCompany({ ...company, name: e.target.value })}
           />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Input
-              label="So dien thoai"
+              label="Số điện thoại"
               value={company.phone}
               onChange={(e) => setCompany({ ...company, phone: e.target.value })}
             />
@@ -181,13 +181,13 @@ export default function SettingsPage() {
             />
           </div>
           <Input
-            label="Dia chi"
+            label="Địa chỉ"
             value={company.address}
             onChange={(e) => setCompany({ ...company, address: e.target.value })}
           />
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Input
-              label="Gio lam viec"
+              label="Giờ làm việc"
               value={company.workingHours}
               onChange={(e) => setCompany({ ...company, workingHours: e.target.value })}
             />
@@ -205,7 +205,7 @@ export default function SettingsPage() {
               loading={savingSection === 'company'}
             >
               <Save size={14} />
-              {savingSection === 'company' ? 'Dang luu...' : 'Luu thay doi'}
+              {savingSection === 'company' ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </div>
@@ -370,7 +370,7 @@ export default function SettingsPage() {
               loading={savingSection === 'ai'}
             >
               <Save size={14} />
-              {savingSection === 'ai' ? 'Dang luu...' : 'Luu thay doi'}
+              {savingSection === 'ai' ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </div>
@@ -466,7 +466,7 @@ export default function SettingsPage() {
               loading={savingSection === 'facebook'}
             >
               <Save size={14} />
-              {savingSection === 'facebook' ? 'Dang luu...' : 'Luu thay doi'}
+              {savingSection === 'facebook' ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </div>
@@ -477,19 +477,19 @@ export default function SettingsPage() {
             <div style={sectionIconStyle}>
               <Search size={18} color={colors.primary} />
             </div>
-            <h2 style={sectionTitleStyle}>SEO mac dinh</h2>
+            <h2 style={sectionTitleStyle}>SEO mặc định</h2>
           </div>
 
           <Input
-            label="Meta title mac dinh"
-            placeholder="Tieu de mac dinh cho cac trang"
+            label="Meta title mặc định"
+            placeholder="Tiêu đề mặc định cho các trang"
             value={seo.defaultTitle}
             onChange={(e) => setSeo({ ...seo, defaultTitle: e.target.value })}
           />
 
           <Textarea
-            label="Meta description mac dinh"
-            placeholder="Mo ta mac dinh cho cac trang..."
+            label="Meta description mặc định"
+            placeholder="Mô tả mặc định cho các trang..."
             rows={3}
             value={seo.defaultDescription}
             onChange={(e) => setSeo({ ...seo, defaultDescription: e.target.value })}
@@ -504,7 +504,7 @@ export default function SettingsPage() {
             }}
           >
             <div style={{ fontSize: 11, color: colors.textMuted, fontFamily: fonts.body, marginBottom: 4 }}>
-              Xem truoc tren Google
+              Xem trước trên Google
             </div>
             <div
               style={{
@@ -517,7 +517,7 @@ export default function SettingsPage() {
                 whiteSpace: 'nowrap',
               }}
             >
-              {seo.defaultTitle || 'Tieu de trang'}
+              {seo.defaultTitle || 'Tiêu đề trang'}
             </div>
             <div
               style={{
@@ -540,7 +540,7 @@ export default function SettingsPage() {
                 overflow: 'hidden',
               }}
             >
-              {seo.defaultDescription || 'Mo ta trang web...'}
+              {seo.defaultDescription || 'Mô tả trang web...'}
             </div>
           </div>
 
@@ -550,7 +550,7 @@ export default function SettingsPage() {
               loading={savingSection === 'seo'}
             >
               <Save size={14} />
-              {savingSection === 'seo' ? 'Dang luu...' : 'Luu thay doi'}
+              {savingSection === 'seo' ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </div>

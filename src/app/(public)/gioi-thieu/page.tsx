@@ -14,58 +14,58 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Gioi thieu | Alpha Digital Center',
+  title: 'Giới thiệu | Alpha Digital Center',
   description:
-    'Alpha Digital Center - Trung tam gia cong nha khoa ky thuat so hang dau. Cong nghe CAD/CAM, may phay CNC 5 truc, scanner 3D, in 3D.',
+    'Alpha Digital Center - Trung tâm gia công nha khoa kỹ thuật số hàng đầu. Công nghệ CAD/CAM, máy phay CNC 5 trục, scanner 3D, in 3D.',
 };
 
 const MILESTONES = [
-  { year: '2014', event: 'Thanh lap Alpha Dental Lab tai TP.HCM' },
-  { year: '2017', event: 'Dau tu may phay CNC 5 truc dau tien' },
-  { year: '2019', event: 'Mo rong xuong san xuat, nang cap he thong CAD/CAM' },
-  { year: '2021', event: 'Doi ten thanh Alpha Digital Center, tap trung cong nghe so' },
-  { year: '2023', event: 'Dat moc 500+ labo doi tac, 50,000+ san pham/nam' },
+  { year: '2014', event: 'Thành lập Alpha Dental Lab tại TP.HCM' },
+  { year: '2017', event: 'Đầu tư máy phay CNC 5 trục đầu tiên' },
+  { year: '2019', event: 'Mở rộng xưởng sản xuất, nâng cấp hệ thống CAD/CAM' },
+  { year: '2021', event: 'Đổi tên thành Alpha Digital Center, tập trung công nghệ số' },
+  { year: '2023', event: 'Đạt mốc 500+ labo đối tác, 50,000+ sản phẩm/năm' },
 ];
 
 const EQUIPMENT = [
   {
     icon: Cpu,
-    name: 'May phay CNC 5 truc',
+    name: 'Máy phay CNC 5 trục',
     description:
-      'He thong phay CNC 5 truc tu Amann Girrbach va VHF, do chinh xac len den 5 micron. Phay Zirconia, CoCr, Titanium, PMMA.',
+      'Hệ thống phay CNC 5 trục từ Amann Girrbach và VHF, độ chính xác lên đến 5 micron. Phay Zirconia, CoCr, Titanium, PMMA.',
   },
   {
     icon: ScanLine,
     name: 'Scanner 3D',
     description:
-      'Scanner 3Shape va Medit Lab chinh xac cao. So hoa mau nhanh chong, ho tro file STL/PLY tu moi he thong.',
+      'Scanner 3Shape và Medit Lab chính xác cao. Số hóa mẫu nhanh chóng, hỗ trợ file STL/PLY từ mọi hệ thống.',
   },
   {
     icon: Printer,
-    name: 'May in 3D',
+    name: 'Máy in 3D',
     description:
-      'In 3D nhua va kim loai. In mau, khay chinh nha, huong dan phau thuat Implant, wax-up ky thuat so.',
+      'In 3D nhựa và kim loại. In mẫu, khay chỉnh nha, hướng dẫn phẫu thuật Implant, wax-up kỹ thuật số.',
   },
 ];
 
 const VALUES = [
   {
     icon: Target,
-    title: 'Su menh',
+    title: 'Sứ mệnh',
     description:
-      'Nang tam chat luong phuc hinh nha khoa tai Viet Nam thong qua ung dung cong nghe so va vat lieu chinh hang. Dong hanh cung cac labo tao ra nhung san pham tot nhat cho benh nhan.',
+      'Nâng tầm chất lượng phục hình nha khoa tại Việt Nam thông qua ứng dụng công nghệ số và vật liệu chính hãng. Đồng hành cùng các labo tạo ra những sản phẩm tốt nhất cho bệnh nhân.',
   },
   {
     icon: Eye,
-    title: 'Tam nhin',
+    title: 'Tầm nhìn',
     description:
-      'Tro thanh trung tam gia cong nha khoa ky thuat so hang dau khu vuc phia Nam. Tien phong ung dung cong nghe CAD/CAM va in 3D trong gia cong nha khoa.',
+      'Trở thành trung tâm gia công nha khoa kỹ thuật số hàng đầu khu vực phía Nam. Tiên phong ứng dụng công nghệ CAD/CAM và in 3D trong gia công nha khoa.',
   },
   {
     icon: Heart,
-    title: 'Gia tri cot loi',
+    title: 'Giá trị cốt lõi',
     description:
-      'Chat luong - Uy tin - Chuyen nghiep. Moi san pham deu duoc kiem soat chat luong nghiem ngat truoc khi giao den tay khach hang.',
+      'Chất lượng - Uy tín - Chuyên nghiệp. Mọi sản phẩm đều được kiểm soát chất lượng nghiêm ngặt trước khi giao đến tay khách hàng.',
   },
 ];
 
@@ -92,7 +92,7 @@ export default function GioiThieuPage() {
               marginBottom: 16,
             }}
           >
-            Ve chung toi
+            Về chúng tôi
           </div>
           <h1
             style={{
@@ -115,9 +115,9 @@ export default function GioiThieuPage() {
               margin: '0 auto',
             }}
           >
-            Trung tam gia cong ban thanh pham nha khoa ky thuat so hang dau.
-            Ung dung cong nghe CAD/CAM, in 3D va vat lieu chinh hang tu cac hang
-            hang dau the gioi.
+            Trung tâm gia công bán thành phẩm nha khoa kỹ thuật số hàng đầu.
+            Ứng dụng công nghệ CAD/CAM, in 3D và vật liệu chính hãng từ các hãng
+            hàng đầu thế giới.
           </p>
         </div>
       </section>
@@ -199,10 +199,10 @@ export default function GioiThieuPage() {
                 marginBottom: 8,
               }}
             >
-              Hanh trinh phat trien
+              Hành trình phát triển
             </h2>
             <p style={{ fontSize: 14, color: colors.textSecondary }}>
-              Hon 10 nam xay dung va phat trien
+              Hơn 10 năm xây dựng và phát triển
             </p>
           </div>
           <div style={{ maxWidth: 600, margin: '0 auto' }}>
@@ -263,10 +263,10 @@ export default function GioiThieuPage() {
                 marginBottom: 8,
               }}
             >
-              Trang thiet bi & Cong nghe
+              Trang thiết bị & Công nghệ
             </h2>
             <p style={{ fontSize: 14, color: colors.textSecondary }}>
-              Dau tu he thong may moc hien dai, dam bao do chinh xac va chat luong cao nhat
+              Đầu tư hệ thống máy móc hiện đại, đảm bảo độ chính xác và chất lượng cao nhất
             </p>
           </div>
           <div
@@ -344,7 +344,7 @@ export default function GioiThieuPage() {
                 marginBottom: 8,
               }}
             >
-              Doi ngu cua chung toi
+              Đội ngũ của chúng tôi
             </h2>
             <p
               style={{
@@ -355,8 +355,8 @@ export default function GioiThieuPage() {
                 lineHeight: 1.6,
               }}
             >
-              Doi ngu ky thuat vien gioi, nhieu nam kinh nghiem, thuong xuyen cap nhat
-              cong nghe va ky thuat moi nhat trong linh vuc nha khoa.
+              Đội ngũ kỹ thuật viên giỏi, nhiều năm kinh nghiệm, thường xuyên cập nhật
+              công nghệ và kỹ thuật mới nhất trong lĩnh vực nha khoa.
             </p>
           </div>
           <div
@@ -367,10 +367,10 @@ export default function GioiThieuPage() {
             }}
           >
             {[
-              { icon: Users, title: 'Ky thuat vien CAD/CAM', count: '8+' },
-              { icon: Award, title: 'Ky thuat vien labo', count: '15+' },
+              { icon: Users, title: 'Kỹ thuật viên CAD/CAM', count: '8+' },
+              { icon: Award, title: 'Kỹ thuật viên labo', count: '15+' },
               { icon: Clock, title: 'Kinh doanh & CSKH', count: '6+' },
-              { icon: Cpu, title: 'QC & Quan ly', count: '4+' },
+              { icon: Cpu, title: 'QC & Quản lý', count: '4+' },
             ].map((team) => {
               const Icon = team.icon;
               return (
@@ -448,10 +448,10 @@ export default function GioiThieuPage() {
                   marginBottom: 6,
                 }}
               >
-                Dia chi xuong san xuat
+                Địa chỉ xưởng sản xuất
               </h3>
               <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.9)', lineHeight: 1.5 }}>
-                242/12 Pham Van Hai, Phuong 5, Quan Tan Binh, TP. Ho Chi Minh
+                242/12 Phạm Văn Hai, Phường 5, Quận Tân Bình, TP. Hồ Chí Minh
               </p>
             </div>
           </div>

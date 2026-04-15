@@ -36,18 +36,18 @@ interface KpiCard {
 }
 
 const kpiCards: KpiCard[] = [
-  { icon: Package, value: '12', label: 'San pham', subtitle: 'danh muc' },
-  { icon: FileText, value: '6', label: 'Bai viet', subtitle: 'da xuat ban' },
-  { icon: Users, value: '24', label: 'Khach hang', subtitle: 'leads moi' },
-  { icon: Shield, value: '156', label: 'Bao hanh', subtitle: 'phieu active' },
+  { icon: Package, value: '12', label: 'Sản phẩm', subtitle: 'danh mục' },
+  { icon: FileText, value: '6', label: 'Bài viết', subtitle: 'đã xuất bản' },
+  { icon: Users, value: '24', label: 'Khách hàng', subtitle: 'leads mới' },
+  { icon: Shield, value: '156', label: 'Bảo hành', subtitle: 'phiếu active' },
 ];
 
-const kpiLabels = ['San pham', 'Bai viet', 'Khach hang', 'Bao hanh'];
+const kpiLabels = ['Sản phẩm', 'Bài viết', 'Khách hàng', 'Bảo hành'];
 const kpiDisplayLabels = [
-  { title: 'San ph\u1ea9m', sub: 'danh m\u1ee5c' },
-  { title: 'B\u00e0i vi\u1ebft', sub: '\u0111\u00e3 xu\u1ea5t b\u1ea3n' },
-  { title: 'Kh\u00e1ch h\u00e0ng', sub: 'leads m\u1edbi' },
-  { title: 'B\u1ea3o h\u00e0nh', sub: 'phi\u1ebfu active' },
+  { title: 'Sản phẩm', sub: 'danh mục' },
+  { title: 'Bài viết', sub: 'đã xuất bản' },
+  { title: 'Khách hàng', sub: 'leads mới' },
+  { title: 'Bảo hành', sub: 'phiếu active' },
 ];
 
 interface Activity {
@@ -57,11 +57,11 @@ interface Activity {
 }
 
 const recentActivities: Activity[] = [
-  { icon: Edit3, text: 'C\u1eadp nh\u1eadt trang ch\u1ee7 - Hero section', time: '5 ph\u00fat tr\u01b0\u1edbc' },
-  { icon: UserPlus, text: 'Lead m\u1edbi t\u1eeb form li\u00ean h\u1ec7 - Nha khoa ABC', time: '15 ph\u00fat tr\u01b0\u1edbc' },
-  { icon: CheckCircle, text: 'Xu\u1ea5t b\u1ea3n b\u00e0i vi\u1ebft "C\u00f4ng ngh\u1ec7 CAD/CAM"', time: '1 gi\u1edd tr\u01b0\u1edbc' },
-  { icon: Package, text: 'Th\u00eam s\u1ea3n ph\u1ea9m m\u1edbi - R\u0103ng s\u1ee9 Zirconia', time: '2 gi\u1edd tr\u01b0\u1edbc' },
-  { icon: TrendingUp, text: 'Chi\u1ebfn d\u1ecbch Facebook Ads \u0111\u1ea1t 1,200 clicks', time: '3 gi\u1edd tr\u01b0\u1edbc' },
+  { icon: Edit3, text: 'Cập nhật trang chủ - Hero section', time: '5 phút trước' },
+  { icon: UserPlus, text: 'Lead mới từ form liên hệ - Nha khoa ABC', time: '15 phút trước' },
+  { icon: CheckCircle, text: 'Xuất bản bài viết "Công nghệ CAD/CAM"', time: '1 giờ trước' },
+  { icon: Package, text: 'Thêm sản phẩm mới - Răng sứ Zirconia', time: '2 giờ trước' },
+  { icon: TrendingUp, text: 'Chiến dịch Facebook Ads đạt 1,200 clicks', time: '3 giờ trước' },
 ];
 
 interface QuickAction {
@@ -71,15 +71,15 @@ interface QuickAction {
 }
 
 const quickActions: QuickAction[] = [
-  { icon: Home, label: 'Qu\u1ea3n l\u00fd Trang ch\u1ee7', href: '/admin/homepage' },
-  { icon: Info, label: 'Qu\u1ea3n l\u00fd Gi\u1edbi thi\u1ec7u', href: '/admin/about' },
-  { icon: Package, label: 'Qu\u1ea3n l\u00fd S\u1ea3n ph\u1ea9m', href: '/admin/products' },
-  { icon: FileText, label: 'Qu\u1ea3n l\u00fd B\u00e0i vi\u1ebft', href: '/admin/blog' },
+  { icon: Home, label: 'Quản lý Trang chủ', href: '/admin/homepage' },
+  { icon: Info, label: 'Quản lý Giới thiệu', href: '/admin/about' },
+  { icon: Package, label: 'Quản lý Sản phẩm', href: '/admin/products' },
+  { icon: FileText, label: 'Quản lý Bài viết', href: '/admin/blog' },
 ];
 
 function getTodayString(): string {
   const now = new Date();
-  const days = ['Ch\u1ee7 nh\u1eadt', 'Th\u1ee9 Hai', 'Th\u1ee9 Ba', 'Th\u1ee9 T\u01b0', 'Th\u1ee9 N\u0103m', 'Th\u1ee9 S\u00e1u', 'Th\u1ee9 B\u1ea3y'];
+  const days = ['Chủ nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'];
   const day = days[now.getDay()];
   const dd = String(now.getDate()).padStart(2, '0');
   const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -93,7 +93,7 @@ export default function DashboardPage() {
       {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={pageTitle}>Dashboard</h1>
-        <p style={pageSubtitle}>H\u00f4m nay: {getTodayString()}</p>
+        <p style={pageSubtitle}>Hôm nay: {getTodayString()}</p>
       </div>
 
       {/* KPI Cards Grid */}
@@ -188,7 +188,7 @@ export default function DashboardPage() {
               margin: '0 0 16px 0',
             }}
           >
-            Ho\u1ea1t \u0111\u1ed9ng g\u1ea7n \u0111\u00e2y
+            Hoạt động gần đây
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
             {recentActivities.map((activity, idx) => {
@@ -260,7 +260,7 @@ export default function DashboardPage() {
               margin: '0 0 16px 0',
             }}
           >
-            Thao t\u00e1c nhanh
+            Thao tác nhanh
           </h2>
           <div
             style={{

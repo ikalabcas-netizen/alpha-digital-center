@@ -14,67 +14,67 @@ import {
 } from 'lucide-react';
 
 const CATEGORIES = [
-  { key: 'all', label: 'Tat ca', icon: Newspaper },
-  { key: 'tin-tuc', label: 'Tin tuc', icon: Newspaper },
-  { key: 'kien-thuc', label: 'Kien thuc', icon: BookOpen },
-  { key: 'cong-nghe', label: 'Cong nghe', icon: Cpu },
-  { key: 'tuyen-dung', label: 'Tuyen dung', icon: Users },
+  { key: 'all', label: 'Tất cả', icon: Newspaper },
+  { key: 'tin-tuc', label: 'Tin tức', icon: Newspaper },
+  { key: 'kien-thuc', label: 'Kiến thức', icon: BookOpen },
+  { key: 'cong-nghe', label: 'Công nghệ', icon: Cpu },
+  { key: 'tuyen-dung', label: 'Tuyển dụng', icon: Users },
 ];
 
 const PLACEHOLDER_POSTS = [
   {
     slug: 'su-khac-biet-zirconia-emax',
-    title: 'Su khac biet giua Zirconia va E.Max - Lua chon nao phu hop?',
+    title: 'Sự khác biệt giữa Zirconia và E.Max - Lựa chọn nào phù hợp?',
     excerpt:
-      'Tim hieu uu nhuoc diem cua su Zirconia va su ep E.Max de tu van dung cho tung truong hop lam sang.',
+      'Tìm hiểu ưu nhược điểm của sứ Zirconia và sứ ép E.Max để tư vấn đúng cho từng trường hợp lâm sàng.',
     category: 'kien-thuc',
     date: '10/04/2026',
-    readTime: '5 phut doc',
+    readTime: '5 phút đọc',
   },
   {
     slug: 'cong-nghe-cadcam-nha-khoa',
-    title: 'Cong nghe CAD/CAM trong nha khoa - Xu huong tat yeu',
+    title: 'Công nghệ CAD/CAM trong nha khoa - Xu hướng tất yếu',
     excerpt:
-      'Ung dung cong nghe CAD/CAM giup nang cao do chinh xac, rut ngan thoi gian san xuat phuc hinh nha khoa.',
+      'Ứng dụng công nghệ CAD/CAM giúp nâng cao độ chính xác, rút ngắn thời gian sản xuất phục hình nha khoa.',
     category: 'cong-nghe',
     date: '05/04/2026',
-    readTime: '7 phut doc',
+    readTime: '7 phút đọc',
   },
   {
     slug: 'huong-dan-chon-mau-rang',
-    title: 'Huong dan chon mau rang chinh xac cho phuc hinh su',
+    title: 'Hướng dẫn chọn màu răng chính xác cho phục hình sứ',
     excerpt:
-      'Cac buoc lay mau rang dung ky thuat, luu y anh sang, goc nhin de dat ket qua tham my tot nhat.',
+      'Các bước lấy màu răng đúng kỹ thuật, lưu ý ánh sáng, góc nhìn để đạt kết quả thẩm mỹ tốt nhất.',
     category: 'kien-thuc',
     date: '28/03/2026',
-    readTime: '4 phut doc',
+    readTime: '4 phút đọc',
   },
   {
     slug: 'alpha-tham-gia-trienlam-2026',
-    title: 'Alpha Digital Center tham gia Trien lam Nha khoa Quoc te 2026',
+    title: 'Alpha Digital Center tham gia Triển lãm Nha khoa Quốc tế 2026',
     excerpt:
-      'Chung toi hang hanh gioi thieu cac giai phap gia cong ky thuat so tai trien lam nha khoa lon nhat nam.',
+      'Chúng tôi hân hạnh giới thiệu các giải pháp gia công kỹ thuật số tại triển lãm nha khoa lớn nhất năm.',
     category: 'tin-tuc',
     date: '20/03/2026',
-    readTime: '3 phut doc',
+    readTime: '3 phút đọc',
   },
   {
     slug: 'in-3d-trong-nha-khoa',
-    title: 'Ung dung in 3D trong nha khoa - Tu mau den san pham',
+    title: 'Ứng dụng in 3D trong nha khoa - Từ mẫu đến sản phẩm',
     excerpt:
-      'Cong nghe in 3D dang thay doi cach lam viec cua labo nha khoa. Tu in mau, khay chinh nha den huong dan phau thuat.',
+      'Công nghệ in 3D đang thay đổi cách làm việc của labo nha khoa. Từ in mẫu, khay chỉnh nha đến hướng dẫn phẫu thuật.',
     category: 'cong-nghe',
     date: '15/03/2026',
-    readTime: '6 phut doc',
+    readTime: '6 phút đọc',
   },
   {
     slug: 'tuyen-ky-thuat-vien-cadcam',
-    title: 'Tuyen dung: Ky thuat vien CAD/CAM - Co hoi phat trien nghe nghiep',
+    title: 'Tuyển dụng: Kỹ thuật viên CAD/CAM - Cơ hội phát triển nghề nghiệp',
     excerpt:
-      'Alpha Digital Center tuyen ky thuat vien CAD/CAM co kinh nghiem. Moi truong lam viec hien dai, phuc loi hap dan.',
+      'Alpha Digital Center tuyển kỹ thuật viên CAD/CAM có kinh nghiệm. Môi trường làm việc hiện đại, phúc lợi hấp dẫn.',
     category: 'tuyen-dung',
     date: '10/03/2026',
-    readTime: '2 phut doc',
+    readTime: '2 phút đọc',
   },
 ];
 
@@ -124,7 +124,7 @@ export default function TinTucPage() {
               marginBottom: 12,
             }}
           >
-            Tin tuc & <span style={{ color: colors.primary }}>Kien thuc</span>
+            Tin tức & <span style={{ color: colors.primary }}>Kiến thức</span>
           </h1>
           <p
             style={{
@@ -135,8 +135,8 @@ export default function TinTucPage() {
               margin: '0 auto',
             }}
           >
-            Cap nhat cac tin tuc moi nhat, kien thuc chuyen nganh va xu huong
-            cong nghe trong linh vuc nha khoa.
+            Cập nhật các tin tức mới nhất, kiến thức chuyên ngành và xu hướng
+            công nghệ trong lĩnh vực nha khoa.
           </p>
         </div>
       </section>
@@ -200,7 +200,7 @@ export default function TinTucPage() {
             >
               <Newspaper size={40} color={colors.textMuted} style={{ marginBottom: 12 }} />
               <p style={{ fontSize: 14, color: colors.textSecondary }}>
-                Chua co bai viet nao trong danh muc nay.
+                Chưa có bài viết nào trong danh mục này.
               </p>
             </div>
           ) : (
@@ -332,7 +332,7 @@ export default function TinTucPage() {
                             color: colors.primary,
                           }}
                         >
-                          Doc them <ArrowRight size={13} />
+                          Đọc thêm <ArrowRight size={13} />
                         </span>
                       </div>
                     </div>

@@ -63,110 +63,110 @@ interface Application {
 }
 
 const appStatusConfig: Record<AppStatus, { bg: string; color: string; label: string }> = {
-  received: { bg: '#ecfeff', color: '#0891b2', label: 'Da nhan' },
-  reviewing: { bg: '#eff6ff', color: '#2563eb', label: 'Dang xem xet' },
-  interview: { bg: '#fffbeb', color: '#d97706', label: 'Phong van' },
-  hired: { bg: '#f0fdf4', color: '#16a34a', label: 'Da tuyen' },
-  rejected: { bg: '#fff1f2', color: '#e11d48', label: 'Tu choi' },
+  received: { bg: '#ecfeff', color: '#0891b2', label: 'Đã nhận' },
+  reviewing: { bg: '#eff6ff', color: '#2563eb', label: 'Đang xem xét' },
+  interview: { bg: '#fffbeb', color: '#d97706', label: 'Phỏng vấn' },
+  hired: { bg: '#f0fdf4', color: '#16a34a', label: 'Đã tuyển' },
+  rejected: { bg: '#fff1f2', color: '#e11d48', label: 'Từ chối' },
 };
 
 const typeLabels: Record<string, string> = {
-  'full-time': 'Toan thoi gian',
-  'part-time': 'Ban thoi gian',
+  'full-time': 'Toàn thời gian',
+  'part-time': 'Bán thời gian',
 };
 
 const initialJobs: JobPosting[] = [
   {
     id: 1,
-    title: 'Ky thuat vien CAD/CAM',
-    department: 'Ky thuat',
+    title: 'Kỹ thuật viên CAD/CAM',
+    department: 'Kỹ thuật',
     location: 'TP.HCM',
     type: 'full-time',
     active: true,
     applicationCount: 8,
     publishDate: '01/04/2026',
-    description: 'Thiet ke phuc hinh rang su bang phan mem CAD/CAM chuyen dung. Lam viec voi cac he thong scan 3D va may phay hien dai.',
-    requirements: 'Tot nghiep Trung cap Nha khoa tro len.\nCo kinh nghiem su dung phan mem Exocad, 3Shape.\nCo kha nang lam viec nhom va chiu duoc ap luc.',
-    benefits: 'Luong canh tranh, thuong hieu suat.\nBao hiem xa hoi day du.\nDuoc dao tao cac cong nghe moi.\nMoi truong lam viec chuyen nghiep.',
-    salaryRange: '12 - 20 trieu',
+    description: 'Thiết kế phục hình răng sứ bằng phần mềm CAD/CAM chuyên dụng. Làm việc với các hệ thống scan 3D và máy phay hiện đại.',
+    requirements: 'Tốt nghiệp Trung cấp Nha khoa trở lên.\nCó kinh nghiệm sử dụng phần mềm Exocad, 3Shape.\nCó khả năng làm việc nhóm và chịu được áp lực.',
+    benefits: 'Lương cạnh tranh, thưởng hiệu suất.\nBảo hiểm xã hội đầy đủ.\nĐược đào tạo các công nghệ mới.\nMôi trường làm việc chuyên nghiệp.',
+    salaryRange: '12 - 20 triệu',
   },
   {
     id: 2,
-    title: 'Ky thuat vien Labo',
-    department: 'San xuat',
+    title: 'Kỹ thuật viên Labo',
+    department: 'Sản xuất',
     location: 'TP.HCM',
     type: 'full-time',
     active: true,
     applicationCount: 12,
     publishDate: '05/04/2026',
-    description: 'Gia cong rang su, phuc hinh tham my. Thao tac tren cac loai vat lieu Zirconia, Emax, kim loai.',
-    requirements: 'Tot nghiep Trung cap Nha khoa.\nIt nhat 1 nam kinh nghiem lam viec tai labo.\nKheo tay, ti mi, co mat tham my.',
-    benefits: 'Luong theo nang luc.\nBao hiem xa hoi.\nThuong le, tet.\nCo hoi thang tien.',
-    salaryRange: '10 - 18 trieu',
+    description: 'Gia công răng sứ, phục hình thẩm mỹ. Thao tác trên các loại vật liệu Zirconia, Emax, kim loại.',
+    requirements: 'Tốt nghiệp Trung cấp Nha khoa.\nÍt nhất 1 năm kinh nghiệm làm việc tại labo.\nKhéo tay, tỉ mỉ, có mắt thẩm mỹ.',
+    benefits: 'Lương theo năng lực.\nBảo hiểm xã hội.\nThưởng lễ, tết.\nCơ hội thăng tiến.',
+    salaryRange: '10 - 18 triệu',
   },
   {
     id: 3,
-    title: 'Nhan vien kinh doanh',
+    title: 'Nhân viên kinh doanh',
     department: 'Kinh doanh',
     location: 'TP.HCM',
     type: 'full-time',
     active: false,
     applicationCount: 5,
     publishDate: '20/03/2026',
-    description: 'Tim kiem va phat trien khach hang moi (phong kham nha khoa, labo). Duy tri quan he khach hang hien tai.',
-    requirements: 'Tot nghiep Cao dang tro len.\nCo kinh nghiem kinh doanh B2B.\nKy nang giao tiep tot.\nCo xe may va GPLX.',
-    benefits: 'Luong co ban + hoa hong hap dan.\nHo tro chi phi di lai.\nBao hiem xa hoi.\nDu lich hang nam.',
-    salaryRange: '10 - 25 trieu',
+    description: 'Tìm kiếm và phát triển khách hàng mới (phòng khám nha khoa, labo). Duy trì quan hệ khách hàng hiện tại.',
+    requirements: 'Tốt nghiệp Cao đẳng trở lên.\nCó kinh nghiệm kinh doanh B2B.\nKỹ năng giao tiếp tốt.\nCó xe máy và GPLX.',
+    benefits: 'Lương cơ bản + hoa hồng hấp dẫn.\nHỗ trợ chi phí đi lại.\nBảo hiểm xã hội.\nDu lịch hàng năm.',
+    salaryRange: '10 - 25 triệu',
   },
 ];
 
 const initialApplications: Application[] = [
   {
     id: 1,
-    applicantName: 'Le Thi Mai',
+    applicantName: 'Lê Thị Mai',
     phone: '0912 111 222',
     email: 'mai.le@gmail.com',
-    appliedJob: 'Ky thuat vien CAD/CAM',
+    appliedJob: 'Kỹ thuật viên CAD/CAM',
     status: 'received',
     date: '12/04/2026',
     cvUrl: '#',
   },
   {
     id: 2,
-    applicantName: 'Nguyen Quoc Dat',
+    applicantName: 'Nguyễn Quốc Đạt',
     phone: '0987 333 444',
     email: 'dat.nguyen@gmail.com',
-    appliedJob: 'Ky thuat vien Labo',
+    appliedJob: 'Kỹ thuật viên Labo',
     status: 'reviewing',
     date: '11/04/2026',
     cvUrl: '#',
   },
   {
     id: 3,
-    applicantName: 'Tran Van Tien',
+    applicantName: 'Trần Văn Tiến',
     phone: '0903 555 666',
     email: 'tien.tran@gmail.com',
-    appliedJob: 'Nhan vien kinh doanh',
+    appliedJob: 'Nhân viên kinh doanh',
     status: 'interview',
     date: '10/04/2026',
     cvUrl: '#',
   },
   {
     id: 4,
-    applicantName: 'Pham Ngoc Anh',
+    applicantName: 'Phạm Ngọc Anh',
     phone: '0976 777 888',
     email: 'anh.pham@gmail.com',
-    appliedJob: 'Ky thuat vien CAD/CAM',
+    appliedJob: 'Kỹ thuật viên CAD/CAM',
     status: 'hired',
     date: '05/04/2026',
     cvUrl: '#',
   },
   {
     id: 5,
-    applicantName: 'Vo Hoang Long',
+    applicantName: 'Võ Hoàng Long',
     phone: '0918 999 000',
     email: 'long.vo@gmail.com',
-    appliedJob: 'Ky thuat vien Labo',
+    appliedJob: 'Kỹ thuật viên Labo',
     status: 'rejected',
     date: '03/04/2026',
     cvUrl: '#',
@@ -253,10 +253,10 @@ export default function RecruitmentPage() {
     <div style={{ padding: 0 }}>
       {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={pageTitle}>Quan ly Tuyen dung</h1>
+        <h1 style={pageTitle}>Quản lý Tuyển dụng</h1>
         <p style={pageSubtitle}>
-          {jobs.filter((j) => j.active).length} vi tri dang tuyen -{' '}
-          {applications.length} ho so ung tuyen
+          {jobs.filter((j) => j.active).length} vị trí đang tuyển -{' '}
+          {applications.length} hồ sơ ứng tuyển
         </p>
       </div>
 
@@ -270,8 +270,8 @@ export default function RecruitmentPage() {
         }}
       >
         {[
-          { key: 'postings' as ActiveTab, label: 'Tin tuyen dung', icon: Briefcase },
-          { key: 'applications' as ActiveTab, label: 'Ho so ung tuyen', icon: FileText },
+          { key: 'postings' as ActiveTab, label: 'Tin tuyển dụng', icon: Briefcase },
+          { key: 'applications' as ActiveTab, label: 'Hồ sơ ứng tuyển', icon: FileText },
         ].map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.key;
@@ -309,7 +309,7 @@ export default function RecruitmentPage() {
           <div style={{ marginBottom: 16 }}>
             <Button onClick={handleNewJob}>
               <Plus size={16} />
-              Tao tin moi
+              Tạo tin mới
             </Button>
           </div>
 
@@ -439,7 +439,7 @@ export default function RecruitmentPage() {
                       {job.applicationCount}
                     </div>
                     <div style={{ fontSize: 11, color: colors.textMuted, fontFamily: fonts.body }}>
-                      ung tuyen
+                      ứng tuyển
                     </div>
                   </div>
 
@@ -455,7 +455,7 @@ export default function RecruitmentPage() {
                       fontFamily: fonts.body,
                     }}
                   >
-                    {job.active ? 'Dang tuyen' : 'Da dong'}
+                    {job.active ? 'Đang tuyển' : 'Đã đóng'}
                   </span>
 
                   <button
@@ -469,7 +469,7 @@ export default function RecruitmentPage() {
                     }}
                   >
                     <Edit size={14} />
-                    Sua
+                    Sửa
                   </button>
                   <button
                     onClick={() => handleToggleActive(job.id)}
@@ -480,7 +480,7 @@ export default function RecruitmentPage() {
                       color: job.active ? colors.success : colors.textMuted,
                       padding: 4,
                     }}
-                    title={job.active ? 'Tat tuyen dung' : 'Bat tuyen dung'}
+                    title={job.active ? 'Tắt tuyển dụng' : 'Bật tuyển dụng'}
                   >
                     {job.active ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
                   </button>
@@ -656,11 +656,11 @@ export default function RecruitmentPage() {
                     cursor: 'pointer',
                   }}
                 >
-                  <option value="received">Da nhan</option>
-                  <option value="reviewing">Dang xem xet</option>
-                  <option value="interview">Phong van</option>
-                  <option value="hired">Da tuyen</option>
-                  <option value="rejected">Tu choi</option>
+                  <option value="received">Đã nhận</option>
+                  <option value="reviewing">Đang xem xét</option>
+                  <option value="interview">Phỏng vấn</option>
+                  <option value="hired">Đã tuyển</option>
+                  <option value="rejected">Từ chối</option>
                 </select>
               </div>
             </div>
@@ -672,26 +672,26 @@ export default function RecruitmentPage() {
       <Modal
         isOpen={showJobModal}
         onClose={() => setShowJobModal(false)}
-        title={editingJob ? 'Chinh sua tin tuyen dung' : 'Tao tin tuyen dung moi'}
+        title={editingJob ? 'Chỉnh sửa tin tuyển dụng' : 'Tạo tin tuyển dụng mới'}
         maxWidth={600}
       >
         <div>
           <Input
-            label="Tieu de"
-            placeholder="VD: Ky thuat vien CAD/CAM"
+            label="Tiêu đề"
+            placeholder="VD: Kỹ thuật viên CAD/CAM"
             value={jobForm.title}
             onChange={(e) => setJobForm({ ...jobForm, title: e.target.value })}
           />
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Input
-              label="Phong ban"
-              placeholder="VD: Ky thuat"
+              label="Phòng ban"
+              placeholder="VD: Kỹ thuật"
               value={jobForm.department}
               onChange={(e) => setJobForm({ ...jobForm, department: e.target.value })}
             />
             <Input
-              label="Dia diem"
+              label="Địa điểm"
               placeholder="VD: TP.HCM"
               value={jobForm.location}
               onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })}
@@ -710,7 +710,7 @@ export default function RecruitmentPage() {
                   fontFamily: fonts.body,
                 }}
               >
-                Loai hinh
+                Loại hình
               </label>
               <select
                 value={jobForm.type}
@@ -730,37 +730,37 @@ export default function RecruitmentPage() {
                   cursor: 'pointer',
                 }}
               >
-                <option value="full-time">Toan thoi gian</option>
-                <option value="part-time">Ban thoi gian</option>
+                <option value="full-time">Toàn thời gian</option>
+                <option value="part-time">Bán thời gian</option>
               </select>
             </div>
             <Input
-              label="Muc luong"
-              placeholder="VD: 12 - 20 trieu"
+              label="Mức lương"
+              placeholder="VD: 12 - 20 triệu"
               value={jobForm.salaryRange}
               onChange={(e) => setJobForm({ ...jobForm, salaryRange: e.target.value })}
             />
           </div>
 
           <Textarea
-            label="Mo ta cong viec"
-            placeholder="Mo ta chi tiet cong viec..."
+            label="Mô tả công việc"
+            placeholder="Mô tả chi tiết công việc..."
             rows={3}
             value={jobForm.description}
             onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })}
           />
 
           <Textarea
-            label="Yeu cau"
-            placeholder="Moi yeu cau tren mot dong..."
+            label="Yêu cầu"
+            placeholder="Mỗi yêu cầu trên một dòng..."
             rows={3}
             value={jobForm.requirements}
             onChange={(e) => setJobForm({ ...jobForm, requirements: e.target.value })}
           />
 
           <Textarea
-            label="Quyen loi"
-            placeholder="Moi quyen loi tren mot dong..."
+            label="Quyền lợi"
+            placeholder="Mỗi quyền lợi trên một dòng..."
             rows={3}
             value={jobForm.benefits}
             onChange={(e) => setJobForm({ ...jobForm, benefits: e.target.value })}
@@ -794,16 +794,16 @@ export default function RecruitmentPage() {
                 fontFamily: fonts.body,
               }}
             >
-              {jobForm.active ? 'Dang tuyen' : 'Tam dung'}
+              {jobForm.active ? 'Đang tuyển' : 'Tạm dừng'}
             </span>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
             <Button variant="secondary" onClick={() => setShowJobModal(false)}>
-              Huy
+              Hủy
             </Button>
             <Button onClick={handleSaveJob}>
-              {editingJob ? 'Cap nhat' : 'Tao tin'}
+              {editingJob ? 'Cập nhật' : 'Tạo tin'}
             </Button>
           </div>
         </div>

@@ -136,7 +136,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
           lineHeight: 1,
         }}
       >
-        \u00d7
+        ×
       </button>
     </div>
   );
@@ -145,50 +145,50 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
 // ---- Default Data ----
 
 const defaultHero: HeroData = {
-  title: 'Gia C\u00f4ng Nha Khoa Chuy\u00ean Nghi\u1ec7p',
+  title: 'Gia Công Nha Khoa Chuyên Nghiệp',
   subtitle:
-    'Alpha Digital Center - \u0110\u1ed1i t\u00e1c gia c\u00f4ng nha khoa h\u00e0ng \u0111\u1ea7u v\u1edbi c\u00f4ng ngh\u1ec7 CAD/CAM ti\u00ean ti\u1ebfn, \u0111\u1ea3m b\u1ea3o ch\u1ea5t l\u01b0\u1ee3ng v\u01b0\u1ee3t tr\u1ed9i cho m\u1ecdi s\u1ea3n ph\u1ea9m.',
+    'Alpha Digital Center - Đối tác gia công nha khoa hàng đầu với công nghệ CAD/CAM tiên tiến, đảm bảo chất lượng vượt trội cho mọi sản phẩm.',
   badge: 'Digital Service For Lab',
-  cta1Text: 'Xem s\u1ea3n ph\u1ea9m',
+  cta1Text: 'Xem sản phẩm',
   cta1Link: '/products',
-  cta2Text: 'Li\u00ean h\u1ec7 ngay',
+  cta2Text: 'Liên hệ ngay',
   cta2Link: '/contact',
 };
 
 const defaultStats: StatItem[] = [
-  { icon: 'Clock', value: '10+', label: 'N\u0103m kinh nghi\u1ec7m' },
-  { icon: 'Users', value: '500+', label: 'Labo \u0111\u1ed1i t\u00e1c' },
-  { icon: 'Package', value: '50,000+', label: 'S\u1ea3n ph\u1ea9m/n\u0103m' },
-  { icon: 'ThumbsUp', value: '99%', label: 'H\u00e0i l\u00f2ng' },
+  { icon: 'Clock', value: '10+', label: 'Năm kinh nghiệm' },
+  { icon: 'Users', value: '500+', label: 'Labo đối tác' },
+  { icon: 'Package', value: '50,000+', label: 'Sản phẩm/năm' },
+  { icon: 'ThumbsUp', value: '99%', label: 'Hài lòng' },
 ];
 
 const defaultUsps: UspItem[] = [
   {
-    title: 'C\u00f4ng ngh\u1ec7 CAD/CAM',
+    title: 'Công nghệ CAD/CAM',
     description:
-      '\u1ee8ng d\u1ee5ng c\u00f4ng ngh\u1ec7 CAD/CAM ti\u00ean ti\u1ebfn nh\u1ea5t trong thi\u1ebft k\u1ebf v\u00e0 gia c\u00f4ng nha khoa, \u0111\u1ea3m b\u1ea3o \u0111\u1ed9 ch\u00ednh x\u00e1c tuy\u1ec7t \u0111\u1ed1i.',
+      'Ứng dụng công nghệ CAD/CAM tiên tiến nhất trong thiết kế và gia công nha khoa, đảm bảo độ chính xác tuyệt đối.',
   },
   {
-    title: 'B\u1ea3o h\u00e0nh l\u00ean \u0111\u1ebfn 19 n\u0103m',
+    title: 'Bảo hành lên đến 19 năm',
     description:
-      'Cam k\u1ebft b\u1ea3o h\u00e0nh d\u00e0i h\u1ea1n cho t\u1ea5t c\u1ea3 s\u1ea3n ph\u1ea9m, th\u1ec3 hi\u1ec7n s\u1ef1 t\u1ef1 tin v\u00e0o ch\u1ea5t l\u01b0\u1ee3ng s\u1ea3n xu\u1ea5t.',
+      'Cam kết bảo hành dài hạn cho tất cả sản phẩm, thể hiện sự tự tin vào chất lượng sản xuất.',
   },
   {
-    title: 'V\u1eadt li\u1ec7u ch\u00ednh h\u00e3ng',
+    title: 'Vật liệu chính hãng',
     description:
-      'S\u1eed d\u1ee5ng 100% v\u1eadt li\u1ec7u ch\u00ednh h\u00e3ng t\u1eeb c\u00e1c th\u01b0\u01a1ng hi\u1ec7u h\u00e0ng \u0111\u1ea7u th\u1ebf gi\u1edbi nh\u01b0 Ivoclar, VITA, Kuraray.',
+      'Sử dụng 100% vật liệu chính hãng từ các thương hiệu hàng đầu thế giới như Ivoclar, VITA, Kuraray.',
   },
 ];
 
 const defaultProducts: FeaturedProduct[] = [
-  { id: '1', name: 'R\u0103ng s\u1ee9 Zirconia Multilayer', checked: true },
-  { id: '2', name: 'R\u0103ng s\u1ee9 E.max', checked: true },
-  { id: '3', name: 'Kh\u00e1m h\u00e0m \u0111\u1ee3i', checked: false },
-  { id: '4', name: 'M\u1eb7t d\u00e1n s\u1ee9 Veneer', checked: true },
+  { id: '1', name: 'Răng sứ Zirconia Multilayer', checked: true },
+  { id: '2', name: 'Răng sứ E.max', checked: true },
+  { id: '3', name: 'Khám hàm đợi', checked: false },
+  { id: '4', name: 'Mặt dán sứ Veneer', checked: true },
   { id: '5', name: 'Inlay / Onlay', checked: false },
-  { id: '6', name: 'Khung s\u01b0\u1eddn CoCr', checked: false },
-  { id: '7', name: 'H\u00e0m kh\u00f4ng Titanium', checked: true },
-  { id: '8', name: 'Nhi\u1ec7t l\u1ef1c h\u00e0m', checked: false },
+  { id: '6', name: 'Khung sườn CoCr', checked: false },
+  { id: '7', name: 'Hàm không Titanium', checked: true },
+  { id: '8', name: 'Nhiệt lực hàm', checked: false },
 ];
 
 // ---- Main Component ----
@@ -212,7 +212,7 @@ export default function HomepageManager() {
       // Placeholder: simulate API call
       await new Promise((r) => setTimeout(r, 600));
       setSaving(false);
-      showToast(`\u0110\u00e3 l\u01b0u ${section} th\u00e0nh c\u00f4ng!`);
+      showToast(`Đã lưu ${section} thành công!`);
     },
     [showToast]
   );
@@ -243,9 +243,9 @@ export default function HomepageManager() {
     <div style={{ padding: 0 }}>
       {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={pageTitle}>Qu\u1ea3n l\u00fd Trang ch\u1ee7</h1>
+        <h1 style={pageTitle}>Quản lý Trang chủ</h1>
         <p style={pageSubtitle}>
-          Ch\u1ec9nh s\u1eeda n\u1ed9i dung hi\u1ec3n th\u1ecb tr\u00ean trang ch\u1ee7 c\u1ee7a website
+          Chỉnh sửa nội dung hiển thị trên trang chủ của website
         </p>
       </div>
 
@@ -262,18 +262,18 @@ export default function HomepageManager() {
         >
           <div style={{ gridColumn: '1 / -1' }}>
             <Input
-              label="Ti\u00eau \u0111\u1ec1 ch\u00ednh"
+              label="Tiêu đề chính"
               value={hero.title}
               onChange={(e) => setHero({ ...hero, title: e.target.value })}
-              placeholder="Nh\u1eadp ti\u00eau \u0111\u1ec1 ch\u00ednh..."
+              placeholder="Nhập tiêu đề chính..."
             />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
             <Textarea
-              label="M\u00f4 t\u1ea3 ph\u1ee5"
+              label="Mô tả phụ"
               value={hero.subtitle}
               onChange={(e) => setHero({ ...hero, subtitle: e.target.value })}
-              placeholder="Nh\u1eadp m\u00f4 t\u1ea3 ph\u1ee5..."
+              placeholder="Nhập mô tả phụ..."
             />
           </div>
           <div style={{ gridColumn: '1 / -1' }}>
@@ -309,14 +309,14 @@ export default function HomepageManager() {
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
           <Button loading={saving} onClick={() => handleSave('Hero')}>
             <Save size={14} />
-            L\u01b0u Hero
+            Lưu Hero
           </Button>
         </div>
       </div>
 
       {/* Section 2: Stats */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={Star} title="Th\u1ed1ng k\u00ea" />
+        <SectionHeader icon={Star} title="Thống kê" />
 
         <div
           style={{
@@ -346,41 +346,41 @@ export default function HomepageManager() {
                   letterSpacing: 0.5,
                 }}
               >
-                Th\u1ed1ng k\u00ea {idx + 1}
+                Thống kê {idx + 1}
               </div>
               <Input
                 label="Icon"
                 value={stat.icon}
                 onChange={(e) => updateStat(idx, 'icon', e.target.value)}
-                placeholder="T\u00ean icon (Clock, Users, Package...)"
+                placeholder="Tên icon (Clock, Users, Package...)"
               />
               <Input
-                label="Gi\u00e1 tr\u1ecb"
+                label="Giá trị"
                 value={stat.value}
                 onChange={(e) => updateStat(idx, 'value', e.target.value)}
                 placeholder="VD: 10+"
               />
               <Input
-                label="Nh\u00e3n"
+                label="Nhãn"
                 value={stat.label}
                 onChange={(e) => updateStat(idx, 'label', e.target.value)}
-                placeholder="VD: N\u0103m kinh nghi\u1ec7m"
+                placeholder="VD: Năm kinh nghiệm"
               />
             </div>
           ))}
         </div>
 
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button loading={saving} onClick={() => handleSave('Th\u1ed1ng k\u00ea')}>
+          <Button loading={saving} onClick={() => handleSave('Thống kê')}>
             <Save size={14} />
-            L\u01b0u Th\u1ed1ng k\u00ea
+            Lưu Thống kê
           </Button>
         </div>
       </div>
 
       {/* Section 3: USPs */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={Award} title="\u0110i\u1ec3m m\u1ea1nh" />
+        <SectionHeader icon={Award} title="Điểm mạnh" />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {usps.map((usp, idx) => (
@@ -404,35 +404,35 @@ export default function HomepageManager() {
                   letterSpacing: 0.5,
                 }}
               >
-                \u0110i\u1ec3m m\u1ea1nh {idx + 1}
+                Điểm mạnh {idx + 1}
               </div>
               <Input
-                label="Ti\u00eau \u0111\u1ec1"
+                label="Tiêu đề"
                 value={usp.title}
                 onChange={(e) => updateUsp(idx, 'title', e.target.value)}
-                placeholder="Nh\u1eadp ti\u00eau \u0111\u1ec1..."
+                placeholder="Nhập tiêu đề..."
               />
               <Textarea
-                label="M\u00f4 t\u1ea3"
+                label="Mô tả"
                 value={usp.description}
                 onChange={(e) => updateUsp(idx, 'description', e.target.value)}
-                placeholder="Nh\u1eadp m\u00f4 t\u1ea3 chi ti\u1ebft..."
+                placeholder="Nhập mô tả chi tiết..."
               />
             </div>
           ))}
         </div>
 
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
-          <Button loading={saving} onClick={() => handleSave('\u0110i\u1ec3m m\u1ea1nh')}>
+          <Button loading={saving} onClick={() => handleSave('Điểm mạnh')}>
             <Save size={14} />
-            L\u01b0u \u0110i\u1ec3m m\u1ea1nh
+            Lưu Điểm mạnh
           </Button>
         </div>
       </div>
 
       {/* Section 4: Featured Products */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={ShoppingBag} title="S\u1ea3n ph\u1ea9m n\u1ed5i b\u1eadt" />
+        <SectionHeader icon={ShoppingBag} title="Sản phẩm nổi bật" />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
           {products.map((product) => (
@@ -492,10 +492,10 @@ export default function HomepageManager() {
         <div style={{ marginTop: 16, display: 'flex', justifyContent: 'flex-end' }}>
           <Button
             loading={saving}
-            onClick={() => handleSave('S\u1ea3n ph\u1ea9m n\u1ed5i b\u1eadt')}
+            onClick={() => handleSave('Sản phẩm nổi bật')}
           >
             <Save size={14} />
-            L\u01b0u S\u1ea3n ph\u1ea9m n\u1ed5i b\u1eadt
+            Lưu Sản phẩm nổi bật
           </Button>
         </div>
       </div>

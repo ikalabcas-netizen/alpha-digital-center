@@ -136,7 +136,7 @@ function Toast({ message, onClose }: { message: string; onClose: () => void }) {
           lineHeight: 1,
         }}
       >
-        \u00d7
+        ×
       </button>
     </div>
   );
@@ -151,72 +151,72 @@ function nextId() {
 
 const defaultMission: MissionData = {
   mission:
-    'Tr\u1edf th\u00e0nh \u0111\u1ed1i t\u00e1c gia c\u00f4ng nha khoa tin c\u1eady nh\u1ea5t t\u1ea1i Vi\u1ec7t Nam, mang \u0111\u1ebfn s\u1ea3n ph\u1ea9m ch\u1ea5t l\u01b0\u1ee3ng qu\u1ed1c t\u1ebf v\u1edbi gi\u00e1 th\u00e0nh h\u1ee3p l\u00fd.',
+    'Trở thành đối tác gia công nha khoa tin cậy nhất tại Việt Nam, mang đến sản phẩm chất lượng quốc tế với giá thành hợp lý.',
   vision:
-    'D\u1eabn \u0111\u1ea7u ng\u00e0nh gia c\u00f4ng nha khoa s\u1ed1 t\u1ea1i Vi\u1ec7t Nam v\u00e0 v\u01b0\u01a1n t\u1ea7m khu v\u1ef1c \u0110\u00f4ng Nam \u00c1 v\u00e0o n\u0103m 2030.',
+    'Dẫn đầu ngành gia công nha khoa số tại Việt Nam và vươn tầm khu vực Đông Nam Á vào năm 2030.',
   values:
-    'Ch\u1ea5t l\u01b0\u1ee3ng - Ch\u00ednh x\u00e1c - \u0110\u1ed5i m\u1edbi - T\u1eadn t\u00e2m. Ch\u00fang t\u00f4i lu\u00f4n \u0111\u1eb7t ch\u1ea5t l\u01b0\u1ee3ng s\u1ea3n ph\u1ea9m l\u00ean h\u00e0ng \u0111\u1ea7u, kh\u00f4ng ng\u1eebng c\u1ea3i ti\u1ebfn c\u00f4ng ngh\u1ec7 v\u00e0 ph\u1ee5c v\u1ee5 kh\u00e1ch h\u00e0ng b\u1eb1ng s\u1ef1 t\u1eadn t\u00e2m.',
+    'Chất lượng - Chính xác - Đổi mới - Tận tâm. Chúng tôi luôn đặt chất lượng sản phẩm lên hàng đầu, không ngừng cải tiến công nghệ và phục vụ khách hàng bằng sự tận tâm.',
 };
 
 const defaultMilestones: Milestone[] = [
   {
     id: '1',
     year: '2014',
-    title: 'Th\u00e0nh l\u1eadp',
+    title: 'Thành lập',
     description:
-      'Alpha Digital Center \u0111\u01b0\u1ee3c th\u00e0nh l\u1eadp t\u1ea1i TP.HCM v\u1edbi \u0111\u1ed9i ng\u0169 5 k\u1ef9 thu\u1eadt vi\u00ean.',
+      'Alpha Digital Center được thành lập tại TP.HCM với đội ngũ 5 kỹ thuật viên.',
   },
   {
     id: '2',
     year: '2016',
-    title: '\u0110\u1ea7u t\u01b0 CAD/CAM',
+    title: 'Đầu tư CAD/CAM',
     description:
-      '\u0110\u1ea7u t\u01b0 h\u1ec7 th\u1ed1ng CAD/CAM \u0111\u1ea7u ti\u00ean, n\u00e2ng c\u1ea5p n\u0103ng l\u1ef1c s\u1ea3n xu\u1ea5t s\u1ed1.',
+      'Đầu tư hệ thống CAD/CAM đầu tiên, nâng cấp năng lực sản xuất số.',
   },
   {
     id: '3',
     year: '2018',
-    title: 'M\u1edf r\u1ed9ng quy m\u00f4',
+    title: 'Mở rộng quy mô',
     description:
-    'M\u1edf r\u1ed9ng nh\u00e0 x\u01b0\u1edfng l\u00ean 300m\u00b2, \u0111\u1ea1t 200+ labo \u0111\u1ed1i t\u00e1c.',
+    'Mở rộng nhà xưởng lên 300m², đạt 200+ labo đối tác.',
   },
   {
     id: '4',
     year: '2021',
-    title: 'CNC 5 tr\u1ee5c',
+    title: 'CNC 5 trục',
     description:
-      '\u0110\u1ea7u t\u01b0 m\u00e1y CNC 5 tr\u1ee5c v\u00e0 scanner 3D th\u1ebf h\u1ec7 m\u1edbi.',
+      'Đầu tư máy CNC 5 trục và scanner 3D thế hệ mới.',
   },
   {
     id: '5',
     year: '2023',
-    title: 'Chuy\u1ec3n \u0111\u1ed5i s\u1ed1',
+    title: 'Chuyển đổi số',
     description:
-      'Tri\u1ec3n khai h\u1ec7 th\u1ed1ng qu\u1ea3n l\u00fd s\u1ed1 to\u00e0n di\u1ec7n, \u0111\u1ea1t 500+ labo \u0111\u1ed1i t\u00e1c.',
+      'Triển khai hệ thống quản lý số toàn diện, đạt 500+ labo đối tác.',
   },
 ];
 
 const defaultEquipment: Equipment[] = [
   {
     id: '1',
-    name: 'M\u00e1y CNC 5 tr\u1ee5c',
+    name: 'Máy CNC 5 trục',
     description:
-      'M\u00e1y phay CNC 5 tr\u1ee5c chuy\u00ean d\u1ee5ng cho gia c\u00f4ng Zirconia v\u00e0 kim lo\u1ea1i nha khoa.',
-    specs: '\u0110\u1ed9 ch\u00ednh x\u00e1c: \u00b15\u03bcm\nT\u1ed1c \u0111\u1ed9 tr\u1ee5c ch\u00ednh: 60,000 rpm\nS\u1ed1 tr\u1ee5c: 5 tr\u1ee5c \u0111\u1ed3ng th\u1eddi',
+      'Máy phay CNC 5 trục chuyên dụng cho gia công Zirconia và kim loại nha khoa.',
+    specs: 'Độ chính xác: ±5μm\nTốc độ trục chính: 60,000 rpm\nSố trục: 5 trục đồng thời',
   },
   {
     id: '2',
     name: 'Scanner 3D',
     description:
-      'M\u00e1y qu\u00e9t 3D \u0111\u1ed9 ph\u00e2n gi\u1ea3i cao cho scan m\u1eabu v\u00e0 scan trong mi\u1ec7ng.',
-    specs: '\u0110\u1ed9 ph\u00e2n gi\u1ea3i: 7\u03bcm\nT\u1ed1c \u0111\u1ed9 qu\u00e9t: 10 gi\u00e2y/c\u1ea7u\nC\u00f4ng ngh\u1ec7: \u00c1nh s\u00e1ng c\u1ea5u tr\u00fac',
+      'Máy quét 3D độ phân giải cao cho scan mẫu và scan trong miệng.',
+    specs: 'Độ phân giải: 7μm\nTốc độ quét: 10 giây/cầu\nCông nghệ: Ánh sáng cấu trúc',
   },
   {
     id: '3',
-    name: 'M\u00e1y in 3D',
+    name: 'Máy in 3D',
     description:
-      'M\u00e1y in 3D SLA cho in m\u1eabu, h\u01b0\u1edbng d\u1eabn ph\u1eabu thu\u1eadt v\u00e0 kh\u00e1m h\u00e0m.',
-    specs: '\u0110\u1ed9 ph\u00e2n gi\u1ea3i l\u1edbp: 25\u03bcm\n\u0110\u1ed9 ch\u00ednh x\u00e1c XY: 50\u03bcm\nV\u1eadt li\u1ec7u: Resin nha khoa',
+      'Máy in 3D SLA cho in mẫu, hướng dẫn phẫu thuật và khám hàm.',
+    specs: 'Độ phân giải lớp: 25μm\nĐộ chính xác XY: 50μm\nVật liệu: Resin nha khoa',
   },
 ];
 
@@ -247,7 +247,7 @@ export default function AboutManager() {
     // Placeholder: simulate API call
     await new Promise((r) => setTimeout(r, 800));
     setSaving(false);
-    showToast('\u0110\u00e3 l\u01b0u t\u1ea5t c\u1ea3 n\u1ed9i dung th\u00e0nh c\u00f4ng!');
+    showToast('Đã lưu tất cả nội dung thành công!');
   }, [showToast]);
 
   // Milestones
@@ -298,42 +298,42 @@ export default function AboutManager() {
     <div style={{ padding: 0 }}>
       {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
-        <h1 style={pageTitle}>Qu\u1ea3n l\u00fd Gi\u1edbi thi\u1ec7u</h1>
+        <h1 style={pageTitle}>Quản lý Giới thiệu</h1>
         <p style={pageSubtitle}>
-          Ch\u1ec9nh s\u1eeda n\u1ed9i dung trang Gi\u1edbi thi\u1ec7u c\u1ee7a website
+          Chỉnh sửa nội dung trang Giới thiệu của website
         </p>
       </div>
 
       {/* Section 1: Mission / Vision / Values */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={Target} title="S\u1ee9 m\u1ec7nh / T\u1ea7m nh\u00ecn / Gi\u00e1 tr\u1ecb" />
+        <SectionHeader icon={Target} title="Sứ mệnh / Tầm nhìn / Giá trị" />
 
         <Textarea
-          label="S\u1ee9 m\u1ec7nh"
+          label="Sứ mệnh"
           value={mission.mission}
           onChange={(e) => setMission({ ...mission, mission: e.target.value })}
-          placeholder="Nh\u1eadp s\u1ee9 m\u1ec7nh c\u1ee7a c\u00f4ng ty..."
+          placeholder="Nhập sứ mệnh của công ty..."
           style={{ minHeight: 100 }}
         />
         <Textarea
-          label="T\u1ea7m nh\u00ecn"
+          label="Tầm nhìn"
           value={mission.vision}
           onChange={(e) => setMission({ ...mission, vision: e.target.value })}
-          placeholder="Nh\u1eadp t\u1ea7m nh\u00ecn c\u1ee7a c\u00f4ng ty..."
+          placeholder="Nhập tầm nhìn của công ty..."
           style={{ minHeight: 100 }}
         />
         <Textarea
-          label="Gi\u00e1 tr\u1ecb c\u1ed1t l\u00f5i"
+          label="Giá trị cốt lõi"
           value={mission.values}
           onChange={(e) => setMission({ ...mission, values: e.target.value })}
-          placeholder="Nh\u1eadp gi\u00e1 tr\u1ecb c\u1ed1t l\u00f5i..."
+          placeholder="Nhập giá trị cốt lõi..."
           style={{ minHeight: 100 }}
         />
       </div>
 
       {/* Section 2: Timeline / Milestones */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={Clock} title="L\u1ecbch s\u1eed ph\u00e1t tri\u1ec3n" />
+        <SectionHeader icon={Clock} title="Lịch sử phát triển" />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {milestones.map((milestone, idx) => (
@@ -365,7 +365,7 @@ export default function AboutManager() {
                     letterSpacing: 0.5,
                   }}
                 >
-                  M\u1ed1c {idx + 1}
+                  Mốc {idx + 1}
                 </div>
                 <Button
                   variant="danger"
@@ -374,7 +374,7 @@ export default function AboutManager() {
                   style={{ padding: '4px 8px' }}
                 >
                   <Trash2 size={13} />
-                  X\u00f3a
+                  Xóa
                 </Button>
               </div>
               <div
@@ -385,7 +385,7 @@ export default function AboutManager() {
                 }}
               >
                 <Input
-                  label="N\u0103m"
+                  label="Năm"
                   value={milestone.year}
                   onChange={(e) =>
                     updateMilestone(milestone.id, 'year', e.target.value)
@@ -393,21 +393,21 @@ export default function AboutManager() {
                   placeholder="VD: 2014"
                 />
                 <Input
-                  label="Ti\u00eau \u0111\u1ec1"
+                  label="Tiêu đề"
                   value={milestone.title}
                   onChange={(e) =>
                     updateMilestone(milestone.id, 'title', e.target.value)
                   }
-                  placeholder="Nh\u1eadp ti\u00eau \u0111\u1ec1 m\u1ed1c..."
+                  placeholder="Nhập tiêu đề mốc..."
                 />
               </div>
               <Textarea
-                label="M\u00f4 t\u1ea3"
+                label="Mô tả"
                 value={milestone.description}
                 onChange={(e) =>
                   updateMilestone(milestone.id, 'description', e.target.value)
                 }
-                placeholder="M\u00f4 t\u1ea3 chi ti\u1ebft..."
+                placeholder="Mô tả chi tiết..."
               />
             </div>
           ))}
@@ -416,14 +416,14 @@ export default function AboutManager() {
         <div style={{ marginTop: 14 }}>
           <Button variant="secondary" onClick={addMilestone}>
             <Plus size={14} />
-            Th\u00eam m\u1ed1c m\u1edbi
+            Thêm mốc mới
           </Button>
         </div>
       </div>
 
       {/* Section 3: Equipment & Technology */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={Cpu} title="Thi\u1ebft b\u1ecb & C\u00f4ng ngh\u1ec7" />
+        <SectionHeader icon={Cpu} title="Thiết bị & Công nghệ" />
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {equipment.map((eq, idx) => (
@@ -454,7 +454,7 @@ export default function AboutManager() {
                     letterSpacing: 0.5,
                   }}
                 >
-                  Thi\u1ebft b\u1ecb {idx + 1}
+                  Thiết bị {idx + 1}
                 </div>
                 <Button
                   variant="danger"
@@ -463,32 +463,32 @@ export default function AboutManager() {
                   style={{ padding: '4px 8px' }}
                 >
                   <Trash2 size={13} />
-                  X\u00f3a
+                  Xóa
                 </Button>
               </div>
               <Input
-                label="T\u00ean thi\u1ebft b\u1ecb"
+                label="Tên thiết bị"
                 value={eq.name}
                 onChange={(e) =>
                   updateEquipment(eq.id, 'name', e.target.value)
                 }
-                placeholder="Nh\u1eadp t\u00ean thi\u1ebft b\u1ecb..."
+                placeholder="Nhập tên thiết bị..."
               />
               <Textarea
-                label="M\u00f4 t\u1ea3"
+                label="Mô tả"
                 value={eq.description}
                 onChange={(e) =>
                   updateEquipment(eq.id, 'description', e.target.value)
                 }
-                placeholder="M\u00f4 t\u1ea3 thi\u1ebft b\u1ecb..."
+                placeholder="Mô tả thiết bị..."
               />
               <Textarea
-                label="Th\u00f4ng s\u1ed1 k\u1ef9 thu\u1eadt"
+                label="Thông số kỹ thuật"
                 value={eq.specs}
                 onChange={(e) =>
                   updateEquipment(eq.id, 'specs', e.target.value)
                 }
-                placeholder="Th\u00f4ng s\u1ed1 k\u1ef9 thu\u1eadt (m\u1ed7i d\u00f2ng m\u1ed9t th\u00f4ng s\u1ed1)..."
+                placeholder="Thông số kỹ thuật (mỗi dòng một thông số)..."
               />
             </div>
           ))}
@@ -497,14 +497,14 @@ export default function AboutManager() {
         <div style={{ marginTop: 14 }}>
           <Button variant="secondary" onClick={addEquipment}>
             <Plus size={14} />
-            Th\u00eam thi\u1ebft b\u1ecb m\u1edbi
+            Thêm thiết bị mới
           </Button>
         </div>
       </div>
 
       {/* Section 4: Team Stats */}
       <div style={{ ...cardStyle, padding: '22px 24px', marginBottom: 16 }}>
-        <SectionHeader icon={Users} title="\u0110\u1ed9i ng\u0169" />
+        <SectionHeader icon={Users} title="Đội ngũ" />
 
         <div
           style={{
@@ -528,7 +528,7 @@ export default function AboutManager() {
               onChange={(e) =>
                 setTeam({ ...team, cadcam: Number(e.target.value) || 0 })
               }
-              placeholder="S\u1ed1 l\u01b0\u1ee3ng"
+              placeholder="Số lượng"
             />
           </div>
           <div
@@ -546,7 +546,7 @@ export default function AboutManager() {
               onChange={(e) =>
                 setTeam({ ...team, labo: Number(e.target.value) || 0 })
               }
-              placeholder="S\u1ed1 l\u01b0\u1ee3ng"
+              placeholder="Số lượng"
             />
           </div>
           <div
@@ -564,7 +564,7 @@ export default function AboutManager() {
               onChange={(e) =>
                 setTeam({ ...team, sales: Number(e.target.value) || 0 })
               }
-              placeholder="S\u1ed1 l\u01b0\u1ee3ng"
+              placeholder="Số lượng"
             />
           </div>
           <div
@@ -576,13 +576,13 @@ export default function AboutManager() {
             }}
           >
             <Input
-              label="H\u00e0nh ch\u00ednh"
+              label="Hành chính"
               type="number"
               value={String(team.admin)}
               onChange={(e) =>
                 setTeam({ ...team, admin: Number(e.target.value) || 0 })
               }
-              placeholder="S\u1ed1 l\u01b0\u1ee3ng"
+              placeholder="Số lượng"
             />
           </div>
         </div>
@@ -598,7 +598,7 @@ export default function AboutManager() {
       >
         <Button size="lg" loading={saving} onClick={handleSaveAll}>
           <Save size={16} />
-          L\u01b0u t\u1ea5t c\u1ea3
+          Lưu tất cả
         </Button>
       </div>
 

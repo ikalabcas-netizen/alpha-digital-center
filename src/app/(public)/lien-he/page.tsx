@@ -33,12 +33,12 @@ const INITIAL_FORM: FormData = {
 };
 
 const PRODUCT_OPTIONS = [
-  'Toan su (Zirconia)',
-  'Su ep (E.Max)',
-  'Kim loai',
-  'Thao lap',
+  'Toàn sứ (Zirconia)',
+  'Sứ ép (E.Max)',
+  'Kim loại',
+  'Tháo lắp',
   'Implant',
-  'Khac',
+  'Khác',
 ];
 
 export default function LienHePage() {
@@ -63,12 +63,12 @@ export default function LienHePage() {
         body: JSON.stringify(form),
       });
 
-      if (!res.ok) throw new Error('Gui that bai');
+      if (!res.ok) throw new Error('Gửi thất bại');
 
       setSubmitted(true);
       setForm(INITIAL_FORM);
     } catch {
-      setError('Co loi xay ra. Vui long thu lai hoac goi truc tiep hotline.');
+      setError('Có lỗi xảy ra. Vui lòng thử lại hoặc gọi trực tiếp hotline.');
     } finally {
       setLoading(false);
     }
@@ -105,7 +105,7 @@ export default function LienHePage() {
               marginBottom: 16,
             }}
           >
-            Lien he
+            Liên hệ
           </div>
           <h1
             style={{
@@ -117,7 +117,7 @@ export default function LienHePage() {
               marginBottom: 12,
             }}
           >
-            Lien He & <span style={{ color: colors.primary }}>Bao Gia</span>
+            Liên Hệ & <span style={{ color: colors.primary }}>Báo Giá</span>
           </h1>
           <p
             style={{
@@ -128,8 +128,8 @@ export default function LienHePage() {
               margin: '0 auto',
             }}
           >
-            San sang ho tro ban! Gui yeu cau bao gia hoac lien he truc tiep qua
-            hotline va Zalo de duoc tu van nhanh nhat.
+            Sẵn sàng hỗ trợ bạn! Gửi yêu cầu báo giá hoặc liên hệ trực tiếp qua
+            hotline và Zalo để được tư vấn nhanh nhất.
           </p>
         </div>
       </section>
@@ -168,7 +168,7 @@ export default function LienHePage() {
                   marginBottom: 20,
                 }}
               >
-                Thong tin lien he
+                Thông tin liên hệ
               </h2>
 
               {[
@@ -186,13 +186,13 @@ export default function LienHePage() {
                 },
                 {
                   icon: MapPin,
-                  label: 'Dia chi',
-                  value: '242/12 Pham Van Hai, Q. Tan Binh, TP.HCM',
+                  label: 'Địa chỉ',
+                  value: '242/12 Phạm Văn Hải, Q. Tân Bình, TP.HCM',
                   href: undefined,
                 },
                 {
                   icon: Clock,
-                  label: 'Gio lam viec',
+                  label: 'Giờ làm việc',
                   value: 'T2 - T7: 8:00 - 17:30',
                   href: undefined,
                 },
@@ -294,7 +294,7 @@ export default function LienHePage() {
                     Chat qua Zalo
                   </div>
                   <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
-                    Tu van nhanh, gui file tien loi
+                    Tư vấn nhanh, gửi file tiện lợi
                   </div>
                 </div>
               </div>
@@ -327,7 +327,7 @@ export default function LienHePage() {
                     marginBottom: 10,
                   }}
                 >
-                  Gui thanh cong!
+                  Gửi thành công!
                 </h3>
                 <p
                   style={{
@@ -337,8 +337,8 @@ export default function LienHePage() {
                     marginBottom: 24,
                   }}
                 >
-                  Cam on ban da quan tam. Doi ngu kinh doanh se lien he voi ban
-                  trong vong 2 gio lam viec.
+                  Cảm ơn bạn đã quan tâm. Đội ngũ kinh doanh sẽ liên hệ với bạn
+                  trong vòng 2 giờ làm việc.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
@@ -348,7 +348,7 @@ export default function LienHePage() {
                     fontSize: 14,
                   }}
                 >
-                  Gui yeu cau khac
+                  Gửi yêu cầu khác
                 </button>
               </div>
             ) : (
@@ -362,7 +362,7 @@ export default function LienHePage() {
                     marginBottom: 6,
                   }}
                 >
-                  Yeu cau bao gia
+                  Yêu cầu báo giá
                 </h2>
                 <p
                   style={{
@@ -371,7 +371,7 @@ export default function LienHePage() {
                     marginBottom: 24,
                   }}
                 >
-                  Dien thong tin ben duoi, chung toi se phan hoi trong thoi gian som nhat.
+                  Điền thông tin bên dưới, chúng tôi sẽ phản hồi trong thời gian sớm nhất.
                 </p>
 
                 {error && (
@@ -404,7 +404,7 @@ export default function LienHePage() {
                   >
                     <div>
                       <label style={labelStyle}>
-                        Ten labo / Phong kham <span style={{ color: colors.danger }}>*</span>
+                        Tên labo / Phòng khám <span style={{ color: colors.danger }}>*</span>
                       </label>
                       <input
                         type="text"
@@ -417,20 +417,20 @@ export default function LienHePage() {
                     </div>
                     <div>
                       <label style={labelStyle}>
-                        Nguoi lien he <span style={{ color: colors.danger }}>*</span>
+                        Người liên hệ <span style={{ color: colors.danger }}>*</span>
                       </label>
                       <input
                         type="text"
                         value={form.contactPerson}
                         onChange={(e) => handleChange('contactPerson', e.target.value)}
                         required
-                        placeholder="Ho va ten"
+                        placeholder="Họ và tên"
                         style={{ ...inputStyle, padding: '10px 12px' }}
                       />
                     </div>
                     <div>
                       <label style={labelStyle}>
-                        So dien thoai <span style={{ color: colors.danger }}>*</span>
+                        Số điện thoại <span style={{ color: colors.danger }}>*</span>
                       </label>
                       <input
                         type="tel"
@@ -454,7 +454,7 @@ export default function LienHePage() {
                   </div>
 
                   <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>San pham quan tam</label>
+                    <label style={labelStyle}>Sản phẩm quan tâm</label>
                     <select
                       value={form.productInterest}
                       onChange={(e) => handleChange('productInterest', e.target.value)}
@@ -464,7 +464,7 @@ export default function LienHePage() {
                         appearance: 'auto',
                       }}
                     >
-                      <option value="">-- Chon san pham --</option>
+                      <option value="">-- Chọn sản phẩm --</option>
                       {PRODUCT_OPTIONS.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}
@@ -474,12 +474,12 @@ export default function LienHePage() {
                   </div>
 
                   <div style={{ marginBottom: 24 }}>
-                    <label style={labelStyle}>Noi dung yeu cau</label>
+                    <label style={labelStyle}>Nội dung yêu cầu</label>
                     <textarea
                       value={form.message}
                       onChange={(e) => handleChange('message', e.target.value)}
                       rows={4}
-                      placeholder="Mo ta nhu cau gia cong, so luong, thoi gian mong muon..."
+                      placeholder="Mô tả nhu cầu gia công, số lượng, thời gian mong muốn..."
                       style={{
                         ...inputStyle,
                         padding: '10px 12px',
@@ -509,7 +509,7 @@ export default function LienHePage() {
                     ) : (
                       <Send size={16} />
                     )}
-                    {loading ? 'Dang gui...' : 'Gui yeu cau bao gia'}
+                    {loading ? 'Đang gửi...' : 'Gửi yêu cầu báo giá'}
                   </button>
                 </form>
               </>

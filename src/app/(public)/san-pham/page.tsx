@@ -11,50 +11,50 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'San pham | Alpha Digital Center',
+  title: 'Sản phẩm | Alpha Digital Center',
   description:
-    'Danh muc san pham gia cong nha khoa: Toan su Zirconia, Su ep, Kim loai, Thao lap, Implant. Vat lieu chinh hang, bao hanh dai han.',
+    'Danh mục sản phẩm gia công nha khoa: Toàn sứ Zirconia, Sứ ép, Kim loại, Tháo lắp, Implant. Vật liệu chính hãng, bảo hành dài hạn.',
 };
 
 const CATEGORIES = [
   {
     slug: 'toan-su',
-    name: 'Toan su (Zirconia)',
+    name: 'Toàn sứ (Zirconia)',
     icon: Crown,
     description:
-      'Phuc hinh toan su cao cap tu Zirconia Cercon HT, Zolid, Katana. Do ben vuot troi, tham my tu nhien, bao hanh len den 19 nam.',
+      'Phục hình toàn sứ cao cấp từ Zirconia Cercon HT, Zolid, Katana. Độ bền vượt trội, thẩm mỹ tự nhiên, bảo hành lên đến 19 năm.',
     products: ['Cercon HT', 'Zolid', 'Katana UTML', 'Prettau'],
   },
   {
     slug: 'su-ep',
-    name: 'Su ep',
+    name: 'Sứ ép',
     icon: Flame,
     description:
-      'Su ep Lithium Disilicate E.Max tu Ivoclar. Tham my toi uu cho vung rang truoc, do trong suot tu nhien.',
+      'Sứ ép Lithium Disilicate E.Max từ Ivoclar. Thẩm mỹ tối ưu cho vùng răng trước, độ trong suốt tự nhiên.',
     products: ['E.Max Press', 'E.Max CAD', 'Initial LiSi'],
   },
   {
     slug: 'kim-loai',
-    name: 'Kim loai',
+    name: 'Kim loại',
     icon: Cog,
     description:
-      'Khung suon kim loai CoCr, NiCr phay CNC chinh xac. Su kim loai truyen thong voi do ben cao.',
-    products: ['CoCr', 'NiCr', 'Titanium', 'Su kim loai'],
+      'Khung sườn kim loại CoCr, NiCr phay CNC chính xác. Sứ kim loại truyền thống với độ bền cao.',
+    products: ['CoCr', 'NiCr', 'Titanium', 'Sứ kim loại'],
   },
   {
     slug: 'thao-lap',
-    name: 'Thao lap',
+    name: 'Tháo lắp',
     icon: Puzzle,
     description:
-      'Ham thao lap ban phan, toan phan. Khung suon CoCr phay CNC, rang nhua nhap khau, mat doan chinh xac.',
-    products: ['Khung CoCr', 'Ham nhua', 'Valplast', 'Rang Ivoclar'],
+      'Hàm tháo lắp bán phần, toàn phần. Khung sườn CoCr phay CNC, răng nhựa nhập khẩu, mắt đoán chính xác.',
+    products: ['Khung CoCr', 'Hàm nhựa', 'Valplast', 'Răng Ivoclar'],
   },
   {
     slug: 'implant',
     name: 'Implant',
     icon: CircleDot,
     description:
-      'Custom Abutment Titanium/Zirconia, phuc hinh tren Implant. Tuong thich moi he Implant pho bien.',
+      'Custom Abutment Titanium/Zirconia, phục hình trên Implant. Tương thích mọi hệ Implant phổ biến.',
     products: ['Custom Abutment', 'Screw-retained', 'Cement-retained', 'All-on-X'],
   },
 ];
@@ -82,7 +82,7 @@ export default function SanPhamPage() {
               marginBottom: 16,
             }}
           >
-            Danh muc san pham
+            Danh mục sản phẩm
           </div>
           <h1
             style={{
@@ -94,7 +94,7 @@ export default function SanPhamPage() {
               marginBottom: 12,
             }}
           >
-            San Pham <span style={{ color: colors.primary }}>Gia Cong Nha Khoa</span>
+            Sản Phẩm <span style={{ color: colors.primary }}>Gia Công Nha Khoa</span>
           </h1>
           <p
             style={{
@@ -105,8 +105,8 @@ export default function SanPhamPage() {
               margin: '0 auto',
             }}
           >
-            Alpha Digital Center cung cap day du cac dong san pham gia cong ban thanh pham
-            cho labo nha khoa. Vat lieu chinh hang, cong nghe CAD/CAM hien dai.
+            Alpha Digital Center cung cấp đầy đủ các dòng sản phẩm gia công bán thành phẩm
+            cho labo nha khoa. Vật liệu chính hãng, công nghệ CAD/CAM hiện đại.
           </p>
         </div>
       </section>
@@ -190,7 +190,7 @@ export default function SanPhamPage() {
                           letterSpacing: 0.5,
                         }}
                       >
-                        San pham tieu bieu
+                        Sản phẩm tiêu biểu
                       </div>
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                         {cat.products.map((p) => (
@@ -221,7 +221,7 @@ export default function SanPhamPage() {
                         color: colors.primary,
                       }}
                     >
-                      Xem chi tiet <ArrowRight size={14} />
+                      Xem chi tiết <ArrowRight size={14} />
                     </div>
                   </div>
                 </Link>
@@ -249,7 +249,7 @@ export default function SanPhamPage() {
               marginBottom: 10,
             }}
           >
-            Can tu van san pham?
+            Cần tư vấn sản phẩm?
           </h2>
           <p
             style={{
@@ -259,7 +259,7 @@ export default function SanPhamPage() {
               lineHeight: 1.6,
             }}
           >
-            Lien he doi ngu kinh doanh de duoc tu van chi tiet va nhan bang gia tot nhat.
+            Liên hệ đội ngũ kinh doanh để được tư vấn chi tiết và nhận bảng giá tốt nhất.
           </p>
           <Link href="/lien-he">
             <button
@@ -275,7 +275,7 @@ export default function SanPhamPage() {
                 fontFamily: fonts.body,
               }}
             >
-              Lien he bao gia
+              Liên hệ báo giá
             </button>
           </Link>
         </div>

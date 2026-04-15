@@ -14,55 +14,55 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Tuyen dung | Alpha Digital Center',
+  title: 'Tuyển dụng | Alpha Digital Center',
   description:
-    'Co hoi nghe nghiep tai Alpha Digital Center. Gia nhap doi ngu ky thuat vien nha khoa chuyen nghiep, moi truong lam viec hien dai.',
+    'Cơ hội nghề nghiệp tại Alpha Digital Center. Gia nhập đội ngũ kỹ thuật viên nha khoa chuyên nghiệp, môi trường làm việc hiện đại.',
 };
 
 const BENEFITS = [
   {
     icon: TrendingUp,
-    title: 'Phat trien nghe nghiep',
-    description: 'Co hoi hoc hoi va phat trien ky nang voi cong nghe CAD/CAM, in 3D tien tien nhat.',
+    title: 'Phát triển nghề nghiệp',
+    description: 'Cơ hội học hỏi và phát triển kỹ năng với công nghệ CAD/CAM, in 3D tiên tiến nhất.',
   },
   {
     icon: Heart,
-    title: 'Phuc loi hap dan',
-    description: 'Luong canh tranh, BHXH day du, thuong le tet, team building hang quy.',
+    title: 'Phúc lợi hấp dẫn',
+    description: 'Lương cạnh tranh, BHXH đầy đủ, thưởng lễ tết, team building hàng quý.',
   },
   {
     icon: GraduationCap,
-    title: 'Dao tao lien tuc',
-    description: 'Chuong trinh dao tao noi bo, tham gia hoi nghi chuyen nganh, cap nhat cong nghe moi.',
+    title: 'Đào tạo liên tục',
+    description: 'Chương trình đào tạo nội bộ, tham gia hội nghị chuyên ngành, cập nhật công nghệ mới.',
   },
   {
     icon: Users,
-    title: 'Moi truong than thien',
-    description: 'Doi ngu tre, nang dong, ho tro lan nhau. Van hoa lam viec coi mo va sang tao.',
+    title: 'Môi trường thân thiện',
+    description: 'Đội ngũ trẻ, năng động, hỗ trợ lẫn nhau. Văn hóa làm việc cởi mở và sáng tạo.',
   },
 ];
 
 const PLACEHOLDER_JOBS = [
   {
-    title: 'Ky thuat vien CAD/CAM',
-    type: 'Toan thoi gian',
-    location: 'Tan Binh, TP.HCM',
+    title: 'Kỹ thuật viên CAD/CAM',
+    type: 'Toàn thời gian',
+    location: 'Tân Bình, TP.HCM',
     description:
-      'Thiet ke phuc hinh nha khoa tren phan mem CAD. Yeu cau: co kinh nghiem 3Shape, Exocad hoac tuong duong.',
+      'Thiết kế phục hình nha khoa trên phần mềm CAD. Yêu cầu: có kinh nghiệm 3Shape, Exocad hoặc tương đương.',
   },
   {
-    title: 'Ky thuat vien Labo',
-    type: 'Toan thoi gian',
-    location: 'Tan Binh, TP.HCM',
+    title: 'Kỹ thuật viên Labo',
+    type: 'Toàn thời gian',
+    location: 'Tân Bình, TP.HCM',
     description:
-      'Gia cong, dap su, hoan thien san pham phuc hinh. Yeu cau: tot nghiep chuyen nganh, co kinh nghiem 1+ nam.',
+      'Gia công, đắp sứ, hoàn thiện sản phẩm phục hình. Yêu cầu: tốt nghiệp chuyên ngành, có kinh nghiệm 1+ năm.',
   },
   {
-    title: 'Nhan vien Kinh doanh',
-    type: 'Toan thoi gian',
-    location: 'Tan Binh, TP.HCM',
+    title: 'Nhân viên Kinh doanh',
+    type: 'Toàn thời gian',
+    location: 'Tân Bình, TP.HCM',
     description:
-      'Cham soc khach hang, tu van san pham, phat trien khach hang moi. Yeu cau: giao tiep tot, uu tien co kien thuc nha khoa.',
+      'Chăm sóc khách hàng, tư vấn sản phẩm, phát triển khách hàng mới. Yêu cầu: giao tiếp tốt, ưu tiên có kiến thức nha khoa.',
   },
 ];
 
@@ -89,7 +89,7 @@ export default function TuyenDungPage() {
               marginBottom: 16,
             }}
           >
-            Co hoi nghe nghiep
+            Cơ hội nghề nghiệp
           </div>
           <h1
             style={{
@@ -101,7 +101,7 @@ export default function TuyenDungPage() {
               marginBottom: 12,
             }}
           >
-            Tuyen Dung
+            Tuyển Dụng
           </h1>
           <p
             style={{
@@ -112,8 +112,8 @@ export default function TuyenDungPage() {
               margin: '0 auto',
             }}
           >
-            Gia nhap Alpha Digital Center - noi ban duoc phat trien nghe nghiep
-            trong moi truong cong nghe hien dai, doi ngu chuyen nghiep va nhiet huyet.
+            Gia nhập Alpha Digital Center - nơi bạn được phát triển nghề nghiệp
+            trong môi trường công nghệ hiện đại, đội ngũ chuyên nghiệp và nhiệt huyết.
           </p>
         </div>
       </section>
@@ -131,10 +131,10 @@ export default function TuyenDungPage() {
                 marginBottom: 8,
               }}
             >
-              Tai sao nen gia nhap Alpha?
+              Tại sao nên gia nhập Alpha?
             </h2>
             <p style={{ fontSize: 14, color: colors.textSecondary }}>
-              Nhung gia tri chung toi mang den cho thanh vien
+              Những giá trị chúng tôi mang đến cho thành viên
             </p>
           </div>
           <div
@@ -206,10 +206,10 @@ export default function TuyenDungPage() {
                 marginBottom: 8,
               }}
             >
-              Vi tri dang tuyen
+              Vị trí đang tuyển
             </h2>
             <p style={{ fontSize: 14, color: colors.textSecondary }}>
-              Khám phá cac co hoi phu hop voi ban
+              Khám phá các cơ hội phù hợp với bạn
             </p>
           </div>
           <div
@@ -263,7 +263,7 @@ export default function TuyenDungPage() {
                       fontWeight: 600,
                     }}
                   >
-                    Dang tuyen
+                    Đang tuyển
                   </div>
                 </div>
                 <div
@@ -331,7 +331,7 @@ export default function TuyenDungPage() {
               marginBottom: 10,
             }}
           >
-            San sang gia nhap?
+            Sẵn sàng gia nhập?
           </h2>
           <p
             style={{
@@ -341,8 +341,8 @@ export default function TuyenDungPage() {
               lineHeight: 1.6,
             }}
           >
-            Gui CV cua ban qua email hoac lien he truc tiep. Chung toi luon chao don
-            nhung ung vien co dam me voi nghe nha khoa.
+            Gửi CV của bạn qua email hoặc liên hệ trực tiếp. Chúng tôi luôn chào đón
+            những ứng viên có đam mê với nghề nha khoa.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="mailto:info@alphacenter.vn" style={{ textDecoration: 'none' }}>
@@ -362,7 +362,7 @@ export default function TuyenDungPage() {
                   gap: 8,
                 }}
               >
-                <Mail size={16} /> Gui CV qua email
+                <Mail size={16} /> Gửi CV qua email
               </button>
             </a>
             <Link href="/lien-he" style={{ textDecoration: 'none' }}>
@@ -382,7 +382,7 @@ export default function TuyenDungPage() {
                   gap: 8,
                 }}
               >
-                Lien he <ArrowRight size={14} />
+                Liên hệ <ArrowRight size={14} />
               </button>
             </Link>
           </div>

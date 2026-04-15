@@ -42,13 +42,13 @@ export default function BaoHanhPage() {
     if (code.trim().toUpperCase().startsWith('ADC')) {
       setResult({
         code: code.trim().toUpperCase(),
-        product: 'Su Zirconia Cercon HT',
-        category: 'Toan su',
+        product: 'Sứ Zirconia Cercon HT',
+        category: 'Toàn sứ',
         startDate: '15/03/2024',
         endDate: '15/03/2034',
         status: 'active',
         lab: 'Labo Nha Khoa ABC',
-        notes: 'Bao hanh 10 nam - Suon Zirconia Cercon HT Dentsply Sirona',
+        notes: 'Bảo hành 10 năm - Sườn Zirconia Cercon HT Dentsply Sirona',
       });
     } else {
       setResult(null);
@@ -59,19 +59,19 @@ export default function BaoHanhPage() {
 
   const statusConfig = {
     active: {
-      label: 'Con hieu luc',
+      label: 'Còn hiệu lực',
       bg: '#f0fdf4',
       color: '#16a34a',
       icon: CheckCircle,
     },
     expired: {
-      label: 'Het han',
+      label: 'Hết hạn',
       bg: '#fff1f2',
       color: '#e11d48',
       icon: AlertCircle,
     },
     pending: {
-      label: 'Dang xu ly',
+      label: 'Đang xử lý',
       bg: '#fffbeb',
       color: '#d97706',
       icon: Clock,
@@ -112,7 +112,7 @@ export default function BaoHanhPage() {
               marginBottom: 12,
             }}
           >
-            Tra Cuu <span style={{ color: colors.primary }}>Bao Hanh</span>
+            Tra Cứu <span style={{ color: colors.primary }}>Bảo Hành</span>
           </h1>
           <p
             style={{
@@ -123,8 +123,8 @@ export default function BaoHanhPage() {
               margin: '0 auto',
             }}
           >
-            Nhap ma bao hanh in tren the bao hanh di kem san pham de kiem tra
-            thong tin va trang thai bao hanh.
+            Nhập mã bảo hành in trên thẻ bảo hành đi kèm sản phẩm để kiểm tra
+            thông tin và trạng thái bảo hành.
           </p>
         </div>
       </section>
@@ -153,7 +153,7 @@ export default function BaoHanhPage() {
                 fontFamily: fonts.body,
               }}
             >
-              Ma bao hanh
+              Mã bảo hành
             </label>
             <div style={{ display: 'flex', gap: 10 }}>
               <input
@@ -161,7 +161,7 @@ export default function BaoHanhPage() {
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Vi du: ADC-2024-00123"
+                placeholder="Ví dụ: ADC-2024-00123"
                 style={{
                   ...inputStyle,
                   flex: 1,
@@ -188,11 +188,11 @@ export default function BaoHanhPage() {
                 ) : (
                   <Search size={16} />
                 )}
-                Tra cuu
+                Tra cứu
               </button>
             </div>
             <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>
-              Ma bao hanh gom 3 phan, cach nhau bang dau gach ngang. Vi du: ADC-2024-00123
+              Mã bảo hành gồm 3 phần, cách nhau bằng dấu gạch ngang. Ví dụ: ADC-2024-00123
             </p>
           </div>
 
@@ -247,7 +247,7 @@ export default function BaoHanhPage() {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                           <Shield size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ma bao hanh</span>
+                          <span style={{ fontSize: 12, color: colors.textMuted }}>Mã bảo hành</span>
                         </div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
                           {result.code}
@@ -257,7 +257,7 @@ export default function BaoHanhPage() {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                           <Package size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>San pham</span>
+                          <span style={{ fontSize: 12, color: colors.textMuted }}>Sản phẩm</span>
                         </div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
                           {result.product}
@@ -267,7 +267,7 @@ export default function BaoHanhPage() {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                           <Calendar size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ngay bat dau</span>
+                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ngày bắt đầu</span>
                         </div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
                           {result.startDate}
@@ -277,7 +277,7 @@ export default function BaoHanhPage() {
                       <div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                           <Calendar size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ngay het han</span>
+                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ngày hết hạn</span>
                         </div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
                           {result.endDate}
@@ -335,15 +335,15 @@ export default function BaoHanhPage() {
                       marginBottom: 8,
                     }}
                   >
-                    Khong tim thay thong tin bao hanh
+                    Không tìm thấy thông tin bảo hành
                   </h3>
                   <p style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 1.5 }}>
-                    Ma bao hanh khong ton tai hoac chua duoc kich hoat.
-                    Vui long kiem tra lai ma hoac lien he hotline{' '}
+                    Mã bảo hành không tồn tại hoặc chưa được kích hoạt.
+                    Vui lòng kiểm tra lại mã hoặc liên hệ hotline{' '}
                     <a href="tel:0378422496" style={{ color: colors.primary, fontWeight: 600 }}>
                       0378 422 496
                     </a>{' '}
-                    de duoc ho tro.
+                    để được hỗ trợ.
                   </p>
                 </div>
               )}
@@ -369,7 +369,7 @@ export default function BaoHanhPage() {
                 marginBottom: 10,
               }}
             >
-              Chinh sach bao hanh
+              Chính sách bảo hành
             </h3>
             <ul
               style={{
@@ -380,10 +380,10 @@ export default function BaoHanhPage() {
                 margin: 0,
               }}
             >
-              <li>Bao hanh tu 3 - 19 nam tuy dong san pham</li>
-              <li>Bao hanh mien phi loi ky thuat do Alpha Digital Center</li>
-              <li>Ho tro bao hanh nhanh chong trong 24-48h</li>
-              <li>Lien he hotline 0378 422 496 de bao hanh truc tiep</li>
+              <li>Bảo hành từ 3 - 19 năm tùy dòng sản phẩm</li>
+              <li>Bảo hành miễn phí lỗi kỹ thuật do Alpha Digital Center</li>
+              <li>Hỗ trợ bảo hành nhanh chóng trong 24-48h</li>
+              <li>Liên hệ hotline 0378 422 496 để bảo hành trực tiếp</li>
             </ul>
           </div>
         </div>
