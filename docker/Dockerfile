@@ -49,5 +49,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Push schema then start server
-CMD sh -c "npx prisma db push --skip-generate --accept-data-loss 2>/dev/null || true; node server.js"
+# Push schema then start server (prisma CLI via direct node path to avoid npx PATH issues)
+CMD sh -c "echo '[db-push] running prisma db push...' && node ./node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss; echo '[db-push] done'; node server.js"
