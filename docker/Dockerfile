@@ -36,11 +36,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma for runtime db push
+# Copy Prisma runtime (client + schema + init.sql) for startup migration
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/scripts ./scripts
 
 USER nextjs
 
@@ -49,5 +49,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Push schema then start server (prisma CLI via direct node path to avoid npx PATH issues)
-CMD sh -c "echo '[db-push] running prisma db push...' && node ./node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss; echo '[db-push] done'; node server.js"
+# Run init.sql (idempotent) then start server
+CMD sh -c "node scripts/init-db.js; node server.js"
