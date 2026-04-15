@@ -7,6 +7,7 @@ const SUPER_ADMIN_EMAIL = 'vuvanthanh1986@gmail.com';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma) as any,
+  trustHost: true,
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID || '',
