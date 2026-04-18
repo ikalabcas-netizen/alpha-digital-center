@@ -290,7 +290,7 @@ export default function ProductsPage() {
                 borderRadius: 20,
                 border: isActive ? 'none' : `1px solid ${colors.border}`,
                 background: isActive
-                  ? 'linear-gradient(135deg, #06b6d4, #0891b2)'
+                  ? `linear-gradient(135deg, ${colors.gold}, ${colors.goldDark})`
                   : colors.cardBg,
                 color: isActive ? colors.white : colors.textSecondary,
                 fontSize: 13,

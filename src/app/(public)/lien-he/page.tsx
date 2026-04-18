@@ -1,529 +1,354 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
-import { colors, fonts, inputStyle, primaryButton } from '@/lib/styles';
-import {
-  Phone,
-  Mail,
-  MapPin,
-  MessageCircle,
-  Send,
-  CheckCircle,
-  AlertCircle,
-  Loader2,
-  Clock,
-} from 'lucide-react';
+import { useState, type CSSProperties, type FormEvent } from 'react';
+import { PageHero } from '@/components/layout/PageHero';
 
-interface FormData {
-  labName: string;
-  contactPerson: string;
-  phone: string;
-  email: string;
-  productInterest: string;
-  message: string;
-}
-
-const INITIAL_FORM: FormData = {
-  labName: '',
-  contactPerson: '',
-  phone: '',
-  email: '',
-  productInterest: '',
-  message: '',
+const fs: CSSProperties = {
+  width: '100%',
+  padding: '14px 16px',
+  background: '#fff',
+  border: '1px solid var(--line)',
+  borderRadius: 10,
+  color: 'var(--ink-900)',
+  fontFamily: 'var(--font-body)',
+  fontSize: 14,
+  outline: 'none',
+  boxSizing: 'border-box',
 };
 
-const PRODUCT_OPTIONS = [
-  'Toàn sứ (Zirconia)',
-  'Sứ ép (E.Max)',
-  'Kim loại',
-  'Tháo lắp',
-  'Implant',
-  'Khác',
-];
-
 export default function LienHePage() {
-  const [form, setForm] = useState<FormData>(INITIAL_FORM);
-  const [loading, setLoading] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
 
-  const handleChange = (field: keyof FormData, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-
-      if (!res.ok) throw new Error('Gửi thất bại');
-
-      setSubmitted(true);
-      setForm(INITIAL_FORM);
-    } catch {
-      setError('Có lỗi xảy ra. Vui lòng thử lại hoặc gọi trực tiếp hotline.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const labelStyle: React.CSSProperties = {
-    display: 'block',
-    fontSize: 13,
-    fontWeight: 600,
-    color: colors.textPrimary,
-    marginBottom: 6,
-    fontFamily: fonts.body,
+    setSent(true);
   };
 
   return (
-    <div>
-      {/* Hero */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #ecfeff 0%, #f0f9ff 40%, #e0f2fe 100%)',
-          padding: '60px 0 48px',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              background: colors.primaryBg,
-              color: colors.primaryHover,
-              borderRadius: 20,
-              fontSize: 12,
-              fontWeight: 600,
-              marginBottom: 16,
-            }}
-          >
-            Liên hệ
-          </div>
-          <h1
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: 'clamp(26px, 3.5vw, 38px)',
-              fontWeight: 800,
-              color: colors.textPrimary,
-              lineHeight: 1.2,
-              marginBottom: 12,
-            }}
-          >
-            Liên Hệ & <span style={{ color: colors.primary }}>Báo Giá</span>
-          </h1>
-          <p
-            style={{
-              fontSize: 15,
-              color: colors.textSecondary,
-              lineHeight: 1.7,
-              maxWidth: 550,
-              margin: '0 auto',
-            }}
-          >
-            Sẵn sàng hỗ trợ bạn! Gửi yêu cầu báo giá hoặc liên hệ trực tiếp qua
-            hotline và Zalo để được tư vấn nhanh nhất.
-          </p>
-        </div>
-      </section>
+    <>
+      <PageHero
+        eyebrow="Contact · Liên hệ"
+        title="Hãy"
+        serif="trò chuyện"
+        tail="với chúng tôi."
+        subtitle="Dù là báo giá, tư vấn kỹ thuật, hay đơn giản muốn tìm hiểu Alpha — chúng tôi luôn sẵn sàng nghe từ bạn."
+      />
 
-      {/* Content */}
-      <section style={{ padding: '48px 0 64px' }}>
+      {/* Contact + Form */}
+      <section style={{ padding: '120px 0', background: 'var(--bg)' }}>
         <div
+          className="container ct"
           style={{
-            maxWidth: 1200,
-            margin: '0 auto',
-            padding: '0 24px',
             display: 'grid',
-            gridTemplateColumns: '1fr 1.5fr',
-            gap: 32,
-            alignItems: 'start',
+            gridTemplateColumns: '1fr 1.1fr',
+            gap: 80,
           }}
         >
-          {/* Contact Info */}
           <div>
-            <div
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }} />
+              <span className="eyebrow">Kênh liên hệ</span>
+            </div>
+            <h2
+              className="display"
+              style={{ fontSize: 'clamp(28px, 3vw, 42px)', margin: '0 0 28px' }}
+            >
+              Luôn sẵn sàng{' '}
+              <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>
+                hỗ trợ
+              </span>{' '}
+              bạn.
+            </h2>
+            <p
               style={{
-                background: colors.cardBg,
-                borderRadius: 16,
-                padding: 28,
-                border: `1px solid ${colors.border}`,
-                boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                marginBottom: 20,
+                fontSize: 15,
+                color: 'var(--ink-500)',
+                lineHeight: 1.75,
+                marginBottom: 40,
               }}
             >
-              <h2
-                style={{
-                  fontFamily: fonts.heading,
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: colors.textPrimary,
-                  marginBottom: 20,
-                }}
-              >
-                Thông tin liên hệ
-              </h2>
-
-              {[
-                {
-                  icon: Phone,
-                  label: 'Hotline',
-                  value: '0378 422 496',
-                  href: 'tel:0378422496',
-                },
-                {
-                  icon: Mail,
-                  label: 'Email',
-                  value: 'info@alphacenter.vn',
-                  href: 'mailto:info@alphacenter.vn',
-                },
-                {
-                  icon: MapPin,
-                  label: 'Địa chỉ',
-                  value: '242/12 Phạm Văn Hải, Q. Tân Bình, TP.HCM',
-                  href: undefined,
-                },
-                {
-                  icon: Clock,
-                  label: 'Giờ làm việc',
-                  value: 'T2 - T7: 8:00 - 17:30',
-                  href: undefined,
-                },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={item.label}
-                    style={{
-                      display: 'flex',
-                      gap: 14,
-                      marginBottom: 18,
-                      alignItems: 'flex-start',
-                    }}
-                  >
-                    <div
-                      style={{
-                        width: 40,
-                        height: 40,
-                        background: colors.primaryUltraLight,
-                        borderRadius: 10,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0,
-                      }}
-                    >
-                      <Icon size={18} color={colors.primary} />
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 12, color: colors.textMuted, marginBottom: 2 }}>
-                        {item.label}
-                      </div>
-                      {item.href ? (
-                        <a
-                          href={item.href}
-                          style={{
-                            fontSize: 14,
-                            fontWeight: 600,
-                            color: colors.textPrimary,
-                            textDecoration: 'none',
-                          }}
-                        >
-                          {item.value}
-                        </a>
-                      ) : (
-                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
-                          {item.value}
-                        </div>
-                      )}
-                    </div>
+              Đội ngũ kinh doanh và kỹ thuật của Alpha luôn sẵn sàng tư vấn — từ câu hỏi kỹ thuật đến báo giá nhanh.
+            </p>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {(
+                [
+                  ['HOTLINE · 24/7', '0378 422 496', 'Hỗ trợ kỹ thuật & đặt hàng'],
+                  ['EMAIL', 'info@alphacenter.vn', 'Phản hồi trong 2 giờ'],
+                  ['ZALO OFFICIAL', '0378 422 496', 'Chat nhanh, gửi file CAD'],
+                  ['GIỜ LÀM VIỆC', '07:30 — 17:30', 'Thứ 2 đến Thứ 7'],
+                ] as [string, string, string][]
+              ).map(([l, v, s]) => (
+                <div
+                  key={l}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '160px 1fr',
+                    gap: 20,
+                    padding: '16px 0',
+                    borderTop: '1px solid var(--line)',
+                    alignItems: 'center',
+                  }}
+                >
+                  <div className="eyebrow" style={{ fontSize: 11 }}>
+                    {l}
                   </div>
-                );
-              })}
+                  <div>
+                    <div
+                      className="display"
+                      style={{ fontSize: 18, fontWeight: 600, marginBottom: 2 }}
+                    >
+                      {v}
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--ink-500)' }}>{s}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            {/* Zalo CTA */}
-            <a
-              href="https://zalo.me/0378422496"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ textDecoration: 'none' }}
-            >
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, #0068ff, #0055cc)',
-                  borderRadius: 14,
-                  padding: '20px 24px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 14,
-                  cursor: 'pointer',
-                }}
-              >
+          </div>
+          <div
+            style={{
+              background: '#fff',
+              border: '1px solid var(--line)',
+              borderRadius: 'var(--r-xl)',
+              padding: 48,
+              boxShadow: 'var(--sh-md)',
+            }}
+          >
+            {sent ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
                 <div
                   style={{
-                    width: 44,
-                    height: 44,
-                    background: 'rgba(255,255,255,0.2)',
-                    borderRadius: 12,
+                    width: 64,
+                    height: 64,
+                    borderRadius: '50%',
+                    background: 'var(--accent)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <MessageCircle size={22} color="#fff" />
-                </div>
-                <div>
-                  <div
-                    style={{
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: '#fff',
-                      marginBottom: 2,
-                      fontFamily: fonts.heading,
-                    }}
-                  >
-                    Chat qua Zalo
-                  </div>
-                  <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.8)' }}>
-                    Tư vấn nhanh, gửi file tiện lợi
-                  </div>
-                </div>
-              </div>
-            </a>
-          </div>
-
-          {/* Quote Request Form */}
-          <div
-            style={{
-              background: colors.cardBg,
-              borderRadius: 16,
-              padding: 32,
-              border: `1px solid ${colors.border}`,
-              boxShadow: '0 2px 8px rgba(6,182,212,0.08)',
-            }}
-          >
-            {submitted ? (
-              <div style={{ textAlign: 'center', padding: '40px 0' }}>
-                <CheckCircle
-                  size={48}
-                  color={colors.success}
-                  style={{ marginBottom: 16 }}
-                />
-                <h3
-                  style={{
-                    fontFamily: fonts.heading,
-                    fontSize: 20,
+                    margin: '0 auto 24px',
+                    color: '#fff',
+                    fontSize: 28,
                     fontWeight: 700,
-                    color: colors.textPrimary,
-                    marginBottom: 10,
                   }}
                 >
-                  Gửi thành công!
+                  ✓
+                </div>
+                <h3
+                  className="display"
+                  style={{ fontSize: 24, margin: '0 0 12px', fontWeight: 600 }}
+                >
+                  Cảm ơn bạn!
                 </h3>
-                <p
-                  style={{
-                    fontSize: 14,
-                    color: colors.textSecondary,
-                    lineHeight: 1.6,
-                    marginBottom: 24,
-                  }}
-                >
-                  Cảm ơn bạn đã quan tâm. Đội ngũ kinh doanh sẽ liên hệ với bạn
-                  trong vòng 2 giờ làm việc.
+                <p style={{ fontSize: 14, color: 'var(--ink-500)' }}>
+                  Chúng tôi sẽ liên hệ trong vòng 24 giờ.
                 </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  style={{
-                    ...primaryButton,
-                    padding: '10px 24px',
-                    fontSize: 14,
-                  }}
-                >
-                  Gửi yêu cầu khác
-                </button>
               </div>
             ) : (
-              <>
-                <h2
-                  style={{
-                    fontFamily: fonts.heading,
-                    fontSize: 20,
-                    fontWeight: 700,
-                    color: colors.textPrimary,
-                    marginBottom: 6,
-                  }}
+              <form onSubmit={handleSubmit}>
+                <h3
+                  className="display"
+                  style={{ fontSize: 22, margin: '0 0 6px', fontWeight: 600 }}
                 >
-                  Yêu cầu báo giá
-                </h2>
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: colors.textSecondary,
-                    marginBottom: 24,
-                  }}
-                >
-                  Điền thông tin bên dưới, chúng tôi sẽ phản hồi trong thời gian sớm nhất.
+                  Gửi tin nhắn
+                </h3>
+                <p style={{ fontSize: 13, color: 'var(--ink-500)', margin: '0 0 24px' }}>
+                  Đội ngũ sẽ phản hồi trong 24h.
                 </p>
-
-                {error && (
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '10px 14px',
-                      background: colors.dangerBg,
-                      borderRadius: 8,
-                      marginBottom: 16,
-                      fontSize: 13,
-                      color: colors.danger,
-                    }}
-                  >
-                    <AlertCircle size={16} />
-                    {error}
+                <div style={{ display: 'grid', gap: 12 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <input required placeholder="Họ và tên *" style={fs} />
+                    <input required type="tel" placeholder="Điện thoại *" style={fs} />
                   </div>
-                )}
-
-                <form onSubmit={handleSubmit}>
-                  <div
-                    style={{
-                      display: 'grid',
-                      gridTemplateColumns: '1fr 1fr',
-                      gap: 16,
-                      marginBottom: 16,
-                    }}
-                  >
-                    <div>
-                      <label style={labelStyle}>
-                        Tên labo / Phòng khám <span style={{ color: colors.danger }}>*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={form.labName}
-                        onChange={(e) => handleChange('labName', e.target.value)}
-                        required
-                        placeholder="VD: Labo Nha Khoa ABC"
-                        style={{ ...inputStyle, padding: '10px 12px' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>
-                        Người liên hệ <span style={{ color: colors.danger }}>*</span>
-                      </label>
-                      <input
-                        type="text"
-                        value={form.contactPerson}
-                        onChange={(e) => handleChange('contactPerson', e.target.value)}
-                        required
-                        placeholder="Họ và tên"
-                        style={{ ...inputStyle, padding: '10px 12px' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>
-                        Số điện thoại <span style={{ color: colors.danger }}>*</span>
-                      </label>
-                      <input
-                        type="tel"
-                        value={form.phone}
-                        onChange={(e) => handleChange('phone', e.target.value)}
-                        required
-                        placeholder="0378 xxx xxx"
-                        style={{ ...inputStyle, padding: '10px 12px' }}
-                      />
-                    </div>
-                    <div>
-                      <label style={labelStyle}>Email</label>
-                      <input
-                        type="email"
-                        value={form.email}
-                        onChange={(e) => handleChange('email', e.target.value)}
-                        placeholder="email@example.com"
-                        style={{ ...inputStyle, padding: '10px 12px' }}
-                      />
-                    </div>
-                  </div>
-
-                  <div style={{ marginBottom: 16 }}>
-                    <label style={labelStyle}>Sản phẩm quan tâm</label>
-                    <select
-                      value={form.productInterest}
-                      onChange={(e) => handleChange('productInterest', e.target.value)}
-                      style={{
-                        ...inputStyle,
-                        padding: '10px 12px',
-                        appearance: 'auto',
-                      }}
-                    >
-                      <option value="">-- Chọn sản phẩm --</option>
-                      {PRODUCT_OPTIONS.map((opt) => (
-                        <option key={opt} value={opt}>
-                          {opt}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div style={{ marginBottom: 24 }}>
-                    <label style={labelStyle}>Nội dung yêu cầu</label>
-                    <textarea
-                      value={form.message}
-                      onChange={(e) => handleChange('message', e.target.value)}
-                      rows={4}
-                      placeholder="Mô tả nhu cầu gia công, số lượng, thời gian mong muốn..."
-                      style={{
-                        ...inputStyle,
-                        padding: '10px 12px',
-                        resize: 'vertical',
-                        minHeight: 100,
-                      }}
-                    />
-                  </div>
-
+                  <input type="email" placeholder="Email" style={fs} />
+                  <input placeholder="Tên labo / phòng khám" style={fs} />
+                  <select defaultValue="" required style={fs}>
+                    <option value="" disabled>
+                      Chủ đề *
+                    </option>
+                    <option>Yêu cầu báo giá</option>
+                    <option>Tư vấn kỹ thuật</option>
+                    <option>Đối tác / hợp tác</option>
+                    <option>Khác</option>
+                  </select>
+                  <textarea
+                    rows={4}
+                    required
+                    placeholder="Nội dung *"
+                    style={{ ...fs, resize: 'vertical', minHeight: 100 }}
+                  />
                   <button
                     type="submit"
-                    disabled={loading}
                     style={{
-                      ...primaryButton,
-                      width: '100%',
-                      padding: '12px 24px',
-                      fontSize: 14,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: 8,
-                      opacity: loading ? 0.7 : 1,
+                      padding: '14px 24px',
+                      borderRadius: 999,
+                      background: 'var(--accent)',
+                      color: '#fff',
+                      border: 'none',
+                      fontSize: 13.5,
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      marginTop: 8,
                     }}
                   >
-                    {loading ? (
-                      <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                    ) : (
-                      <Send size={16} />
-                    )}
-                    {loading ? 'Đang gửi...' : 'Gửi yêu cầu báo giá'}
+                    Gửi yêu cầu →
                   </button>
-                </form>
-              </>
+                </div>
+              </form>
             )}
           </div>
         </div>
+        <style>{`@media (max-width:900px){ .ct { grid-template-columns: 1fr !important; gap: 48px !important; } }`}</style>
       </section>
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
+      {/* Map */}
+      <section style={{ padding: '0 0 120px', background: 'var(--bg)' }}>
+        <div className="container">
+          <div
+            className="mw"
+            style={{
+              borderRadius: 'var(--r-xl)',
+              overflow: 'hidden',
+              border: '1px solid var(--line)',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              minHeight: 420,
+            }}
+          >
+            <div
+              style={{
+                padding: 48,
+                background: 'var(--navy-900)',
+                color: '#fff',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <span style={{ width: 28, height: 1, background: 'var(--gold)' }} />
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>
+                  Văn phòng
+                </span>
+              </div>
+              <h3
+                className="display"
+                style={{
+                  fontSize: 28,
+                  margin: '0 0 16px',
+                  color: '#fff',
+                  fontWeight: 500,
+                }}
+              >
+                242/12 Phạm Văn Hai
+              </h3>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: 'rgba(255,255,255,0.65)',
+                  lineHeight: 1.75,
+                }}
+              >
+                Phường 5, Quận Tân Bình,
+                <br />
+                Thành phố Hồ Chí Minh, Việt Nam
+              </p>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: 10,
+                  marginTop: 20,
+                  flexWrap: 'wrap',
+                }}
+              >
+                <a
+                  href="#"
+                  style={{
+                    padding: '12px 20px',
+                    borderRadius: 999,
+                    background: 'var(--accent)',
+                    color: '#fff',
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                  }}
+                >
+                  Xem Google Maps
+                </a>
+                <a
+                  href="#"
+                  style={{
+                    padding: '12px 20px',
+                    borderRadius: 999,
+                    border: '1px solid rgba(255,255,255,0.2)',
+                    color: '#fff',
+                    fontSize: 13.5,
+                    fontWeight: 600,
+                  }}
+                >
+                  Chỉ đường
+                </a>
+              </div>
+            </div>
+            <div style={{ position: 'relative', background: '#E6EAF0' }}>
+              <svg
+                width="100%"
+                height="100%"
+                viewBox="0 0 600 420"
+                preserveAspectRatio="xMidYMid slice"
+                style={{ position: 'absolute', inset: 0 }}
+              >
+                <rect width="600" height="420" fill="#E6EAF0" />
+                <g stroke="#CCD4DE" strokeWidth="1">
+                  {Array.from({ length: 12 }).map((_, i) => (
+                    <line key={'h' + i} x1="0" y1={i * 40} x2="600" y2={i * 40} />
+                  ))}
+                  {Array.from({ length: 16 }).map((_, i) => (
+                    <line key={'v' + i} x1={i * 40} y1="0" x2={i * 40} y2="420" />
+                  ))}
+                </g>
+                <path
+                  d="M 0 220 Q 200 200 400 240 T 600 220"
+                  stroke="#C9A961"
+                  strokeWidth="6"
+                  fill="none"
+                  opacity="0.5"
+                />
+                <path d="M 300 0 L 320 420" stroke="#B8C2D4" strokeWidth="4" />
+                <circle cx="310" cy="210" r="32" fill="#06B6D4" opacity="0.15" />
+                <circle cx="310" cy="210" r="16" fill="#06B6D4" opacity="0.3" />
+                <circle cx="310" cy="210" r="8" fill="#06B6D4" />
+                <circle cx="310" cy="210" r="3" fill="#fff" />
+              </svg>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 24,
+                  right: 24,
+                  padding: '10px 14px',
+                  background: '#fff',
+                  borderRadius: 8,
+                  boxShadow: 'var(--sh-md)',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    background: 'var(--accent)',
+                  }}
+                />
+                Alpha Digital Center
+              </div>
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .mw { grid-template-columns: 1fr !important; } .mw > div:last-child { min-height: 280px; } }`}</style>
+      </section>
+    </>
   );
 }

@@ -47,3 +47,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scratch / local tooling dumps
+.app-tmp.json
+.deploy*.json
+.logs*.json
+
+# binary uploads (source designs)
+contex/*.zip
+contex/*.xlsx

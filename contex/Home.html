@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alpha Digital Center — Trung tâm gia công nha khoa kỹ thuật số</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/tokens.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="env,react">
+const TWEAKS = /*EDITMODE-BEGIN*/{
+  "accent": "cyan"
+}/*EDITMODE-END*/;
+const ACCENT_PRESETS = {
+  cyan: { main: '#06b6d4', hover: '#0891b2', light: '#67e8f9', bg: '#ecfeff' },
+  teal: { main: '#0d9488', hover: '#0f766e', light: '#5eead4', bg: '#f0fdfa' },
+  mint: { main: '#10b981', hover: '#059669', light: '#6ee7b7', bg: '#ecfdf5' },
+};
+function applyAccent(k) {
+  const p = ACCENT_PRESETS[k] || ACCENT_PRESETS.cyan;
+  const r = document.documentElement;
+  r.style.setProperty('--accent', p.main);
+  r.style.setProperty('--accent-600', p.hover);
+  r.style.setProperty('--accent-300', p.light);
+  r.style.setProperty('--accent-50', p.bg);
+}
+applyAccent(TWEAKS.accent);
+
+const IMG = {
+  heroLab: 'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=1400&q=80',
+  cadcam: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1000&q=80',
+  tech: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1000&q=80',
+  crown: 'https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=1000&q=80',
+  tools: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=1000&q=80',
+  scanner: 'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1000&q=80',
+  dentist: 'https://images.unsplash.com/photo-1581594693702-fbdc51b2763b?w=1000&q=80',
+  office: 'https://images.unsplash.com/photo-1606811842914-f74209f127d1?w=1400&q=80',
+  team: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1400&q=80',
+  hands: 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=1000&q=80',
+  implant: 'https://images.unsplash.com/photo-1626177382002-f43a6d15b7c0?w=1000&q=80',
+};
+
+/* === LOGO === */
+function Logo({ size = 40, variant = 'light' }) {
+  const dark = variant === 'dark';
+  return (
+    <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+      <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="19" stroke={dark ? '#C9A961' : '#0B1220'} strokeWidth="1.2"/>
+        <path d="M 20 8 L 28 30 L 24 30 L 22 24 L 18 24 L 16 30 L 12 30 Z" fill={dark ? '#E3CC8F' : '#0B1220'}/>
+        <circle cx="20" cy="20" r="2" fill="#C9A961"/>
+      </svg>
+      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+        <span style={{ fontFamily: 'var(--font-display)', fontSize: size * 0.48, fontWeight: 600, color: dark ? '#fff' : 'var(--ink-900)', letterSpacing: '-0.02em' }}>
+          alpha<span style={{ color: '#C9A961' }}>.</span>
+        </span>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: size * 0.22, letterSpacing: '0.2em', color: dark ? 'rgba(255,255,255,0.5)' : 'var(--ink-500)', marginTop: 4, textTransform: 'uppercase' }}>
+          Digital Center
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* === ROUTER === */
+const ROUTES = [
+  { id: 'home', label: 'Trang chủ' },
+  { id: 'gioi-thieu', label: 'Giới thiệu' },
+  { id: 'san-pham', label: 'Sản phẩm' },
+  { id: 'tin-tuc', label: 'Tin tức' },
+  { id: 'bao-hanh', label: 'Bảo hành' },
+  { id: 'tuyen-dung', label: 'Tuyển dụng' },
+  { id: 'lien-he', label: 'Liên hệ' },
+];
+
+function useRoute() {
+  const parseHash = () => {
+    const h = (window.location.hash || '#home').replace('#', '');
+    return ROUTES.find(r => r.id === h) ? h : 'home';
+  };
+  const [route, setRoute] = React.useState(parseHash);
+  React.useEffect(() => {
+    const onHash = () => {
+      setRoute(parseHash());
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+  return [route, (r) => { window.location.hash = r; }];
+}
+
+/* === HEADER === */
+function TopBar() {
+  return (
+    <div style={{ background: 'var(--navy-950)', color: 'rgba(255,255,255,0.58)', fontSize: 12, padding: '8px 0' }}>
+      <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 22, flexWrap: 'wrap' }}>
+          <span>📞 0378 422 496</span>
+          <span>✉ info@alphacenter.vn</span>
+        </div>
+        <div style={{ display: 'flex', gap: 22, alignItems: 'center' }}>
+          <span>📍 242/12 Phạm Văn Hai, Q. Tân Bình, TP.HCM</span>
+          <span style={{ color: 'var(--gold-light)', fontFamily: 'var(--font-mono)', letterSpacing: '0.1em', fontSize: 10 }}>EST. 2014</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Header({ current }) {
+  const [scrolled, setScrolled] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    const h = () => setScrolled(window.scrollY > 24);
+    window.addEventListener('scroll', h);
+    return () => window.removeEventListener('scroll', h);
+  }, []);
+  return (
+    <>
+      <TopBar/>
+      <header style={{
+        position: 'sticky', top: 0, zIndex: 50,
+        background: scrolled ? 'rgba(255,255,255,0.92)' : '#fff',
+        backdropFilter: scrolled ? 'blur(14px)' : 'none',
+        borderBottom: '1px solid var(--line)',
+        transition: 'var(--t-med)',
+      }}>
+        <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 76 }}>
+          <a href="#home"><Logo size={40}/></a>
+          <nav className="dn" style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            {ROUTES.map(item => {
+              const active = current === item.id;
+              return (
+                <a key={item.id} href={`#${item.id}`} style={{
+                  padding: '10px 14px', fontSize: 13.5,
+                  fontWeight: active ? 600 : 500,
+                  color: active ? 'var(--ink-900)' : 'var(--ink-500)',
+                  position: 'relative',
+                }}>
+                  {item.label}
+                  {active && <span style={{ position: 'absolute', bottom: -1, left: 14, right: 14, height: 2, background: 'var(--accent)' }}/>}
+                </a>
+              );
+            })}
+          </nav>
+          <div className="dn" style={{ display: 'flex', gap: 10 }}>
+            <a className="btn btn-ghost" href="#bao-hanh" style={{ padding: '10px 14px' }}>Kiểm tra BH</a>
+            <a className="btn btn-primary" href="#lien-he">Báo giá →</a>
+          </div>
+          <button className="mb" onClick={() => setOpen(!open)} style={{ display: 'none', background: 'none', border: 'none', padding: 6 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+        </div>
+        {open && (
+          <div style={{ borderTop: '1px solid var(--line)', padding: '12px 20px 20px', background: '#fff' }}>
+            {ROUTES.map(r => (
+              <a key={r.id} href={`#${r.id}`} onClick={() => setOpen(false)} style={{ display: 'block', padding: '12px 0', fontSize: 15, borderBottom: '1px solid var(--line-soft)', color: current === r.id ? 'var(--accent-600)' : 'var(--ink-700)', fontWeight: current === r.id ? 600 : 500 }}>{r.label}</a>
+            ))}
+          </div>
+        )}
+      </header>
+      <style>{`
+        @media (max-width: 980px) { .dn { display: none !important; } .mb { display: inline-flex !important; } }
+      `}</style>
+    </>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="grain" style={{ background: 'linear-gradient(180deg, var(--navy-900), var(--navy-950))', color: 'rgba(255,255,255,0.72)', padding: '80px 0 32px' }}>
+      <div className="container">
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr 1.2fr', gap: 56, paddingBottom: 56, borderBottom: '1px solid rgba(255,255,255,0.08)' }} className="fg">
+          <div>
+            <Logo variant="dark" size={44}/>
+            <p style={{ fontSize: 13.5, lineHeight: 1.7, marginTop: 24, maxWidth: 320, color: 'rgba(255,255,255,0.6)' }}>
+              Trung tâm gia công nha khoa kỹ thuật số hàng đầu Việt Nam. Cam kết chất lượng — bảo hành đến 19 năm — công nghệ CAD/CAM hiện đại.
+            </p>
+          </div>
+          <div>
+            <div className="eyebrow" style={{ color: 'var(--gold-light)', marginBottom: 20 }}>Khám phá</div>
+            {ROUTES.slice(0,5).map(r => (
+              <a key={r.id} href={`#${r.id}`} style={{ display: 'block', padding: '7px 0', fontSize: 13.5, color: 'rgba(255,255,255,0.7)' }}>{r.label}</a>
+            ))}
+          </div>
+          <div>
+            <div className="eyebrow" style={{ color: 'var(--gold-light)', marginBottom: 20 }}>Dịch vụ</div>
+            {['Sứ Zirconia','Sứ ép E.max','Implant Abutment','Veneer thẩm mỹ','Hàm tháo lắp'].map(s => (
+              <a key={s} href="#san-pham" style={{ display: 'block', padding: '7px 0', fontSize: 13.5, color: 'rgba(255,255,255,0.7)' }}>{s}</a>
+            ))}
+          </div>
+          <div>
+            <div className="eyebrow" style={{ color: 'var(--gold-light)', marginBottom: 20 }}>Liên hệ</div>
+            <div style={{ fontSize: 13.5, lineHeight: 1.8, color: 'rgba(255,255,255,0.75)' }}>
+              <div>📍 242/12 Phạm Văn Hai,<br/>P.5, Q. Tân Bình, TP.HCM</div>
+              <div style={{ marginTop: 10 }}>📞 0378 422 496</div>
+              <div style={{ marginTop: 10 }}>✉ info@alphacenter.vn</div>
+            </div>
+          </div>
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 32, flexWrap: 'wrap', gap: 16 }}>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-mono)', letterSpacing: '0.05em' }}>© 2026 ALPHA DIGITAL CENTER · ALL RIGHTS RESERVED</div>
+          <div style={{ display: 'flex', gap: 24, fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
+            <a>Chính sách bảo mật</a><a>Điều khoản</a><a>Sitemap</a>
+          </div>
+        </div>
+      </div>
+      <style>{`@media (max-width: 900px){ .fg { grid-template-columns: 1fr 1fr !important; gap: 40px !important; } } @media (max-width: 560px){ .fg { grid-template-columns: 1fr !important; } }`}</style>
+    </footer>
+  );
+}
+
+/* === SHARED HERO === */
+function PageHero({ eyebrow, title, serif, tail, subtitle, image }) {
+  return (
+    <section className="grain" style={{ background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))', color: '#fff', padding: '88px 0 96px', position: 'relative', overflow: 'hidden' }}>
+      <div aria-hidden style={{ position: 'absolute', right: -180, top: -120, width: 600, height: 600, borderRadius: '50%', border: '1px solid rgba(201,169,97,0.1)' }}/>
+      <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: image ? '1.2fr 1fr' : '1fr', gap: 72, alignItems: 'center' }} className="hg">
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+              <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>{eyebrow}</span>
+            </div>
+            <h1 className="display" style={{ fontSize: 'clamp(36px, 4.5vw, 62px)', margin: 0, fontWeight: 500, color: '#fff' }}>
+              {title}{' '}{serif && <span className="serif" style={{ color: 'var(--gold-light)', fontWeight: 400 }}>{serif}</span>}{tail && ` ${tail}`}
+            </h1>
+            {subtitle && <p style={{ fontSize: 16, lineHeight: 1.7, color: 'rgba(255,255,255,0.65)', margin: '28px 0 0', maxWidth: 560 }}>{subtitle}</p>}
+          </div>
+          {image && (
+            <div style={{ height: 360, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 30px 80px rgba(0,0,0,0.3)' }}>
+              <img src={image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+            </div>
+          )}
+        </div>
+      </div>
+      <style>{`@media (max-width: 900px){ .hg { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
+    </section>
+  );
+}
+
+/* === PAGES === */
+function HomePage() {
+  return (
+    <>
+      <section className="grain" style={{ background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))', color: '#fff', padding: '88px 0 120px', position: 'relative', overflow: 'hidden' }}>
+        <div aria-hidden style={{ position: 'absolute', right: -180, top: -120, width: 600, height: 600, borderRadius: '50%', border: '1px solid rgba(201,169,97,0.12)' }}/>
+        <div aria-hidden style={{ position: 'absolute', right: -80, top: -40, width: 420, height: 420, borderRadius: '50%', border: '1px solid rgba(103,232,249,0.08)' }}/>
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1fr', gap: 72, alignItems: 'center' }} className="ha">
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
+                <span style={{ width: 36, height: 1, background: 'var(--gold)' }}/>
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>Digital dental laboratory · Est. 2014</span>
+              </div>
+              <h1 className="display" style={{ fontSize: 'clamp(42px, 5.4vw, 72px)', margin: 0, color: '#fff', fontWeight: 500 }}>
+                Nơi tinh hoa <br/><span className="serif" style={{ color: 'var(--gold-light)', fontWeight: 400 }}>nha khoa</span> kỹ thuật số <br/>được <span style={{ color: 'var(--accent-300)' }}>kiến tạo</span>.
+              </h1>
+              <p style={{ fontSize: 16.5, lineHeight: 1.7, color: 'rgba(255,255,255,0.68)', margin: '32px 0 40px', maxWidth: 520 }}>
+                Alpha Digital Center — đối tác gia công bán thành phẩm cao cấp cho hơn 500 labo trên toàn quốc. Công nghệ CAD/CAM, phôi chính hãng Dentsply, Ivoclar, Amann Girrbach. Bảo hành đến 19 năm.
+              </p>
+              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+                <a className="btn btn-primary" href="#san-pham" style={{ padding: '15px 28px' }}>Khám phá sản phẩm →</a>
+                <a className="btn btn-gold" href="#lien-he" style={{ padding: '15px 28px' }}>Yêu cầu báo giá</a>
+              </div>
+              <div style={{ marginTop: 56, paddingTop: 32, borderTop: '1px solid rgba(255,255,255,0.08)', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }}>
+                {[{n:'12+',l:'Năm kinh nghiệm'},{n:'500+',l:'Labo đối tác'},{n:'19 năm',l:'Bảo hành tối đa'}].map(s => (
+                  <div key={s.l}>
+                    <div className="display" style={{ fontSize: 28, color: 'var(--gold-light)', fontWeight: 500 }}>{s.n}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.55)', marginTop: 4 }}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div style={{ position: 'relative', height: 580 }}>
+              <div style={{ position: 'absolute', top: 0, right: 0, width: '78%', height: 380, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 30px 80px rgba(0,0,0,0.4)' }}>
+                <img src={IMG.heroLab} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+              </div>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, width: '55%', height: 280, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid rgba(201,169,97,0.2)', boxShadow: '0 20px 60px rgba(0,0,0,0.45)' }}>
+                <img src={IMG.cadcam} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+              </div>
+              <div style={{ position: 'absolute', right: 20, bottom: 90, padding: '18px 22px', background: 'rgba(10,22,40,0.85)', backdropFilter: 'blur(20px)', border: '1px solid rgba(201,169,97,0.35)', borderRadius: 12, display: 'flex', alignItems: 'center', gap: 14 }}>
+                <div style={{ width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, var(--gold), var(--gold-dark))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: 18, fontWeight: 700 }}>✓</div>
+                <div>
+                  <div style={{ fontSize: 10, color: 'var(--gold-light)', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em' }}>ISO 13485</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: '#fff', marginTop: 2 }}>Certified Medical Device</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .ha { grid-template-columns: 1fr !important; gap: 40px !important; } .ha > div:nth-child(2) { height: 420px !important; } }`}</style>
+      </section>
+
+      {/* Technology */}
+      <section style={{ padding: '120px 0', background: 'var(--bg)' }}>
+        <div className="container">
+          <div style={{ marginBottom: 56, maxWidth: 720 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }}/>
+              <span className="eyebrow">Công nghệ · Technology</span>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(30px, 3.5vw, 46px)', margin: 0 }}>
+              Máy móc hàng đầu, <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>độ chính xác tuyệt đối.</span>
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="tg">
+            {[
+              { tag:'01', meta:'±10μm', t:'Máy phay CNC 5 trục', d:'Hệ thống milling đa trục nhập từ Đức/Nhật. Đảm bảo chi tiết chính xác cho từng sườn sứ và custom abutment.', img: IMG.cadcam },
+              { tag:'02', meta:'7μm', t:'Scanner 3D chính xác cao', d:'3Shape E4, Medit T710 — scan dấu thạch cao và dấu trong miệng. Workflow số hoàn toàn.', img: IMG.scanner },
+              { tag:'03', meta:'25μm', t:'In 3D kim loại & nhựa', d:'Máy in Laser SLM cho khung titanium, in SLA cho mẫu hàm. Rút ngắn thời gian 40%.', img: IMG.tools },
+            ].map(it => (
+              <article key={it.tag} className="card" style={{ padding: 0, overflow: 'hidden' }}>
+                <div style={{ position: 'relative', height: 240, overflow: 'hidden' }}>
+                  <img src={it.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                  <div style={{ position: 'absolute', top: 16, left: 16, padding: '5px 10px', background: 'rgba(10,22,40,0.75)', backdropFilter: 'blur(10px)', color: '#fff', fontFamily: 'var(--font-mono)', fontSize: 10, letterSpacing: '0.15em', borderRadius: 4 }}>
+                    {it.tag} · {it.meta}
+                  </div>
+                </div>
+                <div style={{ padding: 28 }}>
+                  <h3 className="display" style={{ fontSize: 20, margin: '0 0 10px', fontWeight: 600 }}>{it.t}</h3>
+                  <p style={{ fontSize: 13.5, color: 'var(--ink-500)', lineHeight: 1.7, margin: 0 }}>{it.d}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .tg { grid-template-columns: 1fr !important; } }`}</style>
+      </section>
+
+      {/* Materials */}
+      <section className="grain" style={{ padding: '120px 0', background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))', color: '#fff' }}>
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: 80 }} className="mg">
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>Materials · Vật liệu</span>
+              </div>
+              <h2 className="display" style={{ fontSize: 'clamp(30px, 3.5vw, 46px)', margin: '0 0 24px', color: '#fff' }}>
+                Phôi chính hãng <span className="serif" style={{ color: 'var(--gold-light)', fontWeight: 400 }}>từ các thương hiệu danh tiếng</span> thế giới.
+              </h2>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.8 }}>
+                Chúng tôi không đánh đổi chất lượng để lấy giá rẻ. Tất cả phôi Zirconia, sứ ép, kim loại đều nhập khẩu chính ngạch — có Certificate of Origin và lô sản xuất truy xuất được.
+              </p>
+            </div>
+            <div>
+              {[
+                { n:'Dentsply Sirona', c:'Germany / USA', m:'Cercon HT Zirconia', y:'Từ 2016' },
+                { n:'Ivoclar Vivadent', c:'Liechtenstein', m:'IPS e.max Press', y:'Từ 2017' },
+                { n:'Amann Girrbach', c:'Austria', m:'Zolid Gen-X', y:'Từ 2019' },
+                { n:'Kuraray Noritake', c:'Japan', m:'Katana Zirconia', y:'Từ 2020' },
+              ].map((p, i) => (
+                <div key={p.n} style={{ display: 'grid', gridTemplateColumns: '60px 1fr auto', gap: 24, padding: '28px 0', borderTop: i===0 ? '1px solid rgba(255,255,255,0.1)' : 'none', borderBottom: '1px solid rgba(255,255,255,0.1)', alignItems: 'center' }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'rgba(201,169,97,0.7)' }}>0{i+1}</div>
+                  <div>
+                    <div className="display" style={{ fontSize: 22, fontWeight: 500, marginBottom: 6 }}>{p.n}</div>
+                    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>{p.m} · {p.c}</div>
+                  </div>
+                  <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'rgba(255,255,255,0.45)' }}>{p.y}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .mg { grid-template-columns: 1fr !important; gap: 48px !important; } }`}</style>
+      </section>
+
+      {/* Testimonials */}
+      <section style={{ padding: '120px 0', background: 'var(--bg-warm)' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+              <span className="eyebrow" style={{ color: 'var(--gold-dark)' }}>Khách hàng nói</span>
+              <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(30px, 3.5vw, 46px)', margin: 0 }}>
+              Tin tưởng từ <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>500+ labo</span> đối tác.
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24 }} className="tg">
+            {[
+              { q:'Chất lượng gia công của Alpha ổn định qua 6 năm hợp tác. Sườn zirconia sát khít, màu sắc chính xác với shade yêu cầu.', n:'BS. Nguyễn Anh Tuấn', r:'Giám đốc Labo Anh Tuấn Dental', c:'TP.HCM' },
+              { q:'Đội ngũ CAD thiết kế tỉ mỉ, tư vấn kỹ. Chúng tôi đã chuyển 80% case ra Alpha và chưa phải làm lại case nào.', n:'KTV. Phạm Minh Hà', r:'Trưởng labo Nha khoa Việt Smile', c:'Hà Nội' },
+              { q:'Bảo hành 19 năm là cam kết thực sự — lần duy nhất cần bảo hành, họ làm lại miễn phí trong 72h.', n:'BS. Lê Quốc Khánh', r:'Chủ Phòng khám Khánh Dental', c:'Đà Nẵng' },
+            ].map((t, i) => (
+              <figure key={i} style={{ padding: 36, background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--r-lg)', margin: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
+                <div style={{ fontFamily: 'var(--font-serif)', fontSize: 64, color: 'var(--gold)', lineHeight: 0.5, fontStyle: 'italic' }}>"</div>
+                <blockquote style={{ margin: 0, fontSize: 15.5, lineHeight: 1.7, color: 'var(--ink-700)', flex: 1 }}>{t.q}</blockquote>
+                <div style={{ paddingTop: 20, borderTop: '1px solid var(--line-soft)' }}>
+                  <div className="display" style={{ fontSize: 15, fontWeight: 600 }}>{t.n}</div>
+                  <div style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 4 }}>{t.r}</div>
+                  <div style={{ fontSize: 11, color: 'var(--ink-400)', marginTop: 4, fontFamily: 'var(--font-mono)' }}>{t.c.toUpperCase()}</div>
+                </div>
+              </figure>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .tg { grid-template-columns: 1fr !important; } }`}</style>
+      </section>
+    </>
+  );
+}
+
+function GioiThieuPage() {
+  return (
+    <>
+      <PageHero eyebrow="About us · Về chúng tôi" title="Hơn một" serif="xưởng gia công —" tail="một đối tác kỹ thuật." subtitle="Alpha Digital Center thành lập năm 2014 với sứ mệnh mang công nghệ CAD/CAM đến mọi labo nha khoa Việt Nam. Hôm nay chúng tôi là đối tác của hơn 500 labo trên toàn quốc." image={IMG.office}/>
+
+      <section style={{ padding: '120px 0', background: 'var(--bg)' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 80, alignItems: 'center' }} className="sg">
+          <div style={{ position: 'relative', height: 520 }}>
+            <div style={{ position: 'absolute', top: 0, left: 0, width: '70%', height: 330, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--line)' }}>
+              <img src={IMG.office} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+            </div>
+            <div style={{ position: 'absolute', bottom: 0, right: 0, width: '65%', height: 290, borderRadius: 'var(--r-lg)', overflow: 'hidden', boxShadow: 'var(--sh-lg)' }}>
+              <img src={IMG.hands} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+            </div>
+            <div style={{ position: 'absolute', top: 260, right: 20, padding: 20, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, boxShadow: 'var(--sh-lg)' }}>
+              <div className="display" style={{ fontSize: 36, color: 'var(--accent)', fontWeight: 500 }}>2014</div>
+              <div style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 8, fontFamily: 'var(--font-mono)' }}>FOUNDED</div>
+            </div>
+          </div>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }}/>
+              <span className="eyebrow">Câu chuyện</span>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(28px, 3.2vw, 42px)', margin: '0 0 24px' }}>
+              Khởi nghiệp từ <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>một phòng lab nhỏ</span>, vươn ra thị trường cả nước.
+            </h2>
+            <div style={{ fontSize: 15, lineHeight: 1.85, color: 'var(--ink-700)' }}>
+              <p>Alpha Digital Center được thành lập năm 2014 bởi một nhóm kỹ thuật viên nha khoa yêu nghề, với khao khát mang công nghệ CAD/CAM đến từng labo nhỏ trên khắp cả nước.</p>
+              <p>Sau hơn 12 năm, chúng tôi đã trở thành đối tác gia công của hơn 500 labo. Triết lý ban đầu vẫn không đổi: <strong>mỗi sản phẩm rời xưởng phải đủ tốt để tự tin đặt tên mình lên đó.</strong></p>
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .sg { grid-template-columns: 1fr !important; gap: 48px !important; } }`}</style>
+      </section>
+
+      <section className="grain" style={{ padding: '120px 0', color: '#fff', background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))' }}>
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: 72 }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+              <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>Giá trị cốt lõi</span>
+              <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(30px, 3.5vw, 46px)', margin: 0, color: '#fff' }}>
+              Bốn chữ <span className="serif" style={{ color: 'var(--gold-light)', fontWeight: 400 }}>"Chính"</span> làm nền móng.
+            </h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)' }} className="vg">
+            {[
+              { n:'01', t:'Chính xác', d:'Mỗi sản phẩm qua 5 vòng QC. Dung sai tối đa 25μm.' },
+              { n:'02', t:'Chính hãng', d:'Chỉ dùng phôi có Certificate of Origin từ hãng danh tiếng.' },
+              { n:'03', t:'Chính trực', d:'Bảo hành đến 19 năm, làm lại miễn phí nếu không đạt.' },
+              { n:'04', t:'Chuyên nghiệp', d:'Đội ngũ 40+ KTV đào tạo bài bản, cập nhật liên tục.' },
+            ].map((v, i) => (
+              <div key={v.n} style={{ padding: '36px 32px', borderRight: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--gold-light)', letterSpacing: '0.15em', marginBottom: 16 }}>{v.n}</div>
+                <h3 className="display" style={{ fontSize: 22, margin: '0 0 12px', fontWeight: 500 }}>{v.t}</h3>
+                <p style={{ fontSize: 13.5, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75, margin: 0 }}>{v.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .vg { grid-template-columns: 1fr 1fr !important; } .vg > div { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.08); } } @media (max-width:560px){ .vg { grid-template-columns: 1fr !important; } }`}</style>
+      </section>
+
+      <section style={{ padding: '120px 0', background: 'var(--bg-warm)' }}>
+        <div className="container">
+          <div style={{ maxWidth: 720, marginBottom: 56 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }}/>
+              <span className="eyebrow">Dấu mốc</span>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(28px, 3.2vw, 42px)', margin: 0 }}>
+              12 năm, <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>một hành trình</span> không ngừng nâng tầm.
+            </h2>
+          </div>
+          <div style={{ position: 'relative', paddingLeft: 40 }}>
+            <div style={{ position: 'absolute', top: 0, bottom: 0, left: 11, width: 1, background: 'var(--line)' }}/>
+            {[
+              { y:'2014', t:'Thành lập', d:'Mở xưởng gia công đầu tiên tại Q. Tân Bình với 3 KTV.' },
+              { y:'2016', t:'Đối tác Dentsply', d:'Chính thức trở thành đối tác uỷ quyền Dentsply Sirona.' },
+              { y:'2018', t:'Mở rộng CAD/CAM', d:'Đầu tư 3 máy CNC 5 trục, scanner 3Shape E3.' },
+              { y:'2020', t:'500 labo đối tác', d:'Phủ sóng 63 tỉnh thành, ký hợp tác chuỗi nha khoa lớn.' },
+              { y:'2023', t:'Chứng nhận ISO 13485', d:'Đạt chuẩn ISO 13485 về thiết bị y tế.' },
+              { y:'2026', t:'Digital Center 2.0', d:'Ra mắt nền tảng đặt case online, AI thiết kế.' },
+            ].map((e, i, a) => (
+              <div key={e.y} style={{ display: 'grid', gridTemplateColumns: '140px 1fr 1.2fr', gap: 32, paddingBottom: 40, position: 'relative', alignItems: 'flex-start' }}>
+                <div style={{ position: 'absolute', left: -35, top: 6, width: 22, height: 22, borderRadius: '50%', background: '#fff', border: `2px solid ${i === a.length - 1 ? 'var(--gold)' : 'var(--accent)'}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: i === a.length - 1 ? 'var(--gold)' : 'var(--accent)' }}/>
+                </div>
+                <div className="display" style={{ fontSize: 30, fontWeight: 500 }}>{e.y}</div>
+                <h3 className="display" style={{ fontSize: 18, margin: 0, fontWeight: 600 }}>{e.t}</h3>
+                <p style={{ fontSize: 14, color: 'var(--ink-500)', lineHeight: 1.7, margin: 0 }}>{e.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </>
+  );
+}
+
+function SanPhamPage() {
+  const [cat, setCat] = React.useState('Tất cả');
+  const CATS = ['Tất cả', 'Toàn sứ', 'Sứ ép', 'Implant', 'Veneer', 'Hàm tháo lắp'];
+  const PRODS = [
+    { tag:'Toàn sứ', n:'Sứ Zirconia Cercon HT', b:'Dentsply Sirona', d:'Zirconia siêu bền, độ trong suốt cao. Ứng dụng cho cầu răng trước và sau.', w:'10 năm', p:'850K', f:true, img:IMG.crown },
+    { tag:'Sứ ép', n:'IPS e.max Press', b:'Ivoclar Vivadent', d:'Lithium disilicate 400 MPa, thẩm mỹ tự nhiên.', w:'7 năm', p:'950K', img:IMG.tech },
+    { tag:'Toàn sứ', n:'Zolid Gen-X', b:'Amann Girrbach', d:'Multilayered zirconia thế hệ mới.', w:'15 năm', p:'1.100K', img:IMG.tools },
+    { tag:'Implant', n:'Custom Abutment Titanium', b:'Alpha Lab', d:'Abutment cá nhân hoá Ti Grade 5.', w:'10 năm', p:'1.800K', img:IMG.implant },
+    { tag:'Implant', n:'Abutment Zirconia', b:'Alpha Lab', d:'Trụ Zirconia cho vùng thẩm mỹ.', w:'10 năm', p:'2.200K', img:IMG.dentist },
+    { tag:'Veneer', n:'IPS e.max Veneer', b:'Ivoclar', d:'Veneer mỏng 0.3mm cho smile design.', w:'7 năm', p:'1.050K', img:IMG.hands },
+    { tag:'Hàm tháo lắp', n:'Hàm Flexi Partial', b:'Valplast', d:'Hàm tháo lắp đàn hồi, không móc kim loại.', w:'5 năm', p:'1.500K', img:IMG.scanner },
+    { tag:'Toàn sứ', n:'Katana UTML Zirconia', b:'Kuraray Noritake', d:'Ultra-translucent zirconia cho vùng cửa.', w:'12 năm', p:'1.250K', img:IMG.heroLab },
+  ];
+  const filt = cat === 'Tất cả' ? PRODS : PRODS.filter(p => p.tag === cat);
+  return (
+    <>
+      <PageHero eyebrow="Products · Sản phẩm" title="Danh mục" serif="sản phẩm gia công —" tail="đầy đủ & chính hãng." subtitle="Từ sứ Zirconia cao cấp đến custom abutment implant, veneer thẩm mỹ — tất cả gia công CAD/CAM với phôi chính hãng." image={IMG.crown}/>
+      <section style={{ padding: '56px 0 120px', background: 'var(--bg)' }}>
+        <div className="container">
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '24px 0 36px', borderBottom: '1px solid var(--line)', marginBottom: 40 }}>
+            {CATS.map(c => (
+              <button key={c} onClick={() => setCat(c)} style={{ padding: '10px 18px', borderRadius: 999, border: `1px solid ${cat === c ? 'var(--ink-900)' : 'var(--line)'}`, background: cat === c ? 'var(--ink-900)' : '#fff', color: cat === c ? '#fff' : 'var(--ink-700)', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}>{c}</button>
+            ))}
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20 }} className="pg">
+            {filt.map((p, i) => (
+              <article key={p.n} className="card" style={{ overflow: 'hidden', gridColumn: (i === 0 && p.f) ? 'span 2' : 'auto', gridRow: (i === 0 && p.f) ? 'span 2' : 'auto' }}>
+                <div style={{ height: (i===0 && p.f) ? 380 : 200, overflow: 'hidden', background: '#f0f2f6', position: 'relative' }}>
+                  <img src={p.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                  {p.f && <div style={{ position: 'absolute', top: 16, left: 16 }}><span className="badge" style={{ background: 'var(--gold)', color: '#fff' }}>★ Flagship</span></div>}
+                </div>
+                <div style={{ padding: (i===0 && p.f) ? 32 : 20 }}>
+                  <div className="eyebrow" style={{ fontSize: 10, marginBottom: 6 }}>{p.tag} · {p.b}</div>
+                  <h3 className="display" style={{ fontSize: (i===0 && p.f) ? 24 : 16, margin: '0 0 8px', fontWeight: 600 }}>{p.n}</h3>
+                  <p style={{ fontSize: 13, color: 'var(--ink-500)', lineHeight: 1.6, margin: '0 0 16px' }}>{p.d}</p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 14, borderTop: '1px solid var(--line-soft)' }}>
+                    <div className="display" style={{ fontSize: 16, fontWeight: 600 }}>{p.p}</div>
+                    <div style={{ fontSize: 11, color: 'var(--accent-600)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>BH {p.w}</div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width:980px){ .pg { grid-template-columns: 1fr 1fr !important; } } @media (max-width:560px){ .pg { grid-template-columns: 1fr !important; } .pg > article { grid-column: auto !important; grid-row: auto !important; } }`}</style>
+      </section>
+    </>
+  );
+}
+
+function TinTucPage() {
+  const POSTS = [
+    { cat:'Công nghệ', d:'12 Apr 2026', t:'AI trong thiết kế CAD nha khoa: tương lai đã đến', e:'Machine learning rút ngắn thời gian thiết kế từ 45 phút xuống 8 phút.', img:IMG.scanner, feat:true },
+    { cat:'Vật liệu', d:'08 Apr 2026', t:'So sánh Zirconia thế hệ 5 vs Multilayer', e:'Độ trong suốt, độ bền, giá thành — phân tích chi tiết.', img:IMG.crown },
+    { cat:'Quy trình', d:'02 Apr 2026', t:'Workflow số: từ scan đến milling trong 3 giờ', e:'Khám phá quy trình CAD/CAM tại Alpha.', img:IMG.cadcam },
+    { cat:'Kinh nghiệm', d:'28 Mar 2026', t:'Tránh 5 lỗi thường gặp khi chuẩn bị file scan', e:'Hướng dẫn từ đội kỹ thuật Alpha.', img:IMG.tools },
+    { cat:'Sự kiện', d:'22 Mar 2026', t:'Alpha tại IDS 2026 Cologne, Đức', e:'Công nghệ mới từ triển lãm nha khoa lớn nhất thế giới.', img:IMG.tech },
+    { cat:'Công nghệ', d:'14 Mar 2026', t:'In 3D kim loại titanium: đã đến lúc đầu tư?', e:'Phân tích ROI cho labo quy mô vừa và nhỏ.', img:IMG.implant },
+  ];
+  const [f, ...rest] = POSTS;
+  return (
+    <>
+      <PageHero eyebrow="Insights · Tin tức" title="Góc nhìn" serif="chuyên gia —" tail="cập nhật từ phòng lab." subtitle="Chia sẻ kinh nghiệm, công nghệ mới, phân tích vật liệu và các sự kiện trong ngành nha khoa kỹ thuật số."/>
+      <section style={{ padding: '80px 0 120px', background: 'var(--bg)' }}>
+        <div className="container">
+          <article style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 48, alignItems: 'center', paddingBottom: 80, borderBottom: '1px solid var(--line)' }} className="fa">
+            <div style={{ height: 440, borderRadius: 'var(--r-lg)', overflow: 'hidden', border: '1px solid var(--line)' }}>
+              <img src={f.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <span className="badge badge-gold">★ Featured</span>
+                <span style={{ fontSize: 11, color: 'var(--ink-400)', fontFamily: 'var(--font-mono)' }}>{f.d}</span>
+              </div>
+              <h2 className="display" style={{ fontSize: 'clamp(26px, 3vw, 38px)', margin: '0 0 20px', lineHeight: 1.15 }}>{f.t}</h2>
+              <p style={{ fontSize: 15, color: 'var(--ink-500)', lineHeight: 1.75, margin: '0 0 28px' }}>{f.e}</p>
+              <a href="#" className="btn btn-dark">Đọc bài viết →</a>
+            </div>
+          </article>
+          <div style={{ paddingTop: 72 }}>
+            <h2 className="display" style={{ fontSize: 28, margin: '0 0 40px', fontWeight: 600 }}>Bài viết gần đây</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 36 }} className="pg">
+              {rest.map(p => (
+                <article key={p.t}>
+                  <div style={{ height: 220, borderRadius: 'var(--r-lg)', overflow: 'hidden', marginBottom: 20 }}>
+                    <img src={p.img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }}/>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
+                    <span className="badge badge-accent">{p.cat}</span>
+                    <span style={{ fontSize: 11, color: 'var(--ink-400)', fontFamily: 'var(--font-mono)' }}>{p.d}</span>
+                  </div>
+                  <h3 className="display" style={{ fontSize: 19, margin: '0 0 10px', fontWeight: 600, lineHeight: 1.3 }}>{p.t}</h3>
+                  <p style={{ fontSize: 13.5, color: 'var(--ink-500)', lineHeight: 1.65, margin: 0 }}>{p.e}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .fa { grid-template-columns: 1fr !important; } } @media (max-width:980px){ .pg { grid-template-columns: 1fr 1fr !important; } } @media (max-width:560px){ .pg { grid-template-columns: 1fr !important; } }`}</style>
+      </section>
+    </>
+  );
+}
+
+function BaoHanhPage() {
+  const [code, setCode] = React.useState('');
+  const [res, setRes] = React.useState(null);
+  const run = (v) => {
+    const c = (v || 'ADC-2024-8X7F').toUpperCase();
+    setCode(c);
+    setTimeout(() => setRes({ code:c, product:'Sứ Zirconia Cercon HT', lab:'Nha khoa Minh Châu', date:'15/08/2024', exp:'15/08/2034', rem:104, tot:120 }), 300);
+  };
+  return (
+    <>
+      <PageHero eyebrow="Warranty · Bảo hành" title="Cam kết" serif="bảo hành —" tail="đến 19 năm." subtitle="Nhập mã bảo hành trên phiếu đi kèm sản phẩm để tra cứu tình trạng, thời hạn và các quyền lợi kèm theo."/>
+      <section className="grain" style={{ padding: '88px 0 120px', background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))', color: '#fff' }}>
+        <div className="container">
+          <div style={{ maxWidth: 720, margin: '0 auto', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 'var(--r-xl)', padding: 48, backdropFilter: 'blur(20px)' }}>
+            <div style={{ textAlign: 'center', marginBottom: 36 }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <span style={{ width: 24, height: 1, background: 'var(--gold)' }}/>
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>Tra cứu bảo hành</span>
+                <span style={{ width: 24, height: 1, background: 'var(--gold)' }}/>
+              </div>
+              <h2 className="display" style={{ fontSize: 32, margin: 0, fontWeight: 500, color: '#fff' }}>Nhập mã bảo hành</h2>
+              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.6)', margin: '12px 0 0' }}>Mã có 8 ký tự, in trên phiếu bảo hành đi kèm sản phẩm</p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+              <input value={code} onChange={e => setCode(e.target.value)} placeholder="VD: ADC-2024-8X7F" style={{ flex: 1, padding: '16px 20px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: 10, color: '#fff', fontFamily: 'var(--font-mono)', fontSize: 15, letterSpacing: '0.1em', textTransform: 'uppercase', outline: 'none' }}/>
+              <button className="btn btn-primary" onClick={() => run(code)} style={{ padding: '16px 28px' }}>Tra cứu</button>
+            </div>
+            <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+              Chưa có mã? <a style={{ color: 'var(--gold-light)', cursor: 'pointer' }} onClick={() => run()}>Thử với mã demo</a>
+            </div>
+            {res && (
+              <div style={{ marginTop: 36, padding: 28, background: 'rgba(6,182,212,0.08)', border: '1px solid rgba(6,182,212,0.25)', borderRadius: 14 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700 }}>✓</div>
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>Đang trong thời gian bảo hành</div>
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: 11, color: 'var(--gold-light)' }}>{res.code}</div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  {[['Sản phẩm', res.product],['Labo', res.lab],['Ngày kích hoạt', res.date],['Hết hạn', res.exp]].map(([k,v]) => (
+                    <div key={k}>
+                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-mono)', letterSpacing: '0.15em', marginBottom: 4 }}>{k.toUpperCase()}</div>
+                      <div style={{ fontSize: 14, color: '#fff', fontWeight: 500 }}>{v}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12, marginBottom: 8 }}>
+                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>Còn lại</span>
+                    <span style={{ color: 'var(--gold-light)', fontWeight: 600 }}>{res.rem}/{res.tot} tháng</span>
+                  </div>
+                  <div style={{ height: 4, background: 'rgba(255,255,255,0.08)', borderRadius: 2, overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${res.rem/res.tot*100}%`, background: 'linear-gradient(90deg, var(--accent), var(--gold))' }}/>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
+      <section style={{ padding: '120px 0', background: 'var(--bg-warm)' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1.3fr', gap: 80 }} className="pol">
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }}/>
+              <span className="eyebrow">Chính sách</span>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(28px, 3vw, 40px)', margin: '0 0 24px' }}>
+              Bảo hành <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>minh bạch</span>.
+            </h2>
+            <p style={{ fontSize: 15, color: 'var(--ink-500)', lineHeight: 1.75 }}>
+              Mọi sản phẩm rời xưởng đều kèm phiếu bảo hành ghi rõ thời hạn, phạm vi. Lỗi gia công — làm lại miễn phí trong 72h.
+            </p>
+          </div>
+          <div>
+            {[
+              { c:'Toàn sứ (Zirconia)', p:['Cercon HT · 10 năm', 'Zolid Gen-X · 15 năm', 'Katana UTML · 12 năm'] },
+              { c:'Sứ ép', p:['IPS e.max Press · 7 năm', 'IPS e.max CAD · 7 năm'] },
+              { c:'Implant', p:['Custom Abutment Ti · 10 năm', 'Abutment Zirconia · 10 năm'] },
+              { c:'Hàm tháo lắp', p:['Flexi Partial · 5 năm', 'Hàm nhựa · 3 năm'] },
+            ].map((r, i, a) => (
+              <div key={r.c} style={{ padding: '28px 0', borderTop: '1px solid var(--line)', borderBottom: i === a.length - 1 ? '1px solid var(--line)' : 'none', display: 'grid', gridTemplateColumns: '1fr 1.6fr', gap: 32, alignItems: 'flex-start' }}>
+                <h3 className="display" style={{ fontSize: 18, margin: 0, fontWeight: 600 }}>{r.c}</h3>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                  {r.p.map(item => (
+                    <li key={item} style={{ padding: '6px 0', fontSize: 14, color: 'var(--ink-700)', display: 'flex', alignItems: 'center', gap: 10 }}>
+                      <span style={{ width: 4, height: 4, borderRadius: '50%', background: 'var(--accent)' }}/>{item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .pol { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
+      </section>
+    </>
+  );
+}
+
+function TuyenDungPage() {
+  const JOBS = [
+    { d:'CAD/CAM', t:'Kỹ thuật viên CAD (2 năm KN)', l:'TP.HCM', ty:'Toàn thời gian', s:'18–25 triệu' },
+    { d:'CAD/CAM', t:'Chuyên viên thiết kế Implant', l:'TP.HCM', ty:'Toàn thời gian', s:'22–30 triệu' },
+    { d:'Sản xuất', t:'KTV vận hành máy CNC 5 trục', l:'TP.HCM', ty:'Toàn thời gian', s:'15–20 triệu' },
+    { d:'QC', t:'Nhân viên kiểm soát chất lượng', l:'TP.HCM', ty:'Toàn thời gian', s:'14–18 triệu' },
+    { d:'Kinh doanh', t:'Sales B2B (Labo đối tác)', l:'HCM/HN/ĐN', ty:'Toàn thời gian', s:'15tr + hoa hồng' },
+    { d:'Marketing', t:'Content Marketing B2B', l:'TP.HCM', ty:'Toàn thời gian', s:'12–18 triệu' },
+  ];
+  return (
+    <>
+      <PageHero eyebrow="Careers · Tuyển dụng" title="Cùng xây dựng" serif="tương lai" tail="nha khoa số." subtitle="Alpha Digital Center đang mở rộng đội ngũ — tìm những con người yêu nghề, thích học và dám làm khác." image={IMG.team}/>
+      <section style={{ padding: '120px 0', background: 'var(--bg)' }}>
+        <div className="container">
+          <div style={{ marginBottom: 48 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }}/>
+              <span className="eyebrow">Vị trí đang tuyển</span>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(28px, 3vw, 42px)', margin: 0 }}>
+              {JOBS.length} vị trí <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>chờ bạn</span>.
+            </h2>
+          </div>
+          <div>
+            {JOBS.map((j, i, a) => (
+              <a key={j.t} style={{ display: 'grid', gridTemplateColumns: '140px 1fr 180px 160px 40px', gap: 24, alignItems: 'center', padding: '26px 0', borderTop: '1px solid var(--line)', borderBottom: i === a.length - 1 ? '1px solid var(--line)' : 'none', color: 'var(--ink-900)', cursor: 'pointer' }} className="jr">
+                <div className="eyebrow" style={{ fontSize: 11 }}>{j.d}</div>
+                <div className="display" style={{ fontSize: 17, fontWeight: 600 }}>{j.t}</div>
+                <div style={{ fontSize: 13, color: 'var(--ink-500)' }}>📍 {j.l} · {j.ty}</div>
+                <div style={{ fontSize: 14, color: 'var(--accent-600)', fontWeight: 600 }}>{j.s}</div>
+                <div style={{ textAlign: 'right', color: 'var(--ink-400)' }}>↗</div>
+              </a>
+            ))}
+          </div>
+          <style>{`@media (max-width:900px){ .jr { grid-template-columns: 1fr !important; gap: 6px !important; } .jr > div:last-child { display: none; } }`}</style>
+        </div>
+      </section>
+      <section className="grain" style={{ padding: '120px 0', background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))', color: '#fff' }}>
+        <div className="container">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: 72, alignItems: 'center' }} className="pk">
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>Why Alpha</span>
+              </div>
+              <h2 className="display" style={{ fontSize: 'clamp(28px, 3vw, 42px)', margin: '0 0 24px', color: '#fff' }}>
+                Đầu tư vào <span className="serif" style={{ color: 'var(--gold-light)', fontWeight: 400 }}>con người</span>, không chỉ máy móc.
+              </h2>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.8 }}>
+                Đội ngũ 45 người, gần 70% gắn bó trên 5 năm — đó là thước đo của chúng tôi.
+              </p>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, background: 'rgba(255,255,255,0.08)' }}>
+              {[
+                { t:'Lương cạnh tranh', d:'Base + thưởng sản lượng + thưởng QC. Review 6 tháng.' },
+                { t:'Đào tạo quốc tế', d:'Workshop từ Dentsply, Ivoclar. Đi IDS Cologne 2 năm/lần.' },
+                { t:'Bảo hiểm cao cấp', d:'BHYT + BHNT + khám sức khoẻ định kỳ tại FV.' },
+                { t:'Môi trường chuyên nghiệp', d:'Xưởng sản xuất đạt ISO 13485. Máy móc thế hệ mới.' },
+              ].map(p => (
+                <div key={p.t} style={{ background: 'var(--navy-900)', padding: 32 }}>
+                  <h3 className="display" style={{ fontSize: 18, margin: '0 0 10px', color: '#fff', fontWeight: 600 }}>{p.t}</h3>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.7, margin: 0 }}>{p.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .pk { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
+      </section>
+    </>
+  );
+}
+
+function LienHePage() {
+  const [sent, setSent] = React.useState(false);
+  const fs = { width: '100%', padding: '14px 16px', background: '#fff', border: '1px solid var(--line)', borderRadius: 10, color: 'var(--ink-900)', fontFamily: 'var(--font-body)', fontSize: 14, outline: 'none', boxSizing: 'border-box' };
+  return (
+    <>
+      <PageHero eyebrow="Contact · Liên hệ" title="Hãy" serif="trò chuyện" tail="với chúng tôi." subtitle="Dù là báo giá, tư vấn kỹ thuật, hay đơn giản muốn tìm hiểu Alpha — chúng tôi luôn sẵn sàng nghe từ bạn."/>
+      <section style={{ padding: '120px 0', background: 'var(--bg)' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: '1fr 1.1fr', gap: 80 }} className="ct">
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }}/>
+              <span className="eyebrow">Kênh liên hệ</span>
+            </div>
+            <h2 className="display" style={{ fontSize: 'clamp(28px, 3vw, 42px)', margin: '0 0 28px' }}>
+              Luôn sẵn sàng <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>hỗ trợ</span> bạn.
+            </h2>
+            <p style={{ fontSize: 15, color: 'var(--ink-500)', lineHeight: 1.75, marginBottom: 40 }}>
+              Đội ngũ kinh doanh và kỹ thuật của Alpha luôn sẵn sàng tư vấn — từ câu hỏi kỹ thuật đến báo giá nhanh.
+            </p>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {[
+                ['HOTLINE · 24/7', '0378 422 496', 'Hỗ trợ kỹ thuật & đặt hàng'],
+                ['EMAIL', 'info@alphacenter.vn', 'Phản hồi trong 2 giờ'],
+                ['ZALO OFFICIAL', '0378 422 496', 'Chat nhanh, gửi file CAD'],
+                ['GIỜ LÀM VIỆC', '07:30 — 17:30', 'Thứ 2 đến Thứ 7'],
+              ].map(([l, v, s]) => (
+                <div key={l} style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 20, padding: '16px 0', borderTop: '1px solid var(--line)', alignItems: 'center' }}>
+                  <div className="eyebrow" style={{ fontSize: 11 }}>{l}</div>
+                  <div>
+                    <div className="display" style={{ fontSize: 18, fontWeight: 600, marginBottom: 2 }}>{v}</div>
+                    <div style={{ fontSize: 12, color: 'var(--ink-500)' }}>{s}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ background: '#fff', border: '1px solid var(--line)', borderRadius: 'var(--r-xl)', padding: 48, boxShadow: 'var(--sh-md)' }}>
+            {sent ? (
+              <div style={{ textAlign: 'center', padding: '40px 20px' }}>
+                <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', color: '#fff', fontSize: 28, fontWeight: 700 }}>✓</div>
+                <h3 className="display" style={{ fontSize: 24, margin: '0 0 12px', fontWeight: 600 }}>Cảm ơn bạn!</h3>
+                <p style={{ fontSize: 14, color: 'var(--ink-500)' }}>Chúng tôi sẽ liên hệ trong vòng 24 giờ.</p>
+              </div>
+            ) : (
+              <form onSubmit={e => { e.preventDefault(); setSent(true); }}>
+                <h3 className="display" style={{ fontSize: 22, margin: '0 0 6px', fontWeight: 600 }}>Gửi tin nhắn</h3>
+                <p style={{ fontSize: 13, color: 'var(--ink-500)', margin: '0 0 24px' }}>Đội ngũ sẽ phản hồi trong 24h.</p>
+                <div style={{ display: 'grid', gap: 12 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    <input required placeholder="Họ và tên *" style={fs}/>
+                    <input required type="tel" placeholder="Điện thoại *" style={fs}/>
+                  </div>
+                  <input type="email" placeholder="Email" style={fs}/>
+                  <input placeholder="Tên labo / phòng khám" style={fs}/>
+                  <select defaultValue="" style={fs}>
+                    <option value="" disabled>Chủ đề *</option>
+                    <option>Yêu cầu báo giá</option>
+                    <option>Tư vấn kỹ thuật</option>
+                    <option>Đối tác / hợp tác</option>
+                    <option>Khác</option>
+                  </select>
+                  <textarea rows={4} required placeholder="Nội dung *" style={{ ...fs, resize: 'vertical', minHeight: 100 }}/>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '14px 24px', justifyContent: 'center', marginTop: 8 }}>Gửi yêu cầu →</button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .ct { grid-template-columns: 1fr !important; gap: 48px !important; } }`}</style>
+      </section>
+      <section style={{ padding: '0 0 120px', background: 'var(--bg)' }}>
+        <div className="container">
+          <div style={{ borderRadius: 'var(--r-xl)', overflow: 'hidden', border: '1px solid var(--line)', display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: 420 }} className="mw">
+            <div style={{ padding: 48, background: 'var(--navy-900)', color: '#fff', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <span style={{ width: 28, height: 1, background: 'var(--gold)' }}/>
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>Văn phòng</span>
+              </div>
+              <h3 className="display" style={{ fontSize: 28, margin: '0 0 16px', color: '#fff', fontWeight: 500 }}>242/12 Phạm Văn Hai</h3>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.65)', lineHeight: 1.75 }}>Phường 5, Quận Tân Bình,<br/>Thành phố Hồ Chí Minh, Việt Nam</p>
+              <div style={{ display: 'flex', gap: 10, marginTop: 20, flexWrap: 'wrap' }}>
+                <a className="btn btn-primary" style={{ padding: '12px 20px' }}>Xem Google Maps</a>
+                <a className="btn btn-on-dark" style={{ padding: '12px 20px' }}>Chỉ đường</a>
+              </div>
+            </div>
+            <div style={{ position: 'relative', background: '#E6EAF0' }}>
+              <svg width="100%" height="100%" viewBox="0 0 600 420" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute', inset: 0 }}>
+                <rect width="600" height="420" fill="#E6EAF0"/>
+                <g stroke="#CCD4DE" strokeWidth="1">
+                  {Array.from({length:12}).map((_,i)=><line key={'h'+i} x1="0" y1={i*40} x2="600" y2={i*40}/>)}
+                  {Array.from({length:16}).map((_,i)=><line key={'v'+i} x1={i*40} y1="0" x2={i*40} y2="420"/>)}
+                </g>
+                <path d="M 0 220 Q 200 200 400 240 T 600 220" stroke="#C9A961" strokeWidth="6" fill="none" opacity="0.5"/>
+                <path d="M 300 0 L 320 420" stroke="#B8C2D4" strokeWidth="4"/>
+                <circle cx="310" cy="210" r="32" fill="#06B6D4" opacity="0.15"/>
+                <circle cx="310" cy="210" r="16" fill="#06B6D4" opacity="0.3"/>
+                <circle cx="310" cy="210" r="8" fill="#06B6D4"/>
+                <circle cx="310" cy="210" r="3" fill="#fff"/>
+              </svg>
+              <div style={{ position: 'absolute', top: 24, right: 24, padding: '10px 14px', background: '#fff', borderRadius: 8, boxShadow: 'var(--sh-md)', fontSize: 12, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent)' }}/>
+                Alpha Digital Center
+              </div>
+            </div>
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .mw { grid-template-columns: 1fr !important; } .mw > div:last-child { min-height: 280px; } }`}</style>
+      </section>
+    </>
+  );
+}
+
+/* === TWEAKS === */
+function Tweaks({ cur, onChange }) {
+  const [on, setOn] = React.useState(false);
+  React.useEffect(() => {
+    const h = (e) => {
+      if (e.data?.type === '__activate_edit_mode') setOn(true);
+      if (e.data?.type === '__deactivate_edit_mode') setOn(false);
+    };
+    window.addEventListener('message', h);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', h);
+  }, []);
+  if (!on) return null;
+  return (
+    <div style={{ position: 'fixed', bottom: 24, right: 24, background: 'rgba(10,22,40,0.96)', backdropFilter: 'blur(16px)', border: '1px solid rgba(201,169,97,0.3)', borderRadius: 14, padding: 20, color: '#fff', zIndex: 999, minWidth: 260, boxShadow: '0 20px 60px rgba(0,0,0,0.4)' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--gold-light)', letterSpacing: '0.2em', marginBottom: 14 }}>TWEAKS</div>
+      <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.6)', marginBottom: 10 }}>Accent color</div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        {Object.entries(ACCENT_PRESETS).map(([k, p]) => (
+          <button key={k} onClick={() => onChange(k)} style={{ flex: 1, padding: 12, borderRadius: 8, background: cur === k ? 'rgba(255,255,255,0.08)' : 'transparent', border: `1px solid ${cur === k ? p.main : 'rgba(255,255,255,0.12)'}`, color: '#fff', fontSize: 11, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, cursor: 'pointer' }}>
+            <span style={{ width: 20, height: 20, borderRadius: '50%', background: p.main }}/>
+            <span style={{ textTransform: 'capitalize' }}>{k}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* === APP === */
+function App() {
+  const [route, setRoute] = useRoute();
+  const [accent, setAccent] = React.useState(TWEAKS.accent);
+  const onAcc = (k) => { applyAccent(k); setAccent(k); window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { accent: k } }, '*'); };
+  const pages = { home: HomePage, 'gioi-thieu': GioiThieuPage, 'san-pham': SanPhamPage, 'tin-tuc': TinTucPage, 'bao-hanh': BaoHanhPage, 'tuyen-dung': TuyenDungPage, 'lien-he': LienHePage };
+  const Page = pages[route] || HomePage;
+  const label = ROUTES.find(r => r.id === route)?.label || 'Home';
+  return (
+    <div data-screen-label={label}>
+      <Header current={route}/>
+      <Page/>
+      <Footer/>
+      <Tweaks cur={accent} onChange={onAcc}/>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

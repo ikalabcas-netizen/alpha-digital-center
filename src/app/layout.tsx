@@ -1,6 +1,36 @@
 import type { Metadata } from 'next';
+import { Inter, Space_Grotesk, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import { Providers } from '@/components/Providers';
 import './globals.css';
+
+const inter = Inter({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-display',
+  display: 'swap',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500'],
+  style: ['italic'],
+  variable: '--font-serif',
+  display: 'swap',
+});
+
+const jetbrains = JetBrains_Mono({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '500'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -37,7 +67,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="vi">
+    <html lang="vi" className={`${inter.variable} ${spaceGrotesk.variable} ${playfair.variable} ${jetbrains.variable}`}>
       <body><Providers>{children}</Providers></body>
     </html>
   );

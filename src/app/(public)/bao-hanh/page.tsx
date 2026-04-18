@@ -1,400 +1,350 @@
 'use client';
 
 import { useState } from 'react';
-import { colors, fonts, inputStyle, primaryButton, cardStyle } from '@/lib/styles';
-import {
-  Search,
-  Shield,
-  Calendar,
-  Package,
-  CheckCircle,
-  AlertCircle,
-  Clock,
-  Loader2,
-} from 'lucide-react';
+import { PageHero } from '@/components/layout/PageHero';
 
-interface WarrantyResult {
+type Result = {
   code: string;
   product: string;
-  category: string;
-  startDate: string;
-  endDate: string;
-  status: 'active' | 'expired' | 'pending';
   lab: string;
-  notes: string;
-}
+  date: string;
+  exp: string;
+  rem: number;
+  tot: number;
+};
 
 export default function BaoHanhPage() {
   const [code, setCode] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<WarrantyResult | null>(null);
-  const [searched, setSearched] = useState(false);
+  const [res, setRes] = useState<Result | null>(null);
 
-  const handleSearch = async () => {
-    if (!code.trim()) return;
-    setLoading(true);
-    setSearched(true);
-
-    // Simulate API call - replace with real endpoint later
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    // Demo result for testing
-    if (code.trim().toUpperCase().startsWith('ADC')) {
-      setResult({
-        code: code.trim().toUpperCase(),
-        product: 'Sứ Zirconia Cercon HT',
-        category: 'Toàn sứ',
-        startDate: '15/03/2024',
-        endDate: '15/03/2034',
-        status: 'active',
-        lab: 'Labo Nha Khoa ABC',
-        notes: 'Bảo hành 10 năm - Sườn Zirconia Cercon HT Dentsply Sirona',
-      });
-    } else {
-      setResult(null);
-    }
-
-    setLoading(false);
-  };
-
-  const statusConfig = {
-    active: {
-      label: 'Còn hiệu lực',
-      bg: '#f0fdf4',
-      color: '#16a34a',
-      icon: CheckCircle,
-    },
-    expired: {
-      label: 'Hết hạn',
-      bg: '#fff1f2',
-      color: '#e11d48',
-      icon: AlertCircle,
-    },
-    pending: {
-      label: 'Đang xử lý',
-      bg: '#fffbeb',
-      color: '#d97706',
-      icon: Clock,
-    },
+  const run = (v?: string) => {
+    const c = (v || 'ADC-2024-8X7F').toUpperCase();
+    setCode(c);
+    setTimeout(
+      () =>
+        setRes({
+          code: c,
+          product: 'Sứ Zirconia Cercon HT',
+          lab: 'Nha khoa Minh Châu',
+          date: '15/08/2024',
+          exp: '15/08/2034',
+          rem: 104,
+          tot: 120,
+        }),
+      300,
+    );
   };
 
   return (
-    <div>
-      {/* Hero */}
+    <>
+      <PageHero
+        eyebrow="Warranty · Bảo hành"
+        title="Cam kết"
+        serif="bảo hành —"
+        tail="đến 19 năm."
+        subtitle="Nhập mã bảo hành trên phiếu đi kèm sản phẩm để tra cứu tình trạng, thời hạn và các quyền lợi kèm theo."
+      />
+
+      {/* Warranty lookup */}
       <section
+        className="grain"
         style={{
-          background: 'linear-gradient(135deg, #ecfeff 0%, #f0f9ff 40%, #e0f2fe 100%)',
-          padding: '60px 0 48px',
+          padding: '88px 0 120px',
+          background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))',
+          color: '#fff',
         }}
       >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
+        <div className="container">
           <div
             style={{
-              width: 64,
-              height: 64,
-              background: colors.primaryBg,
-              borderRadius: 16,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 18px',
-            }}
-          >
-            <Shield size={28} color={colors.primary} />
-          </div>
-          <h1
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: 'clamp(26px, 3.5vw, 38px)',
-              fontWeight: 800,
-              color: colors.textPrimary,
-              lineHeight: 1.2,
-              marginBottom: 12,
-            }}
-          >
-            Tra Cứu <span style={{ color: colors.primary }}>Bảo Hành</span>
-          </h1>
-          <p
-            style={{
-              fontSize: 15,
-              color: colors.textSecondary,
-              lineHeight: 1.7,
-              maxWidth: 550,
+              maxWidth: 720,
               margin: '0 auto',
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: 'var(--r-xl)',
+              padding: 48,
+              backdropFilter: 'blur(20px)',
             }}
           >
-            Nhập mã bảo hành in trên thẻ bảo hành đi kèm sản phẩm để kiểm tra
-            thông tin và trạng thái bảo hành.
-          </p>
-        </div>
-      </section>
-
-      {/* Search Section */}
-      <section style={{ padding: '48px 0 64px' }}>
-        <div style={{ maxWidth: 560, margin: '0 auto', padding: '0 24px' }}>
-          {/* Search Box */}
-          <div
-            style={{
-              background: colors.cardBg,
-              borderRadius: 16,
-              padding: 28,
-              border: `1px solid ${colors.border}`,
-              boxShadow: '0 2px 8px rgba(6,182,212,0.08)',
-              marginBottom: 24,
-            }}
-          >
-            <label
-              style={{
-                display: 'block',
-                fontSize: 13,
-                fontWeight: 600,
-                color: colors.textPrimary,
-                marginBottom: 8,
-                fontFamily: fonts.body,
-              }}
-            >
-              Mã bảo hành
-            </label>
-            <div style={{ display: 'flex', gap: 10 }}>
+            <div style={{ textAlign: 'center', marginBottom: 36 }}>
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  marginBottom: 16,
+                }}
+              >
+                <span style={{ width: 24, height: 1, background: 'var(--gold)' }} />
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>
+                  Tra cứu bảo hành
+                </span>
+                <span style={{ width: 24, height: 1, background: 'var(--gold)' }} />
+              </div>
+              <h2
+                className="display"
+                style={{ fontSize: 32, margin: 0, fontWeight: 500, color: '#fff' }}
+              >
+                Nhập mã bảo hành
+              </h2>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: 'rgba(255,255,255,0.6)',
+                  margin: '12px 0 0',
+                }}
+              >
+                Mã có 8 ký tự, in trên phiếu bảo hành đi kèm sản phẩm
+              </p>
+            </div>
+            <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
               <input
-                type="text"
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Ví dụ: ADC-2024-00123"
+                placeholder="VD: ADC-2024-8X7F"
                 style={{
-                  ...inputStyle,
                   flex: 1,
-                  padding: '11px 14px',
-                  fontSize: 14,
+                  padding: '16px 20px',
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 10,
+                  color: '#fff',
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 15,
+                  letterSpacing: '0.1em',
+                  textTransform: 'uppercase',
+                  outline: 'none',
                 }}
               />
               <button
-                onClick={handleSearch}
-                disabled={loading || !code.trim()}
+                onClick={() => run(code)}
                 style={{
-                  ...primaryButton,
-                  padding: '11px 22px',
-                  fontSize: 14,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  opacity: loading || !code.trim() ? 0.6 : 1,
-                  whiteSpace: 'nowrap',
+                  padding: '16px 28px',
+                  borderRadius: 999,
+                  background: 'var(--accent)',
+                  color: '#fff',
+                  border: 'none',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                  cursor: 'pointer',
                 }}
               >
-                {loading ? (
-                  <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                ) : (
-                  <Search size={16} />
-                )}
                 Tra cứu
               </button>
             </div>
-            <p style={{ fontSize: 12, color: colors.textMuted, marginTop: 8 }}>
-              Mã bảo hành gồm 3 phần, cách nhau bằng dấu gạch ngang. Ví dụ: ADC-2024-00123
-            </p>
-          </div>
-
-          {/* Results */}
-          {searched && !loading && (
-            <>
-              {result ? (
+            <div style={{ textAlign: 'center', fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>
+              Chưa có mã?{' '}
+              <a
+                style={{ color: 'var(--gold-light)', cursor: 'pointer' }}
+                onClick={() => run()}
+              >
+                Thử với mã demo
+              </a>
+            </div>
+            {res && (
+              <div
+                style={{
+                  marginTop: 36,
+                  padding: 28,
+                  background: 'rgba(6,182,212,0.08)',
+                  border: '1px solid rgba(6,182,212,0.25)',
+                  borderRadius: 14,
+                }}
+              >
                 <div
                   style={{
-                    background: colors.cardBg,
-                    borderRadius: 16,
-                    border: `1px solid ${colors.border}`,
-                    boxShadow: '0 2px 8px rgba(6,182,212,0.08)',
-                    overflow: 'hidden',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: 20,
                   }}
                 >
-                  {/* Status Header */}
-                  <div
-                    style={{
-                      background: statusConfig[result.status].bg,
-                      padding: '16px 24px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 10,
-                      borderBottom: `1px solid ${colors.border}`,
-                    }}
-                  >
-                    {(() => {
-                      const StatusIcon = statusConfig[result.status].icon;
-                      return <StatusIcon size={20} color={statusConfig[result.status].color} />;
-                    })()}
-                    <span
-                      style={{
-                        fontSize: 14,
-                        fontWeight: 700,
-                        color: statusConfig[result.status].color,
-                      }}
-                    >
-                      {statusConfig[result.status].label}
-                    </span>
-                  </div>
-
-                  {/* Details */}
-                  <div style={{ padding: 24 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div
                       style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr 1fr',
-                        gap: 20,
+                        width: 28,
+                        height: 28,
+                        borderRadius: '50%',
+                        background: 'var(--accent)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontWeight: 700,
                       }}
                     >
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                          <Shield size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Mã bảo hành</span>
-                        </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
-                          {result.code}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                          <Package size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Sản phẩm</span>
-                        </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
-                          {result.product}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                          <Calendar size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ngày bắt đầu</span>
-                        </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
-                          {result.startDate}
-                        </div>
-                      </div>
-
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                          <Calendar size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Ngày hết hạn</span>
-                        </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
-                          {result.endDate}
-                        </div>
-                      </div>
-
-                      <div style={{ gridColumn: '1 / -1' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
-                          <Package size={14} color={colors.textMuted} />
-                          <span style={{ fontSize: 12, color: colors.textMuted }}>Labo</span>
-                        </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: colors.textPrimary }}>
-                          {result.lab}
-                        </div>
-                      </div>
+                      ✓
                     </div>
-
-                    {result.notes && (
-                      <div
-                        style={{
-                          marginTop: 18,
-                          padding: '12px 14px',
-                          background: colors.primaryUltraLight,
-                          borderRadius: 8,
-                          fontSize: 13,
-                          color: colors.textSecondary,
-                          lineHeight: 1.5,
-                        }}
-                      >
-                        {result.notes}
-                      </div>
-                    )}
+                    <div style={{ fontSize: 14, fontWeight: 600 }}>
+                      Đang trong thời gian bảo hành
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: 11,
+                      color: 'var(--gold-light)',
+                    }}
+                  >
+                    {res.code}
                   </div>
                 </div>
-              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+                  {(
+                    [
+                      ['Sản phẩm', res.product],
+                      ['Labo', res.lab],
+                      ['Ngày kích hoạt', res.date],
+                      ['Hết hạn', res.exp],
+                    ] as [string, string][]
+                  ).map(([k, v]) => (
+                    <div key={k}>
+                      <div
+                        style={{
+                          fontSize: 10,
+                          color: 'rgba(255,255,255,0.45)',
+                          fontFamily: 'var(--font-mono)',
+                          letterSpacing: '0.15em',
+                          marginBottom: 4,
+                        }}
+                      >
+                        {k.toUpperCase()}
+                      </div>
+                      <div style={{ fontSize: 14, color: '#fff', fontWeight: 500 }}>{v}</div>
+                    </div>
+                  ))}
+                </div>
                 <div
                   style={{
-                    ...cardStyle,
-                    borderRadius: 16,
-                    padding: 40,
-                    textAlign: 'center',
+                    marginTop: 24,
+                    paddingTop: 20,
+                    borderTop: '1px solid rgba(255,255,255,0.1)',
                   }}
                 >
-                  <AlertCircle
-                    size={40}
-                    color={colors.textMuted}
-                    style={{ marginBottom: 12 }}
-                  />
-                  <h3
+                  <div
                     style={{
-                      fontFamily: fonts.heading,
-                      fontSize: 16,
-                      fontWeight: 700,
-                      color: colors.textPrimary,
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      fontSize: 12,
                       marginBottom: 8,
                     }}
                   >
-                    Không tìm thấy thông tin bảo hành
-                  </h3>
-                  <p style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 1.5 }}>
-                    Mã bảo hành không tồn tại hoặc chưa được kích hoạt.
-                    Vui lòng kiểm tra lại mã hoặc liên hệ hotline{' '}
-                    <a href="tel:0378422496" style={{ color: colors.primary, fontWeight: 600 }}>
-                      0378 422 496
-                    </a>{' '}
-                    để được hỗ trợ.
-                  </p>
+                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>Còn lại</span>
+                    <span style={{ color: 'var(--gold-light)', fontWeight: 600 }}>
+                      {res.rem}/{res.tot} tháng
+                    </span>
+                  </div>
+                  <div
+                    style={{
+                      height: 4,
+                      background: 'rgba(255,255,255,0.08)',
+                      borderRadius: 2,
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        height: '100%',
+                        width: `${(res.rem / res.tot) * 100}%`,
+                        background: 'linear-gradient(90deg, var(--accent), var(--gold))',
+                      }}
+                    />
+                  </div>
                 </div>
-              )}
-            </>
-          )}
-
-          {/* Info */}
-          <div
-            style={{
-              marginTop: 32,
-              padding: '20px 24px',
-              background: colors.primaryUltraLight,
-              borderRadius: 12,
-              border: `1px solid ${colors.borderCyan}`,
-            }}
-          >
-            <h3
-              style={{
-                fontFamily: fonts.heading,
-                fontSize: 14,
-                fontWeight: 700,
-                color: colors.textPrimary,
-                marginBottom: 10,
-              }}
-            >
-              Chính sách bảo hành
-            </h3>
-            <ul
-              style={{
-                fontSize: 13,
-                color: colors.textSecondary,
-                lineHeight: 1.7,
-                paddingLeft: 18,
-                margin: 0,
-              }}
-            >
-              <li>Bảo hành từ 3 - 19 năm tùy dòng sản phẩm</li>
-              <li>Bảo hành miễn phí lỗi kỹ thuật do Alpha Digital Center</li>
-              <li>Hỗ trợ bảo hành nhanh chóng trong 24-48h</li>
-              <li>Liên hệ hotline 0378 422 496 để bảo hành trực tiếp</li>
-            </ul>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-      `}</style>
-    </div>
+      {/* Warranty policy */}
+      <section style={{ padding: '120px 0', background: 'var(--bg-warm)' }}>
+        <div
+          className="container pol"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1.3fr',
+            gap: 80,
+          }}
+        >
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }} />
+              <span className="eyebrow">Chính sách</span>
+            </div>
+            <h2
+              className="display"
+              style={{ fontSize: 'clamp(28px, 3vw, 40px)', margin: '0 0 24px' }}
+            >
+              Bảo hành{' '}
+              <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>
+                minh bạch
+              </span>
+              .
+            </h2>
+            <p style={{ fontSize: 15, color: 'var(--ink-500)', lineHeight: 1.75 }}>
+              Mọi sản phẩm rời xưởng đều kèm phiếu bảo hành ghi rõ thời hạn, phạm vi. Lỗi gia công — làm lại miễn phí trong 72h.
+            </p>
+          </div>
+          <div>
+            {[
+              {
+                c: 'Toàn sứ (Zirconia)',
+                p: ['Cercon HT · 10 năm', 'Zolid Gen-X · 15 năm', 'Katana UTML · 12 năm'],
+              },
+              { c: 'Sứ ép', p: ['IPS e.max Press · 7 năm', 'IPS e.max CAD · 7 năm'] },
+              {
+                c: 'Implant',
+                p: ['Custom Abutment Ti · 10 năm', 'Abutment Zirconia · 10 năm'],
+              },
+              { c: 'Hàm tháo lắp', p: ['Flexi Partial · 5 năm', 'Hàm nhựa · 3 năm'] },
+            ].map((r, i, a) => (
+              <div
+                key={r.c}
+                style={{
+                  padding: '28px 0',
+                  borderTop: '1px solid var(--line)',
+                  borderBottom: i === a.length - 1 ? '1px solid var(--line)' : 'none',
+                  display: 'grid',
+                  gridTemplateColumns: '1fr 1.6fr',
+                  gap: 32,
+                  alignItems: 'flex-start',
+                }}
+              >
+                <h3 className="display" style={{ fontSize: 18, margin: 0, fontWeight: 600 }}>
+                  {r.c}
+                </h3>
+                <ul style={{ margin: 0, padding: 0, listStyle: 'none' }}>
+                  {r.p.map((item) => (
+                    <li
+                      key={item}
+                      style={{
+                        padding: '6px 0',
+                        fontSize: 14,
+                        color: 'var(--ink-700)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 10,
+                      }}
+                    >
+                      <span
+                        style={{
+                          width: 4,
+                          height: 4,
+                          borderRadius: '50%',
+                          background: 'var(--accent)',
+                        }}
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+        <style>{`@media (max-width:900px){ .pol { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
+      </section>
+    </>
   );
 }

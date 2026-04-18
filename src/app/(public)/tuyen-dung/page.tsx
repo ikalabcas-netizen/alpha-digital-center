@@ -1,393 +1,198 @@
-import { colors, fonts } from '@/lib/styles';
-import Link from 'next/link';
-import type { Metadata } from 'next';
-import {
-  Briefcase,
-  MapPin,
-  Clock,
-  Heart,
-  GraduationCap,
-  TrendingUp,
-  Users,
-  Mail,
-  ArrowRight,
-} from 'lucide-react';
+import { PageHero } from '@/components/layout/PageHero';
 
-export const metadata: Metadata = {
-  title: 'Tuyển dụng | Alpha Digital Center',
-  description:
-    'Cơ hội nghề nghiệp tại Alpha Digital Center. Gia nhập đội ngũ kỹ thuật viên nha khoa chuyên nghiệp, môi trường làm việc hiện đại.',
+const IMG = {
+  team: 'https://images.unsplash.com/photo-1559757175-0eb30cd8c063?w=1400&q=80',
 };
 
-const BENEFITS = [
-  {
-    icon: TrendingUp,
-    title: 'Phát triển nghề nghiệp',
-    description: 'Cơ hội học hỏi và phát triển kỹ năng với công nghệ CAD/CAM, in 3D tiên tiến nhất.',
-  },
-  {
-    icon: Heart,
-    title: 'Phúc lợi hấp dẫn',
-    description: 'Lương cạnh tranh, BHXH đầy đủ, thưởng lễ tết, team building hàng quý.',
-  },
-  {
-    icon: GraduationCap,
-    title: 'Đào tạo liên tục',
-    description: 'Chương trình đào tạo nội bộ, tham gia hội nghị chuyên ngành, cập nhật công nghệ mới.',
-  },
-  {
-    icon: Users,
-    title: 'Môi trường thân thiện',
-    description: 'Đội ngũ trẻ, năng động, hỗ trợ lẫn nhau. Văn hóa làm việc cởi mở và sáng tạo.',
-  },
-];
-
-const PLACEHOLDER_JOBS = [
-  {
-    title: 'Kỹ thuật viên CAD/CAM',
-    type: 'Toàn thời gian',
-    location: 'Tân Bình, TP.HCM',
-    description:
-      'Thiết kế phục hình nha khoa trên phần mềm CAD. Yêu cầu: có kinh nghiệm 3Shape, Exocad hoặc tương đương.',
-  },
-  {
-    title: 'Kỹ thuật viên Labo',
-    type: 'Toàn thời gian',
-    location: 'Tân Bình, TP.HCM',
-    description:
-      'Gia công, đắp sứ, hoàn thiện sản phẩm phục hình. Yêu cầu: tốt nghiệp chuyên ngành, có kinh nghiệm 1+ năm.',
-  },
-  {
-    title: 'Nhân viên Kinh doanh',
-    type: 'Toàn thời gian',
-    location: 'Tân Bình, TP.HCM',
-    description:
-      'Chăm sóc khách hàng, tư vấn sản phẩm, phát triển khách hàng mới. Yêu cầu: giao tiếp tốt, ưu tiên có kiến thức nha khoa.',
-  },
+const JOBS = [
+  { d: 'CAD/CAM', t: 'Kỹ thuật viên CAD (2 năm KN)', l: 'TP.HCM', ty: 'Toàn thời gian', s: '18–25 triệu' },
+  { d: 'CAD/CAM', t: 'Chuyên viên thiết kế Implant', l: 'TP.HCM', ty: 'Toàn thời gian', s: '22–30 triệu' },
+  { d: 'Sản xuất', t: 'KTV vận hành máy CNC 5 trục', l: 'TP.HCM', ty: 'Toàn thời gian', s: '15–20 triệu' },
+  { d: 'QC', t: 'Nhân viên kiểm soát chất lượng', l: 'TP.HCM', ty: 'Toàn thời gian', s: '14–18 triệu' },
+  { d: 'Kinh doanh', t: 'Sales B2B (Labo đối tác)', l: 'HCM/HN/ĐN', ty: 'Toàn thời gian', s: '15tr + hoa hồng' },
+  { d: 'Marketing', t: 'Content Marketing B2B', l: 'TP.HCM', ty: 'Toàn thời gian', s: '12–18 triệu' },
 ];
 
 export default function TuyenDungPage() {
   return (
-    <div>
-      {/* Hero */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #ecfeff 0%, #f0f9ff 40%, #e0f2fe 100%)',
-          padding: '60px 0 48px',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <div
-            style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              background: colors.primaryBg,
-              color: colors.primaryHover,
-              borderRadius: 20,
-              fontSize: 12,
-              fontWeight: 600,
-              marginBottom: 16,
-            }}
-          >
-            Cơ hội nghề nghiệp
-          </div>
-          <h1
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: 'clamp(26px, 3.5vw, 38px)',
-              fontWeight: 800,
-              color: colors.textPrimary,
-              lineHeight: 1.2,
-              marginBottom: 12,
-            }}
-          >
-            Tuyển Dụng
-          </h1>
-          <p
-            style={{
-              fontSize: 15,
-              color: colors.textSecondary,
-              lineHeight: 1.7,
-              maxWidth: 600,
-              margin: '0 auto',
-            }}
-          >
-            Gia nhập Alpha Digital Center - nơi bạn được phát triển nghề nghiệp
-            trong môi trường công nghệ hiện đại, đội ngũ chuyên nghiệp và nhiệt huyết.
-          </p>
-        </div>
-      </section>
+    <>
+      <PageHero
+        eyebrow="Careers · Tuyển dụng"
+        title="Cùng xây dựng"
+        serif="tương lai"
+        tail="nha khoa số."
+        subtitle="Alpha Digital Center đang mở rộng đội ngũ — tìm những con người yêu nghề, thích học và dám làm khác."
+        image={IMG.team}
+      />
 
-      {/* Benefits */}
-      <section style={{ padding: '56px 0' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
+      {/* Job list */}
+      <section style={{ padding: '120px 0', background: 'var(--bg)' }}>
+        <div className="container">
+          <div style={{ marginBottom: 48 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+              <span style={{ width: 28, height: 1, background: 'var(--accent)' }} />
+              <span className="eyebrow">Vị trí đang tuyển</span>
+            </div>
             <h2
-              style={{
-                fontFamily: fonts.heading,
-                fontSize: 24,
-                fontWeight: 700,
-                color: colors.textPrimary,
-                marginBottom: 8,
-              }}
+              className="display"
+              style={{ fontSize: 'clamp(28px, 3vw, 42px)', margin: 0 }}
             >
-              Tại sao nên gia nhập Alpha?
+              {JOBS.length} vị trí{' '}
+              <span className="serif" style={{ color: 'var(--ink-500)', fontWeight: 400 }}>
+                chờ bạn
+              </span>
+              .
             </h2>
-            <p style={{ fontSize: 14, color: colors.textSecondary }}>
-              Những giá trị chúng tôi mang đến cho thành viên
-            </p>
           </div>
-          <div
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-              gap: 20,
-            }}
-          >
-            {BENEFITS.map((b) => {
-              const Icon = b.icon;
-              return (
-                <div
-                  key={b.title}
-                  style={{
-                    background: colors.cardBg,
-                    borderRadius: 16,
-                    padding: 24,
-                    border: `1px solid ${colors.border}`,
-                    boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-                    textAlign: 'center',
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 48,
-                      height: 48,
-                      background: colors.primaryUltraLight,
-                      borderRadius: 12,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0 auto 14px',
-                    }}
-                  >
-                    <Icon size={22} color={colors.primary} />
-                  </div>
-                  <h3
-                    style={{
-                      fontFamily: fonts.heading,
-                      fontSize: 15,
-                      fontWeight: 700,
-                      color: colors.textPrimary,
-                      marginBottom: 8,
-                    }}
-                  >
-                    {b.title}
-                  </h3>
-                  <p style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 1.6 }}>
-                    {b.description}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Job Listings */}
-      <section style={{ padding: '56px 0', background: '#fff' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-          <div style={{ textAlign: 'center', marginBottom: 36 }}>
-            <h2
-              style={{
-                fontFamily: fonts.heading,
-                fontSize: 24,
-                fontWeight: 700,
-                color: colors.textPrimary,
-                marginBottom: 8,
-              }}
-            >
-              Vị trí đang tuyển
-            </h2>
-            <p style={{ fontSize: 14, color: colors.textSecondary }}>
-              Khám phá các cơ hội phù hợp với bạn
-            </p>
-          </div>
-          <div
-            style={{
-              display: 'grid',
-              gap: 16,
-              maxWidth: 760,
-              margin: '0 auto',
-            }}
-          >
-            {PLACEHOLDER_JOBS.map((job) => (
-              <div
-                key={job.title}
+          <div>
+            {JOBS.map((j, i, a) => (
+              <a
+                key={j.t}
+                href="#"
+                className="jr"
                 style={{
-                  background: colors.pageBg,
-                  borderRadius: 14,
-                  padding: 24,
-                  border: `1px solid ${colors.border}`,
-                  transition: 'all 0.15s ease',
+                  display: 'grid',
+                  gridTemplateColumns: '140px 1fr 180px 160px 40px',
+                  gap: 24,
+                  alignItems: 'center',
+                  padding: '26px 0',
+                  borderTop: '1px solid var(--line)',
+                  borderBottom: i === a.length - 1 ? '1px solid var(--line)' : 'none',
+                  color: 'var(--ink-900)',
+                  cursor: 'pointer',
                 }}
               >
+                <div className="eyebrow" style={{ fontSize: 11 }}>
+                  {j.d}
+                </div>
+                <div className="display" style={{ fontSize: 17, fontWeight: 600 }}>
+                  {j.t}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--ink-500)' }}>
+                  📍 {j.l} · {j.ty}
+                </div>
                 <div
                   style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'flex-start',
-                    marginBottom: 12,
-                    flexWrap: 'wrap',
-                    gap: 10,
+                    fontSize: 14,
+                    color: 'var(--accent-600)',
+                    fontWeight: 600,
                   }}
                 >
+                  {j.s}
+                </div>
+                <div style={{ textAlign: 'right', color: 'var(--ink-400)' }}>↗</div>
+              </a>
+            ))}
+          </div>
+          <style>{`@media (max-width:900px){ .jr { grid-template-columns: 1fr !important; gap: 6px !important; } .jr > div:last-child { display: none; } }`}</style>
+        </div>
+      </section>
+
+      {/* Why Alpha */}
+      <section
+        className="grain"
+        style={{
+          padding: '120px 0',
+          background: 'linear-gradient(180deg, var(--navy-900), var(--navy-800))',
+          color: '#fff',
+        }}
+      >
+        <div className="container">
+          <div
+            className="pk"
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1.2fr',
+              gap: 72,
+              alignItems: 'center',
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20 }}>
+                <span style={{ width: 28, height: 1, background: 'var(--gold)' }} />
+                <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>
+                  Why Alpha
+                </span>
+              </div>
+              <h2
+                className="display"
+                style={{
+                  fontSize: 'clamp(28px, 3vw, 42px)',
+                  margin: '0 0 24px',
+                  color: '#fff',
+                }}
+              >
+                Đầu tư vào{' '}
+                <span className="serif" style={{ color: 'var(--gold-light)', fontWeight: 400 }}>
+                  con người
+                </span>
+                , không chỉ máy móc.
+              </h2>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: 'rgba(255,255,255,0.65)',
+                  lineHeight: 1.8,
+                }}
+              >
+                Đội ngũ 45 người, gần 70% gắn bó trên 5 năm — đó là thước đo của chúng tôi.
+              </p>
+            </div>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: 1,
+                background: 'rgba(255,255,255,0.08)',
+              }}
+            >
+              {[
+                {
+                  t: 'Lương cạnh tranh',
+                  d: 'Base + thưởng sản lượng + thưởng QC. Review 6 tháng.',
+                },
+                {
+                  t: 'Đào tạo quốc tế',
+                  d: 'Workshop từ Dentsply, Ivoclar. Đi IDS Cologne 2 năm/lần.',
+                },
+                {
+                  t: 'Bảo hiểm cao cấp',
+                  d: 'BHYT + BHNT + khám sức khoẻ định kỳ tại FV.',
+                },
+                {
+                  t: 'Môi trường chuyên nghiệp',
+                  d: 'Xưởng sản xuất đạt ISO 13485. Máy móc thế hệ mới.',
+                },
+              ].map((p) => (
+                <div key={p.t} style={{ background: 'var(--navy-900)', padding: 32 }}>
                   <h3
+                    className="display"
                     style={{
-                      fontFamily: fonts.heading,
-                      fontSize: 17,
-                      fontWeight: 700,
-                      color: colors.textPrimary,
-                      margin: 0,
-                    }}
-                  >
-                    {job.title}
-                  </h3>
-                  <div
-                    style={{
-                      display: 'inline-block',
-                      padding: '3px 10px',
-                      background: colors.primaryBg,
-                      color: colors.primaryHover,
-                      borderRadius: 20,
-                      fontSize: 11,
+                      fontSize: 18,
+                      margin: '0 0 10px',
+                      color: '#fff',
                       fontWeight: 600,
                     }}
                   >
-                    Đang tuyển
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    gap: 16,
-                    marginBottom: 12,
-                    flexWrap: 'wrap',
-                  }}
-                >
-                  <span
+                    {p.t}
+                  </h3>
+                  <p
                     style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontSize: 12,
-                      color: colors.textMuted,
+                      fontSize: 13,
+                      color: 'rgba(255,255,255,0.6)',
+                      lineHeight: 1.7,
+                      margin: 0,
                     }}
                   >
-                    <Briefcase size={13} /> {job.type}
-                  </span>
-                  <span
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontSize: 12,
-                      color: colors.textMuted,
-                    }}
-                  >
-                    <MapPin size={13} /> {job.location}
-                  </span>
+                    {p.d}
+                  </p>
                 </div>
-                <p
-                  style={{
-                    fontSize: 13,
-                    color: colors.textSecondary,
-                    lineHeight: 1.6,
-                    margin: 0,
-                  }}
-                >
-                  {job.description}
-                </p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
+        <style>{`@media (max-width:900px){ .pk { grid-template-columns: 1fr !important; gap: 40px !important; } }`}</style>
       </section>
-
-      {/* Application Encouragement */}
-      <section
-        style={{
-          padding: '56px 0',
-          background: 'linear-gradient(135deg, #06b6d4, #0891b2)',
-          textAlign: 'center',
-        }}
-      >
-        <div style={{ maxWidth: 600, margin: '0 auto', padding: '0 24px' }}>
-          <h2
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: 24,
-              fontWeight: 700,
-              color: '#fff',
-              marginBottom: 10,
-            }}
-          >
-            Sẵn sàng gia nhập?
-          </h2>
-          <p
-            style={{
-              fontSize: 14,
-              color: 'rgba(255,255,255,0.85)',
-              marginBottom: 24,
-              lineHeight: 1.6,
-            }}
-          >
-            Gửi CV của bạn qua email hoặc liên hệ trực tiếp. Chúng tôi luôn chào đón
-            những ứng viên có đam mê với nghề nha khoa.
-          </p>
-          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="mailto:info@alphacenter.vn" style={{ textDecoration: 'none' }}>
-              <button
-                style={{
-                  padding: '12px 28px',
-                  background: '#fff',
-                  color: colors.primary,
-                  border: 'none',
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  fontFamily: fonts.body,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                <Mail size={16} /> Gửi CV qua email
-              </button>
-            </a>
-            <Link href="/lien-he" style={{ textDecoration: 'none' }}>
-              <button
-                style={{
-                  padding: '12px 28px',
-                  background: 'rgba(255,255,255,0.15)',
-                  color: '#fff',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  borderRadius: 10,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  cursor: 'pointer',
-                  fontFamily: fonts.body,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                }}
-              >
-                Liên hệ <ArrowRight size={14} />
-              </button>
-            </Link>
-          </div>
-        </div>
-      </section>
-    </div>
+    </>
   );
 }

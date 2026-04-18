@@ -1,348 +1,253 @@
-'use client';
+/* eslint-disable @next/next/no-img-element */
+import { PageHero } from '@/components/layout/PageHero';
 
-import { useState } from 'react';
-import { colors, fonts } from '@/lib/styles';
-import Link from 'next/link';
-import {
-  Newspaper,
-  BookOpen,
-  Cpu,
-  Users,
-  ArrowRight,
-  Calendar,
-  Tag,
-} from 'lucide-react';
+const IMG = {
+  cadcam: 'https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=1000&q=80',
+  tech: 'https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1000&q=80',
+  crown: 'https://images.unsplash.com/photo-1606265752439-1f18756aa5fc?w=1000&q=80',
+  tools: 'https://images.unsplash.com/photo-1609840114035-3c981b782dfe?w=1000&q=80',
+  scanner: 'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1000&q=80',
+  implant: 'https://images.unsplash.com/photo-1626177382002-f43a6d15b7c0?w=1000&q=80',
+};
 
-const CATEGORIES = [
-  { key: 'all', label: 'Tất cả', icon: Newspaper },
-  { key: 'tin-tuc', label: 'Tin tức', icon: Newspaper },
-  { key: 'kien-thuc', label: 'Kiến thức', icon: BookOpen },
-  { key: 'cong-nghe', label: 'Công nghệ', icon: Cpu },
-  { key: 'tuyen-dung', label: 'Tuyển dụng', icon: Users },
-];
+type Post = { cat: string; d: string; t: string; e: string; img: string; feat?: boolean };
 
-const PLACEHOLDER_POSTS = [
+const POSTS: Post[] = [
   {
-    slug: 'su-khac-biet-zirconia-emax',
-    title: 'Sự khác biệt giữa Zirconia và E.Max - Lựa chọn nào phù hợp?',
-    excerpt:
-      'Tìm hiểu ưu nhược điểm của sứ Zirconia và sứ ép E.Max để tư vấn đúng cho từng trường hợp lâm sàng.',
-    category: 'kien-thuc',
-    date: '10/04/2026',
-    readTime: '5 phút đọc',
+    cat: 'Công nghệ',
+    d: '12 Apr 2026',
+    t: 'AI trong thiết kế CAD nha khoa: tương lai đã đến',
+    e: 'Machine learning rút ngắn thời gian thiết kế từ 45 phút xuống 8 phút.',
+    img: IMG.scanner,
+    feat: true,
   },
   {
-    slug: 'cong-nghe-cadcam-nha-khoa',
-    title: 'Công nghệ CAD/CAM trong nha khoa - Xu hướng tất yếu',
-    excerpt:
-      'Ứng dụng công nghệ CAD/CAM giúp nâng cao độ chính xác, rút ngắn thời gian sản xuất phục hình nha khoa.',
-    category: 'cong-nghe',
-    date: '05/04/2026',
-    readTime: '7 phút đọc',
+    cat: 'Vật liệu',
+    d: '08 Apr 2026',
+    t: 'So sánh Zirconia thế hệ 5 vs Multilayer',
+    e: 'Độ trong suốt, độ bền, giá thành — phân tích chi tiết.',
+    img: IMG.crown,
   },
   {
-    slug: 'huong-dan-chon-mau-rang',
-    title: 'Hướng dẫn chọn màu răng chính xác cho phục hình sứ',
-    excerpt:
-      'Các bước lấy màu răng đúng kỹ thuật, lưu ý ánh sáng, góc nhìn để đạt kết quả thẩm mỹ tốt nhất.',
-    category: 'kien-thuc',
-    date: '28/03/2026',
-    readTime: '4 phút đọc',
+    cat: 'Quy trình',
+    d: '02 Apr 2026',
+    t: 'Workflow số: từ scan đến milling trong 3 giờ',
+    e: 'Khám phá quy trình CAD/CAM tại Alpha.',
+    img: IMG.cadcam,
   },
   {
-    slug: 'alpha-tham-gia-trienlam-2026',
-    title: 'Alpha Digital Center tham gia Triển lãm Nha khoa Quốc tế 2026',
-    excerpt:
-      'Chúng tôi hân hạnh giới thiệu các giải pháp gia công kỹ thuật số tại triển lãm nha khoa lớn nhất năm.',
-    category: 'tin-tuc',
-    date: '20/03/2026',
-    readTime: '3 phút đọc',
+    cat: 'Kinh nghiệm',
+    d: '28 Mar 2026',
+    t: 'Tránh 5 lỗi thường gặp khi chuẩn bị file scan',
+    e: 'Hướng dẫn từ đội kỹ thuật Alpha.',
+    img: IMG.tools,
   },
   {
-    slug: 'in-3d-trong-nha-khoa',
-    title: 'Ứng dụng in 3D trong nha khoa - Từ mẫu đến sản phẩm',
-    excerpt:
-      'Công nghệ in 3D đang thay đổi cách làm việc của labo nha khoa. Từ in mẫu, khay chỉnh nha đến hướng dẫn phẫu thuật.',
-    category: 'cong-nghe',
-    date: '15/03/2026',
-    readTime: '6 phút đọc',
+    cat: 'Sự kiện',
+    d: '22 Mar 2026',
+    t: 'Alpha tại IDS 2026 Cologne, Đức',
+    e: 'Công nghệ mới từ triển lãm nha khoa lớn nhất thế giới.',
+    img: IMG.tech,
   },
   {
-    slug: 'tuyen-ky-thuat-vien-cadcam',
-    title: 'Tuyển dụng: Kỹ thuật viên CAD/CAM - Cơ hội phát triển nghề nghiệp',
-    excerpt:
-      'Alpha Digital Center tuyển kỹ thuật viên CAD/CAM có kinh nghiệm. Môi trường làm việc hiện đại, phúc lợi hấp dẫn.',
-    category: 'tuyen-dung',
-    date: '10/03/2026',
-    readTime: '2 phút đọc',
+    cat: 'Công nghệ',
+    d: '14 Mar 2026',
+    t: 'In 3D kim loại titanium: đã đến lúc đầu tư?',
+    e: 'Phân tích ROI cho labo quy mô vừa và nhỏ.',
+    img: IMG.implant,
   },
 ];
 
 export default function TinTucPage() {
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const filteredPosts =
-    activeCategory === 'all'
-      ? PLACEHOLDER_POSTS
-      : PLACEHOLDER_POSTS.filter((p) => p.category === activeCategory);
-
-  const getCategoryLabel = (key: string) => {
-    return CATEGORIES.find((c) => c.key === key)?.label || key;
-  };
-
+  const [f, ...rest] = POSTS;
   return (
-    <div>
-      {/* Hero */}
-      <section
-        style={{
-          background: 'linear-gradient(135deg, #ecfeff 0%, #f0f9ff 40%, #e0f2fe 100%)',
-          padding: '60px 0 48px',
-        }}
-      >
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px', textAlign: 'center' }}>
-          <div
+    <>
+      <PageHero
+        eyebrow="Insights · Tin tức"
+        title="Góc nhìn"
+        serif="chuyên gia —"
+        tail="cập nhật từ phòng lab."
+        subtitle="Chia sẻ kinh nghiệm, công nghệ mới, phân tích vật liệu và các sự kiện trong ngành nha khoa kỹ thuật số."
+      />
+      <section style={{ padding: '80px 0 120px', background: 'var(--bg)' }}>
+        <div className="container">
+          <article
+            className="fa"
             style={{
-              display: 'inline-block',
-              padding: '4px 14px',
-              background: colors.primaryBg,
-              color: colors.primaryHover,
-              borderRadius: 20,
-              fontSize: 12,
-              fontWeight: 600,
-              marginBottom: 16,
+              display: 'grid',
+              gridTemplateColumns: '1.3fr 1fr',
+              gap: 48,
+              alignItems: 'center',
+              paddingBottom: 80,
+              borderBottom: '1px solid var(--line)',
             }}
           >
-            Blog
-          </div>
-          <h1
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: 'clamp(26px, 3.5vw, 38px)',
-              fontWeight: 800,
-              color: colors.textPrimary,
-              lineHeight: 1.2,
-              marginBottom: 12,
-            }}
-          >
-            Tin tức & <span style={{ color: colors.primary }}>Kiến thức</span>
-          </h1>
-          <p
-            style={{
-              fontSize: 15,
-              color: colors.textSecondary,
-              lineHeight: 1.7,
-              maxWidth: 550,
-              margin: '0 auto',
-            }}
-          >
-            Cập nhật các tin tức mới nhất, kiến thức chuyên ngành và xu hướng
-            công nghệ trong lĩnh vực nha khoa.
-          </p>
-        </div>
-      </section>
-
-      {/* Category Filter + Posts */}
-      <section style={{ padding: '40px 0 64px' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
-          {/* Filter Tabs */}
-          <div
-            style={{
-              display: 'flex',
-              gap: 8,
-              marginBottom: 32,
-              overflowX: 'auto',
-              paddingBottom: 4,
-              flexWrap: 'wrap',
-            }}
-          >
-            {CATEGORIES.map((cat) => {
-              const isActive = activeCategory === cat.key;
-              const Icon = cat.icon;
-              return (
-                <button
-                  key={cat.key}
-                  onClick={() => setActiveCategory(cat.key)}
+            <div
+              style={{
+                height: 440,
+                borderRadius: 'var(--r-lg)',
+                overflow: 'hidden',
+                border: '1px solid var(--line)',
+              }}
+            >
+              <img
+                src={f.img}
+                alt=""
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <span
                   style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                    padding: '8px 16px',
-                    borderRadius: 20,
-                    fontSize: 13,
+                    display: 'inline-block',
+                    padding: '4px 10px',
+                    borderRadius: 999,
+                    background: 'var(--gold)',
+                    color: '#fff',
+                    fontSize: 11,
                     fontWeight: 600,
-                    fontFamily: fonts.body,
-                    cursor: 'pointer',
-                    border: isActive
-                      ? '1px solid transparent'
-                      : `1px solid ${colors.border}`,
-                    background: isActive
-                      ? 'linear-gradient(135deg, #06b6d4, #0891b2)'
-                      : colors.cardBg,
-                    color: isActive ? '#fff' : colors.textSecondary,
-                    transition: 'all 0.15s ease',
-                    whiteSpace: 'nowrap',
                   }}
                 >
-                  <Icon size={14} />
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Posts Grid */}
-          {filteredPosts.length === 0 ? (
-            <div
-              style={{
-                textAlign: 'center',
-                padding: '48px 0',
-              }}
-            >
-              <Newspaper size={40} color={colors.textMuted} style={{ marginBottom: 12 }} />
-              <p style={{ fontSize: 14, color: colors.textSecondary }}>
-                Chưa có bài viết nào trong danh mục này.
+                  ★ Featured
+                </span>
+                <span
+                  style={{
+                    fontSize: 11,
+                    color: 'var(--ink-400)',
+                    fontFamily: 'var(--font-mono)',
+                  }}
+                >
+                  {f.d}
+                </span>
+              </div>
+              <h2
+                className="display"
+                style={{
+                  fontSize: 'clamp(26px, 3vw, 38px)',
+                  margin: '0 0 20px',
+                  lineHeight: 1.15,
+                }}
+              >
+                {f.t}
+              </h2>
+              <p
+                style={{
+                  fontSize: 15,
+                  color: 'var(--ink-500)',
+                  lineHeight: 1.75,
+                  margin: '0 0 28px',
+                }}
+              >
+                {f.e}
               </p>
+              <a
+                href="#"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '12px 22px',
+                  borderRadius: 999,
+                  background: 'var(--ink-900)',
+                  color: '#fff',
+                  fontSize: 13.5,
+                  fontWeight: 600,
+                }}
+              >
+                Đọc bài viết →
+              </a>
             </div>
-          ) : (
+          </article>
+          <div style={{ paddingTop: 72 }}>
+            <h2
+              className="display"
+              style={{ fontSize: 28, margin: '0 0 40px', fontWeight: 600 }}
+            >
+              Bài viết gần đây
+            </h2>
             <div
+              className="pg"
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: 20,
+                gridTemplateColumns: 'repeat(3, 1fr)',
+                gap: 36,
               }}
             >
-              {filteredPosts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/tin-tuc/${post.slug}`}
-                  style={{ textDecoration: 'none' }}
-                >
-                  <article
+              {rest.map((p) => (
+                <article key={p.t}>
+                  <div
                     style={{
-                      background: colors.cardBg,
-                      borderRadius: 16,
-                      border: `1px solid ${colors.border}`,
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+                      height: 220,
+                      borderRadius: 'var(--r-lg)',
                       overflow: 'hidden',
-                      transition: 'all 0.2s ease',
-                      cursor: 'pointer',
-                      height: '100%',
-                      display: 'flex',
-                      flexDirection: 'column',
+                      marginBottom: 20,
                     }}
                   >
-                    {/* Placeholder image area */}
-                    <div
+                    <img
+                      src={p.img}
+                      alt=""
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                  </div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 10,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <span
                       style={{
-                        height: 160,
-                        background: 'linear-gradient(135deg, #ecfeff, #e0f2fe)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        display: 'inline-block',
+                        padding: '3px 9px',
+                        borderRadius: 999,
+                        background: 'var(--accent-50)',
+                        color: 'var(--accent-600)',
+                        fontSize: 11,
+                        fontWeight: 600,
                       }}
                     >
-                      <BookOpen size={36} color={colors.primaryLight} />
-                    </div>
-
-                    <div style={{ padding: 22, flex: 1, display: 'flex', flexDirection: 'column' }}>
-                      {/* Category & Date */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          marginBottom: 12,
-                        }}
-                      >
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            padding: '3px 10px',
-                            background: colors.primaryBg,
-                            color: colors.primaryHover,
-                            borderRadius: 20,
-                            fontSize: 11,
-                            fontWeight: 600,
-                          }}
-                        >
-                          <Tag size={10} />
-                          {getCategoryLabel(post.category)}
-                        </span>
-                        <span
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            fontSize: 11,
-                            color: colors.textMuted,
-                          }}
-                        >
-                          <Calendar size={11} />
-                          {post.date}
-                        </span>
-                      </div>
-
-                      {/* Title */}
-                      <h2
-                        style={{
-                          fontFamily: fonts.heading,
-                          fontSize: 16,
-                          fontWeight: 700,
-                          color: colors.textPrimary,
-                          lineHeight: 1.4,
-                          marginBottom: 10,
-                        }}
-                      >
-                        {post.title}
-                      </h2>
-
-                      {/* Excerpt */}
-                      <p
-                        style={{
-                          fontSize: 13,
-                          color: colors.textSecondary,
-                          lineHeight: 1.6,
-                          flex: 1,
-                          marginBottom: 14,
-                        }}
-                      >
-                        {post.excerpt}
-                      </p>
-
-                      {/* Footer */}
-                      <div
-                        style={{
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                        }}
-                      >
-                        <span style={{ fontSize: 12, color: colors.textMuted }}>
-                          {post.readTime}
-                        </span>
-                        <span
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 4,
-                            fontSize: 13,
-                            fontWeight: 600,
-                            color: colors.primary,
-                          }}
-                        >
-                          Đọc thêm <ArrowRight size={13} />
-                        </span>
-                      </div>
-                    </div>
-                  </article>
-                </Link>
+                      {p.cat}
+                    </span>
+                    <span
+                      style={{
+                        fontSize: 11,
+                        color: 'var(--ink-400)',
+                        fontFamily: 'var(--font-mono)',
+                      }}
+                    >
+                      {p.d}
+                    </span>
+                  </div>
+                  <h3
+                    className="display"
+                    style={{
+                      fontSize: 19,
+                      margin: '0 0 10px',
+                      fontWeight: 600,
+                      lineHeight: 1.3,
+                    }}
+                  >
+                    {p.t}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: 13.5,
+                      color: 'var(--ink-500)',
+                      lineHeight: 1.65,
+                      margin: 0,
+                    }}
+                  >
+                    {p.e}
+                  </p>
+                </article>
               ))}
             </div>
-          )}
+          </div>
         </div>
+        <style>{`@media (max-width:900px){ .fa { grid-template-columns: 1fr !important; } } @media (max-width:980px){ .pg { grid-template-columns: 1fr 1fr !important; } } @media (max-width:560px){ .pg { grid-template-columns: 1fr !important; } }`}</style>
       </section>
-    </div>
+    </>
   );
 }
