@@ -1,17 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   colors,
   fonts,
   cardStyle,
-  primaryButton,
   secondaryButton,
   inputStyle,
   pageTitle,
   pageSubtitle,
   transitions,
-  getBadgeStyle,
 } from '@/lib/styles';
 import {
   Briefcase,
@@ -31,35 +29,52 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
+import { apiGet, apiPost, apiPut, ApiError } from '@/lib/api-client';
 
 type ActiveTab = 'postings' | 'applications';
 
+type EmploymentType = 'full-time' | 'part-time';
+
 interface JobPosting {
-  id: number;
-  title: string;
-  department: string;
+  id: string;
+  titleVi: string;
+  department: string | null;
   location: string;
-  type: 'full-time' | 'part-time';
-  active: boolean;
-  applicationCount: number;
-  publishDate: string;
-  description: string;
-  requirements: string;
-  benefits: string;
-  salaryRange: string;
+  employmentType: string | null;
+  descriptionVi: string;
+  requirementsVi: string | null;
+  benefitsVi: string | null;
+  salaryRange: string | null;
+  isActive: boolean;
+  publishedAt: string | null;
+  createdAt: string;
+  _count?: { applications: number };
 }
 
 type AppStatus = 'received' | 'reviewing' | 'interview' | 'hired' | 'rejected';
 
 interface Application {
-  id: number;
+  id: string;
+  jobId: string | null;
+  job: { id: string; titleVi: string } | null;
   applicantName: string;
   phone: string;
-  email: string;
-  appliedJob: string;
+  email: string | null;
+  cvUrl: string | null;
   status: AppStatus;
-  date: string;
-  cvUrl: string;
+  createdAt: string;
+}
+
+interface JobForm {
+  titleVi: string;
+  department: string;
+  location: string;
+  employmentType: EmploymentType;
+  isActive: boolean;
+  descriptionVi: string;
+  requirementsVi: string;
+  benefitsVi: string;
+  salaryRange: string;
 }
 
 const appStatusConfig: Record<AppStatus, { bg: string; color: string; label: string }> = {
@@ -75,192 +90,171 @@ const typeLabels: Record<string, string> = {
   'part-time': 'Bán thời gian',
 };
 
-const initialJobs: JobPosting[] = [
-  {
-    id: 1,
-    title: 'Kỹ thuật viên CAD/CAM',
-    department: 'Kỹ thuật',
-    location: 'TP.HCM',
-    type: 'full-time',
-    active: true,
-    applicationCount: 8,
-    publishDate: '01/04/2026',
-    description: 'Thiết kế phục hình răng sứ bằng phần mềm CAD/CAM chuyên dụng. Làm việc với các hệ thống scan 3D và máy phay hiện đại.',
-    requirements: 'Tốt nghiệp Trung cấp Nha khoa trở lên.\nCó kinh nghiệm sử dụng phần mềm Exocad, 3Shape.\nCó khả năng làm việc nhóm và chịu được áp lực.',
-    benefits: 'Lương cạnh tranh, thưởng hiệu suất.\nBảo hiểm xã hội đầy đủ.\nĐược đào tạo các công nghệ mới.\nMôi trường làm việc chuyên nghiệp.',
-    salaryRange: '12 - 20 triệu',
-  },
-  {
-    id: 2,
-    title: 'Kỹ thuật viên Labo',
-    department: 'Sản xuất',
-    location: 'TP.HCM',
-    type: 'full-time',
-    active: true,
-    applicationCount: 12,
-    publishDate: '05/04/2026',
-    description: 'Gia công răng sứ, phục hình thẩm mỹ. Thao tác trên các loại vật liệu Zirconia, Emax, kim loại.',
-    requirements: 'Tốt nghiệp Trung cấp Nha khoa.\nÍt nhất 1 năm kinh nghiệm làm việc tại labo.\nKhéo tay, tỉ mỉ, có mắt thẩm mỹ.',
-    benefits: 'Lương theo năng lực.\nBảo hiểm xã hội.\nThưởng lễ, tết.\nCơ hội thăng tiến.',
-    salaryRange: '10 - 18 triệu',
-  },
-  {
-    id: 3,
-    title: 'Nhân viên kinh doanh',
-    department: 'Kinh doanh',
-    location: 'TP.HCM',
-    type: 'full-time',
-    active: false,
-    applicationCount: 5,
-    publishDate: '20/03/2026',
-    description: 'Tìm kiếm và phát triển khách hàng mới (phòng khám nha khoa, labo). Duy trì quan hệ khách hàng hiện tại.',
-    requirements: 'Tốt nghiệp Cao đẳng trở lên.\nCó kinh nghiệm kinh doanh B2B.\nKỹ năng giao tiếp tốt.\nCó xe máy và GPLX.',
-    benefits: 'Lương cơ bản + hoa hồng hấp dẫn.\nHỗ trợ chi phí đi lại.\nBảo hiểm xã hội.\nDu lịch hàng năm.',
-    salaryRange: '10 - 25 triệu',
-  },
-];
-
-const initialApplications: Application[] = [
-  {
-    id: 1,
-    applicantName: 'Lê Thị Mai',
-    phone: '0912 111 222',
-    email: 'mai.le@gmail.com',
-    appliedJob: 'Kỹ thuật viên CAD/CAM',
-    status: 'received',
-    date: '12/04/2026',
-    cvUrl: '#',
-  },
-  {
-    id: 2,
-    applicantName: 'Nguyễn Quốc Đạt',
-    phone: '0987 333 444',
-    email: 'dat.nguyen@gmail.com',
-    appliedJob: 'Kỹ thuật viên Labo',
-    status: 'reviewing',
-    date: '11/04/2026',
-    cvUrl: '#',
-  },
-  {
-    id: 3,
-    applicantName: 'Trần Văn Tiến',
-    phone: '0903 555 666',
-    email: 'tien.tran@gmail.com',
-    appliedJob: 'Nhân viên kinh doanh',
-    status: 'interview',
-    date: '10/04/2026',
-    cvUrl: '#',
-  },
-  {
-    id: 4,
-    applicantName: 'Phạm Ngọc Anh',
-    phone: '0976 777 888',
-    email: 'anh.pham@gmail.com',
-    appliedJob: 'Kỹ thuật viên CAD/CAM',
-    status: 'hired',
-    date: '05/04/2026',
-    cvUrl: '#',
-  },
-  {
-    id: 5,
-    applicantName: 'Võ Hoàng Long',
-    phone: '0918 999 000',
-    email: 'long.vo@gmail.com',
-    appliedJob: 'Kỹ thuật viên Labo',
-    status: 'rejected',
-    date: '03/04/2026',
-    cvUrl: '#',
-  },
-];
-
-const emptyJob: Omit<JobPosting, 'id' | 'applicationCount' | 'publishDate'> = {
-  title: '',
+const EMPTY_JOB: JobForm = {
+  titleVi: '',
   department: '',
   location: 'TP.HCM',
-  type: 'full-time',
-  active: true,
-  description: '',
-  requirements: '',
-  benefits: '',
+  employmentType: 'full-time',
+  isActive: true,
+  descriptionVi: '',
+  requirementsVi: '',
+  benefitsVi: '',
   salaryRange: '',
 };
 
+function formatDate(iso: string | null): string {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+}
+
 export default function RecruitmentPage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('postings');
-  const [jobs, setJobs] = useState<JobPosting[]>(initialJobs);
-  const [applications, setApplications] = useState<Application[]>(initialApplications);
+  const [jobs, setJobs] = useState<JobPosting[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showJobModal, setShowJobModal] = useState(false);
-  const [editingJob, setEditingJob] = useState<JobPosting | null>(null);
-  const [jobForm, setJobForm] = useState(emptyJob);
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+  const [jobForm, setJobForm] = useState<JobForm>(EMPTY_JOB);
+  const [saving, setSaving] = useState(false);
 
-  const handleToggleActive = (jobId: number) => {
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [js, as] = await Promise.all([
+        apiGet<JobPosting[]>('/api/admin/recruitment/jobs'),
+        apiGet<Application[]>('/api/admin/recruitment/applications'),
+      ]);
+      setJobs(js);
+      setApplications(as);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Không tải được dữ liệu');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  async function handleToggleActive(job: JobPosting) {
+    const previous = jobs;
     setJobs((prev) =>
-      prev.map((j) => (j.id === jobId ? { ...j, active: !j.active } : j))
+      prev.map((j) => (j.id === job.id ? { ...j, isActive: !j.isActive } : j))
     );
-  };
+    try {
+      await apiPut(`/api/admin/recruitment/jobs/${job.id}`, {
+        isActive: !job.isActive,
+      });
+    } catch (e) {
+      setJobs(previous);
+      setError(e instanceof ApiError ? e.message : 'Cập nhật thất bại');
+    }
+  }
 
-  const handleEditJob = (job: JobPosting) => {
-    setEditingJob(job);
+  function handleEditJob(job: JobPosting) {
+    setEditingJobId(job.id);
     setJobForm({
-      title: job.title,
-      department: job.department,
+      titleVi: job.titleVi,
+      department: job.department || '',
       location: job.location,
-      type: job.type,
-      active: job.active,
-      description: job.description,
-      requirements: job.requirements,
-      benefits: job.benefits,
-      salaryRange: job.salaryRange,
+      employmentType: (job.employmentType as EmploymentType) || 'full-time',
+      isActive: job.isActive,
+      descriptionVi: job.descriptionVi,
+      requirementsVi: job.requirementsVi || '',
+      benefitsVi: job.benefitsVi || '',
+      salaryRange: job.salaryRange || '',
     });
     setShowJobModal(true);
-  };
+  }
 
-  const handleNewJob = () => {
-    setEditingJob(null);
-    setJobForm({ ...emptyJob });
+  function handleNewJob() {
+    setEditingJobId(null);
+    setJobForm(EMPTY_JOB);
     setShowJobModal(true);
-  };
+  }
 
-  const handleSaveJob = () => {
-    if (!jobForm.title.trim()) return;
-    if (editingJob) {
-      setJobs((prev) =>
-        prev.map((j) =>
-          j.id === editingJob.id
-            ? { ...j, ...jobForm }
-            : j
-        )
-      );
-    } else {
-      const newJob: JobPosting = {
-        ...jobForm,
-        id: Date.now(),
-        applicationCount: 0,
-        publishDate: new Date().toLocaleDateString('vi-VN'),
-      };
-      setJobs((prev) => [newJob, ...prev]);
+  async function handleSaveJob() {
+    if (!jobForm.titleVi.trim() || !jobForm.descriptionVi.trim()) {
+      setError('Tiêu đề và mô tả công việc là bắt buộc');
+      return;
     }
-    setShowJobModal(false);
-  };
+    setSaving(true);
+    setError(null);
+    const payload = {
+      titleVi: jobForm.titleVi,
+      department: jobForm.department || null,
+      location: jobForm.location,
+      employmentType: jobForm.employmentType,
+      descriptionVi: jobForm.descriptionVi,
+      requirementsVi: jobForm.requirementsVi || null,
+      benefitsVi: jobForm.benefitsVi || null,
+      salaryRange: jobForm.salaryRange || null,
+      isActive: jobForm.isActive,
+    };
+    try {
+      if (editingJobId) {
+        await apiPut(`/api/admin/recruitment/jobs/${editingJobId}`, payload);
+      } else {
+        await apiPost('/api/admin/recruitment/jobs', payload);
+      }
+      setShowJobModal(false);
+      await load();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Lưu thất bại');
+    } finally {
+      setSaving(false);
+    }
+  }
 
-  const handleAppStatusChange = (appId: number, newStatus: AppStatus) => {
+  async function handleAppStatusChange(appId: string, newStatus: AppStatus) {
+    const previous = applications;
     setApplications((prev) =>
       prev.map((a) => (a.id === appId ? { ...a, status: newStatus } : a))
     );
-  };
+    try {
+      await apiPut(`/api/admin/recruitment/applications/${appId}`, {
+        status: newStatus,
+      });
+    } catch (e) {
+      setApplications(previous);
+      setError(e instanceof ApiError ? e.message : 'Cập nhật thất bại');
+    }
+  }
+
+  const activeJobCount = jobs.filter((j) => j.isActive).length;
 
   return (
     <div style={{ padding: 0 }}>
-      {/* Page Header */}
       <div style={{ marginBottom: 24 }}>
         <h1 style={pageTitle}>Quản lý Tuyển dụng</h1>
         <p style={pageSubtitle}>
-          {jobs.filter((j) => j.active).length} vị trí đang tuyển -{' '}
-          {applications.length} hồ sơ ứng tuyển
+          {activeJobCount} vị trí đang tuyển - {applications.length} hồ sơ ứng tuyển
         </p>
       </div>
 
-      {/* Tabs */}
+      {error && (
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: 16,
+            background: colors.dangerBg,
+            borderColor: 'rgba(225,29,72,0.2)',
+            color: colors.danger,
+            fontSize: 13,
+            fontFamily: fonts.body,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       <div
         style={{
           display: 'flex',
@@ -303,8 +297,20 @@ export default function RecruitmentPage() {
         })}
       </div>
 
-      {/* Tab 1: Job Postings */}
-      {activeTab === 'postings' && (
+      {loading && (
+        <div
+          style={{
+            ...cardStyle,
+            textAlign: 'center',
+            padding: '48px 24px',
+            color: colors.textMuted,
+          }}
+        >
+          Đang tải...
+        </div>
+      )}
+
+      {activeTab === 'postings' && !loading && (
         <div>
           <div style={{ marginBottom: 16 }}>
             <Button onClick={handleNewJob}>
@@ -323,10 +329,9 @@ export default function RecruitmentPage() {
                   display: 'flex',
                   alignItems: 'center',
                   gap: 16,
-                  opacity: job.active ? 1 : 0.65,
+                  opacity: job.isActive ? 1 : 0.65,
                 }}
               >
-                {/* Icon */}
                 <div
                   style={{
                     width: 44,
@@ -342,7 +347,6 @@ export default function RecruitmentPage() {
                   <Briefcase size={20} color={colors.primary} />
                 </div>
 
-                {/* Main Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div
                     style={{
@@ -353,7 +357,7 @@ export default function RecruitmentPage() {
                       marginBottom: 4,
                     }}
                   >
-                    {job.title}
+                    {job.titleVi}
                   </div>
                   <div
                     style={{
@@ -363,19 +367,21 @@ export default function RecruitmentPage() {
                       flexWrap: 'wrap',
                     }}
                   >
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        fontSize: 12,
-                        color: colors.textMuted,
-                        fontFamily: fonts.body,
-                      }}
-                    >
-                      <Users size={12} />
-                      {job.department}
-                    </span>
+                    {job.department && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 12,
+                          color: colors.textMuted,
+                          fontFamily: fonts.body,
+                        }}
+                      >
+                        <Users size={12} />
+                        {job.department}
+                      </span>
+                    )}
                     <span
                       style={{
                         display: 'inline-flex',
@@ -389,19 +395,21 @@ export default function RecruitmentPage() {
                       <MapPin size={12} />
                       {job.location}
                     </span>
-                    <span
-                      style={{
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: 4,
-                        fontSize: 12,
-                        color: colors.textMuted,
-                        fontFamily: fonts.body,
-                      }}
-                    >
-                      <Clock size={12} />
-                      {typeLabels[job.type]}
-                    </span>
+                    {job.employmentType && (
+                      <span
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          fontSize: 12,
+                          color: colors.textMuted,
+                          fontFamily: fonts.body,
+                        }}
+                      >
+                        <Clock size={12} />
+                        {typeLabels[job.employmentType] || job.employmentType}
+                      </span>
+                    )}
                     <span
                       style={{
                         display: 'inline-flex',
@@ -413,12 +421,11 @@ export default function RecruitmentPage() {
                       }}
                     >
                       <Calendar size={12} />
-                      {job.publishDate}
+                      {formatDate(job.publishedAt || job.createdAt)}
                     </span>
                   </div>
                 </div>
 
-                {/* Right Info */}
                 <div
                   style={{
                     display: 'flex',
@@ -436,7 +443,7 @@ export default function RecruitmentPage() {
                         fontFamily: fonts.heading,
                       }}
                     >
-                      {job.applicationCount}
+                      {job._count?.applications ?? 0}
                     </div>
                     <div style={{ fontSize: 11, color: colors.textMuted, fontFamily: fonts.body }}>
                       ứng tuyển
@@ -450,12 +457,12 @@ export default function RecruitmentPage() {
                       borderRadius: 20,
                       fontSize: 12,
                       fontWeight: 600,
-                      background: job.active ? '#f0fdf4' : '#f8fafc',
-                      color: job.active ? '#16a34a' : '#94a3b8',
+                      background: job.isActive ? '#f0fdf4' : '#f8fafc',
+                      color: job.isActive ? '#16a34a' : '#94a3b8',
                       fontFamily: fonts.body,
                     }}
                   >
-                    {job.active ? 'Đang tuyển' : 'Đã đóng'}
+                    {job.isActive ? 'Đang tuyển' : 'Đã đóng'}
                   </span>
 
                   <button
@@ -472,27 +479,38 @@ export default function RecruitmentPage() {
                     Sửa
                   </button>
                   <button
-                    onClick={() => handleToggleActive(job.id)}
+                    onClick={() => handleToggleActive(job)}
                     style={{
                       background: 'none',
                       border: 'none',
                       cursor: 'pointer',
-                      color: job.active ? colors.success : colors.textMuted,
+                      color: job.isActive ? colors.success : colors.textMuted,
                       padding: 4,
                     }}
-                    title={job.active ? 'Tắt tuyển dụng' : 'Bật tuyển dụng'}
+                    title={job.isActive ? 'Tắt tuyển dụng' : 'Bật tuyển dụng'}
                   >
-                    {job.active ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
+                    {job.isActive ? <ToggleRight size={24} /> : <ToggleLeft size={24} />}
                   </button>
                 </div>
               </div>
             ))}
+            {jobs.length === 0 && (
+              <div
+                style={{
+                  ...cardStyle,
+                  textAlign: 'center',
+                  padding: '48px 24px',
+                  color: colors.textMuted,
+                }}
+              >
+                Chưa có tin tuyển dụng nào
+              </div>
+            )}
           </div>
         </div>
       )}
 
-      {/* Tab 2: Applications */}
-      {activeTab === 'applications' && (
+      {activeTab === 'applications' && !loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
           {applications.map((app) => (
             <div
@@ -505,7 +523,6 @@ export default function RecruitmentPage() {
                 gap: 16,
               }}
             >
-              {/* Avatar */}
               <div
                 style={{
                   width: 42,
@@ -525,7 +542,6 @@ export default function RecruitmentPage() {
                 {app.applicantName.charAt(0)}
               </div>
 
-              {/* Main Info */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
@@ -559,23 +575,24 @@ export default function RecruitmentPage() {
                     <Phone size={12} />
                     {app.phone}
                   </span>
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                      fontSize: 12,
-                      color: colors.textMuted,
-                      fontFamily: fonts.body,
-                    }}
-                  >
-                    <Mail size={12} />
-                    {app.email}
-                  </span>
+                  {app.email && (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        fontSize: 12,
+                        color: colors.textMuted,
+                        fontFamily: fonts.body,
+                      }}
+                    >
+                      <Mail size={12} />
+                      {app.email}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Job Applied */}
               <div
                 style={{
                   fontSize: 13,
@@ -585,10 +602,9 @@ export default function RecruitmentPage() {
                   flexShrink: 0,
                 }}
               >
-                {app.appliedJob}
+                {app.job?.titleVi || 'Ứng tuyển tổng'}
               </div>
 
-              {/* Date */}
               <div
                 style={{
                   display: 'flex',
@@ -601,10 +617,9 @@ export default function RecruitmentPage() {
                 }}
               >
                 <Calendar size={12} />
-                {app.date}
+                {formatDate(app.createdAt)}
               </div>
 
-              {/* Status Badge */}
               <span
                 style={{
                   display: 'inline-block',
@@ -621,24 +636,26 @@ export default function RecruitmentPage() {
                 {appStatusConfig[app.status].label}
               </span>
 
-              {/* Actions */}
               <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-                <button
-                  onClick={() => {
-                    /* CV viewer placeholder */
-                  }}
-                  style={{
-                    ...secondaryButton,
-                    padding: '5px 10px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontSize: 12,
-                  }}
-                >
-                  <Eye size={13} />
-                  Xem CV
-                </button>
+                {app.cvUrl && (
+                  <a
+                    href={app.cvUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{
+                      ...secondaryButton,
+                      padding: '5px 10px',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontSize: 12,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    <Eye size={13} />
+                    Xem CV
+                  </a>
+                )}
                 <select
                   value={app.status}
                   onChange={(e) =>
@@ -665,22 +682,33 @@ export default function RecruitmentPage() {
               </div>
             </div>
           ))}
+          {applications.length === 0 && (
+            <div
+              style={{
+                ...cardStyle,
+                textAlign: 'center',
+                padding: '48px 24px',
+                color: colors.textMuted,
+              }}
+            >
+              Chưa có hồ sơ ứng tuyển nào
+            </div>
+          )}
         </div>
       )}
 
-      {/* Add/Edit Job Modal */}
       <Modal
         isOpen={showJobModal}
         onClose={() => setShowJobModal(false)}
-        title={editingJob ? 'Chỉnh sửa tin tuyển dụng' : 'Tạo tin tuyển dụng mới'}
+        title={editingJobId ? 'Chỉnh sửa tin tuyển dụng' : 'Tạo tin tuyển dụng mới'}
         maxWidth={600}
       >
         <div>
           <Input
             label="Tiêu đề"
             placeholder="VD: Kỹ thuật viên CAD/CAM"
-            value={jobForm.title}
-            onChange={(e) => setJobForm({ ...jobForm, title: e.target.value })}
+            value={jobForm.titleVi}
+            onChange={(e) => setJobForm({ ...jobForm, titleVi: e.target.value })}
           />
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -713,11 +741,11 @@ export default function RecruitmentPage() {
                 Loại hình
               </label>
               <select
-                value={jobForm.type}
+                value={jobForm.employmentType}
                 onChange={(e) =>
                   setJobForm({
                     ...jobForm,
-                    type: e.target.value as 'full-time' | 'part-time',
+                    employmentType: e.target.value as EmploymentType,
                   })
                 }
                 style={{
@@ -746,27 +774,26 @@ export default function RecruitmentPage() {
             label="Mô tả công việc"
             placeholder="Mô tả chi tiết công việc..."
             rows={3}
-            value={jobForm.description}
-            onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })}
+            value={jobForm.descriptionVi}
+            onChange={(e) => setJobForm({ ...jobForm, descriptionVi: e.target.value })}
           />
 
           <Textarea
             label="Yêu cầu"
             placeholder="Mỗi yêu cầu trên một dòng..."
             rows={3}
-            value={jobForm.requirements}
-            onChange={(e) => setJobForm({ ...jobForm, requirements: e.target.value })}
+            value={jobForm.requirementsVi}
+            onChange={(e) => setJobForm({ ...jobForm, requirementsVi: e.target.value })}
           />
 
           <Textarea
             label="Quyền lợi"
             placeholder="Mỗi quyền lợi trên một dòng..."
             rows={3}
-            value={jobForm.benefits}
-            onChange={(e) => setJobForm({ ...jobForm, benefits: e.target.value })}
+            value={jobForm.benefitsVi}
+            onChange={(e) => setJobForm({ ...jobForm, benefitsVi: e.target.value })}
           />
 
-          {/* Active toggle */}
           <div
             style={{
               display: 'flex',
@@ -776,16 +803,17 @@ export default function RecruitmentPage() {
             }}
           >
             <button
-              onClick={() => setJobForm({ ...jobForm, active: !jobForm.active })}
+              type="button"
+              onClick={() => setJobForm({ ...jobForm, isActive: !jobForm.isActive })}
               style={{
                 background: 'none',
                 border: 'none',
                 cursor: 'pointer',
-                color: jobForm.active ? colors.success : colors.textMuted,
+                color: jobForm.isActive ? colors.success : colors.textMuted,
                 padding: 0,
               }}
             >
-              {jobForm.active ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
+              {jobForm.isActive ? <ToggleRight size={28} /> : <ToggleLeft size={28} />}
             </button>
             <span
               style={{
@@ -794,16 +822,16 @@ export default function RecruitmentPage() {
                 fontFamily: fonts.body,
               }}
             >
-              {jobForm.active ? 'Đang tuyển' : 'Tạm dừng'}
+              {jobForm.isActive ? 'Đang tuyển' : 'Tạm dừng'}
             </span>
           </div>
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
-            <Button variant="secondary" onClick={() => setShowJobModal(false)}>
+            <Button variant="secondary" onClick={() => setShowJobModal(false)} disabled={saving}>
               Hủy
             </Button>
-            <Button onClick={handleSaveJob}>
-              {editingJob ? 'Cập nhật' : 'Tạo tin'}
+            <Button onClick={handleSaveJob} disabled={saving}>
+              {saving ? 'Đang lưu...' : editingJobId ? 'Cập nhật' : 'Tạo tin'}
             </Button>
           </div>
         </div>

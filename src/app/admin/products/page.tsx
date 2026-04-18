@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Plus,
   Search,
@@ -16,217 +16,232 @@ import {
   pageSubtitle,
   inputStyle,
   transitions,
-  getBadgeStyle,
 } from '@/lib/styles';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
 
-// --- Types ---
+interface Category {
+  id: string;
+  nameVi: string;
+  slug: string;
+}
+
+interface Variant {
+  id: string;
+  nameVi: string;
+  unit: string;
+  priceVnd: string; // BigInt serialized as string
+}
+
+interface ProductImage {
+  id: string;
+  imageUrl: string;
+  isPrimary: boolean;
+}
 
 interface Product {
   id: string;
-  name: string;
-  category: string;
+  nameVi: string;
+  categoryId: string;
+  category?: { id: string; nameVi: string };
+  material: string | null;
+  origin: string | null;
+  warrantyYears: number | null;
+  descriptionVi: string | null;
+  isActive: boolean;
+  isFeatured: boolean;
+  variants: Variant[];
+  images: ProductImage[];
+}
+
+interface ProductFormState {
+  nameVi: string;
+  categoryId: string;
   material: string;
   origin: string;
   warrantyYears: number;
-  description: string;
-  priceMin: number;
-  priceMax: number;
-  active: boolean;
+  descriptionVi: string;
+  isFeatured: boolean;
+  variantName: string;
+  variantUnit: string;
+  variantPriceMin: number;
+  variantPriceMax: number;
 }
 
-// --- Sample data ---
-
-const CATEGORIES = ['Tất cả', 'Toàn sứ', 'Sứ ép', 'Kim loại', 'Tháo lắp', 'Implant'];
-
-const SAMPLE_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Zirconia Multilayer Premium',
-    category: 'Toàn sứ',
-    material: 'Zirconia',
-    origin: 'Đức',
-    warrantyYears: 10,
-    description: 'Răng sứ Zirconia đa lớp cao cấp, thẩm mỹ tự nhiên.',
-    priceMin: 3500000,
-    priceMax: 5000000,
-    active: true,
-  },
-  {
-    id: '2',
-    name: 'Emax Press',
-    category: 'Sứ ép',
-    material: 'Lithium Disilicate',
-    origin: 'Đức',
-    warrantyYears: 7,
-    description: 'Sứ ép Emax thẩm mỹ cao, độ trong suốt tự nhiên.',
-    priceMin: 4000000,
-    priceMax: 6000000,
-    active: true,
-  },
-  {
-    id: '3',
-    name: 'PFM Crown Standard',
-    category: 'Kim loại',
-    material: 'Hợp kim Ni-Cr',
-    origin: 'Nhật Bản',
-    warrantyYears: 5,
-    description: 'Mão sứ kim loại tiêu chuẩn, bền bỉ theo thời gian.',
-    priceMin: 1200000,
-    priceMax: 2000000,
-    active: true,
-  },
-  {
-    id: '4',
-    name: 'Hàm tháo lắp nhựa dẻo',
-    category: 'Tháo lắp',
-    material: 'Nhựa Valplast',
-    origin: 'Mỹ',
-    warrantyYears: 3,
-    description: 'Hàm giả tháo lắp mềm dẻo, không móc kim loại.',
-    priceMin: 2500000,
-    priceMax: 4000000,
-    active: true,
-  },
-  {
-    id: '5',
-    name: 'Implant Abutment Titanium',
-    category: 'Implant',
-    material: 'Titanium Grade 5',
-    origin: 'Hàn Quốc',
-    warrantyYears: 15,
-    description: 'Abutment Implant titanium chính hãng, tương thích sinh học.',
-    priceMin: 3000000,
-    priceMax: 5500000,
-    active: true,
-  },
-  {
-    id: '6',
-    name: 'Zirconia HT Monolithic',
-    category: 'Toàn sứ',
-    material: 'Zirconia HT',
-    origin: 'Nhật Bản',
-    warrantyYears: 8,
-    description: 'Zirconia nguyên khối trong suốt cao, thích hợp cho răng sau.',
-    priceMin: 2800000,
-    priceMax: 3800000,
-    active: false,
-  },
-  {
-    id: '7',
-    name: 'Sứ ép Celtra Press',
-    category: 'Sứ ép',
-    material: 'ZLS (Zirconia-Lithium Silicate)',
-    origin: 'Đức',
-    warrantyYears: 7,
-    description: 'Sứ ép thế hệ mới, kết hợp Zirconia và Lithium Silicate.',
-    priceMin: 4500000,
-    priceMax: 6500000,
-    active: true,
-  },
-  {
-    id: '8',
-    name: 'Hàm khung kim loại',
-    category: 'Tháo lắp',
-    material: 'Hợp kim Co-Cr',
-    origin: 'Đức',
-    warrantyYears: 5,
-    description: 'Hàm khung kim loại Co-Cr, độ bền cao, nhẹ.',
-    priceMin: 3500000,
-    priceMax: 6000000,
-    active: true,
-  },
-];
-
-const EMPTY_FORM: Omit<Product, 'id'> = {
-  name: '',
-  category: 'Toàn sứ',
+const EMPTY_FORM: ProductFormState = {
+  nameVi: '',
+  categoryId: '',
   material: '',
   origin: '',
   warrantyYears: 5,
-  description: '',
-  priceMin: 0,
-  priceMax: 0,
-  active: true,
+  descriptionVi: '',
+  isFeatured: false,
+  variantName: 'Tiêu chuẩn',
+  variantUnit: 'Cái',
+  variantPriceMin: 0,
+  variantPriceMax: 0,
 };
 
 function formatPrice(value: number): string {
   return value.toLocaleString('vi-VN') + 'đ';
 }
 
-// --- Component ---
+function priceRangeOf(product: Product): { min: number; max: number } | null {
+  if (!product.variants.length) return null;
+  const prices = product.variants.map((v) => Number(v.priceVnd));
+  return { min: Math.min(...prices), max: Math.max(...prices) };
+}
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>(SAMPLE_PRODUCTS);
-  const [selectedCategory, setSelectedCategory] = useState('Tất cả');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<Product, 'id'>>(EMPTY_FORM);
+  const [form, setForm] = useState<ProductFormState>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [prods, cats] = await Promise.all([
+        apiGet<Product[]>('/api/admin/products'),
+        apiGet<Category[]>('/api/admin/categories'),
+      ]);
+      setProducts(prods);
+      setCategories(cats);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Không tải được dữ liệu');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     return products.filter((p) => {
-      const matchCategory = selectedCategory === 'Tất cả' || p.category === selectedCategory;
+      const matchCategory = selectedCategory === 'all' || p.categoryId === selectedCategory;
       const matchSearch =
         !searchQuery ||
-        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.material.toLowerCase().includes(searchQuery.toLowerCase());
+        p.nameVi.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (p.material || '').toLowerCase().includes(searchQuery.toLowerCase());
       return matchCategory && matchSearch;
     });
   }, [products, selectedCategory, searchQuery]);
 
   function openAdd() {
     setEditingId(null);
-    setForm(EMPTY_FORM);
+    setForm({ ...EMPTY_FORM, categoryId: categories[0]?.id || '' });
     setModalOpen(true);
   }
 
   function openEdit(product: Product) {
     setEditingId(product.id);
+    const prices = product.variants.map((v) => Number(v.priceVnd));
     setForm({
-      name: product.name,
-      category: product.category,
-      material: product.material,
-      origin: product.origin,
-      warrantyYears: product.warrantyYears,
-      description: product.description,
-      priceMin: product.priceMin,
-      priceMax: product.priceMax,
-      active: product.active,
+      nameVi: product.nameVi,
+      categoryId: product.categoryId,
+      material: product.material || '',
+      origin: product.origin || '',
+      warrantyYears: product.warrantyYears || 0,
+      descriptionVi: product.descriptionVi || '',
+      isFeatured: product.isFeatured,
+      variantName: product.variants[0]?.nameVi || 'Tiêu chuẩn',
+      variantUnit: product.variants[0]?.unit || 'Cái',
+      variantPriceMin: prices.length ? Math.min(...prices) : 0,
+      variantPriceMax: prices.length ? Math.max(...prices) : 0,
     });
     setModalOpen(true);
   }
 
-  function handleSave() {
-    if (editingId) {
-      setProducts((prev) =>
-        prev.map((p) => (p.id === editingId ? { ...p, ...form } : p))
-      );
-    } else {
-      const newProduct: Product = {
-        id: Date.now().toString(),
-        ...form,
-      };
-      setProducts((prev) => [...prev, newProduct]);
+  async function handleSave() {
+    if (!form.nameVi.trim() || !form.categoryId) {
+      setError('Vui lòng nhập tên sản phẩm và chọn danh mục');
+      return;
     }
-    setModalOpen(false);
+    setSaving(true);
+    setError(null);
+    try {
+      if (editingId) {
+        await apiPut<Product>(`/api/admin/products/${editingId}`, {
+          nameVi: form.nameVi,
+          categoryId: form.categoryId,
+          material: form.material || null,
+          origin: form.origin || null,
+          warrantyYears: form.warrantyYears || null,
+          descriptionVi: form.descriptionVi || null,
+          isFeatured: form.isFeatured,
+        });
+      } else {
+        const variants = [] as Array<{ nameVi: string; unit: string; priceVnd: number }>;
+        if (form.variantPriceMin > 0) {
+          variants.push({
+            nameVi: form.variantName,
+            unit: form.variantUnit,
+            priceVnd: form.variantPriceMin,
+          });
+        }
+        if (form.variantPriceMax > 0 && form.variantPriceMax !== form.variantPriceMin) {
+          variants.push({
+            nameVi: `${form.variantName} — cao`,
+            unit: form.variantUnit,
+            priceVnd: form.variantPriceMax,
+          });
+        }
+        await apiPost<Product>('/api/admin/products', {
+          nameVi: form.nameVi,
+          categoryId: form.categoryId,
+          material: form.material || null,
+          origin: form.origin || null,
+          warrantyYears: form.warrantyYears || null,
+          descriptionVi: form.descriptionVi || null,
+          isFeatured: form.isFeatured,
+          variants,
+        });
+      }
+      setModalOpen(false);
+      await load();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Lưu thất bại');
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function handleDelete(id: string) {
-    setProducts((prev) => prev.filter((p) => p.id !== id));
+  async function handleDelete(id: string) {
+    if (!confirm('Xoá sản phẩm này?')) return;
+    try {
+      await apiDelete(`/api/admin/products/${id}`);
+      setProducts((prev) => prev.filter((p) => p.id !== id));
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Xoá thất bại');
+    }
   }
 
-  function toggleActive(id: string) {
+  async function toggleActive(product: Product) {
+    const previous = products;
     setProducts((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, active: !p.active } : p))
+      prev.map((p) => (p.id === product.id ? { ...p, isActive: !p.isActive } : p))
     );
+    try {
+      await apiPut(`/api/admin/products/${product.id}`, { isActive: !product.isActive });
+    } catch (e) {
+      setProducts(previous);
+      setError(e instanceof ApiError ? e.message : 'Cập nhật thất bại');
+    }
   }
 
   return (
     <div>
-      {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -243,13 +258,28 @@ export default function ProductsPage() {
             {products.length} sản phẩm trong hệ thống
           </p>
         </div>
-        <Button onClick={openAdd}>
+        <Button onClick={openAdd} disabled={categories.length === 0}>
           <Plus size={16} />
           Thêm sản phẩm
         </Button>
       </div>
 
-      {/* Search */}
+      {error && (
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: 16,
+            background: colors.dangerBg,
+            borderColor: 'rgba(225,29,72,0.2)',
+            color: colors.danger,
+            fontSize: 13,
+            fontFamily: fonts.body,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       <div style={{ position: 'relative', marginBottom: 16, maxWidth: 380 }}>
         <Search
           size={16}
@@ -269,7 +299,6 @@ export default function ProductsPage() {
         />
       </div>
 
-      {/* Category pills */}
       <div
         style={{
           display: 'flex',
@@ -279,12 +308,12 @@ export default function ProductsPage() {
           paddingBottom: 4,
         }}
       >
-        {CATEGORIES.map((cat) => {
-          const isActive = selectedCategory === cat;
+        {[{ id: 'all', nameVi: 'Tất cả' }, ...categories].map((cat) => {
+          const isActive = selectedCategory === cat.id;
           return (
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
+              key={cat.id}
+              onClick={() => setSelectedCategory(cat.id)}
               style={{
                 padding: '7px 18px',
                 borderRadius: 20,
@@ -301,13 +330,25 @@ export default function ProductsPage() {
                 transition: transitions.fast,
               }}
             >
-              {cat}
+              {cat.nameVi}
             </button>
           );
         })}
       </div>
 
-      {/* Products grid */}
+      {loading && (
+        <div
+          style={{
+            ...cardStyle,
+            textAlign: 'center',
+            padding: '48px 24px',
+            color: colors.textMuted,
+          }}
+        >
+          Đang tải...
+        </div>
+      )}
+
       <div
         style={{
           display: 'grid',
@@ -315,181 +356,184 @@ export default function ProductsPage() {
           gap: 16,
         }}
       >
-        {filtered.map((product) => (
-          <div
-            key={product.id}
-            style={{
-              ...cardStyle,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              opacity: product.active ? 1 : 0.65,
-              transition: transitions.fast,
-            }}
-          >
-            {/* Top row: name + category */}
+        {filtered.map((product) => {
+          const priceRange = priceRangeOf(product);
+          return (
             <div
+              key={product.id}
               style={{
+                ...cardStyle,
                 display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'flex-start',
-                gap: 8,
+                flexDirection: 'column',
+                gap: 10,
+                opacity: product.isActive ? 1 : 0.65,
+                transition: transitions.fast,
               }}
             >
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 700,
-                    color: colors.textPrimary,
-                    fontFamily: fonts.heading,
-                    marginBottom: 4,
-                  }}
-                >
-                  {product.name}
-                </div>
-                <span
-                  style={{
-                    display: 'inline-block',
-                    padding: '2px 10px',
-                    borderRadius: 12,
-                    fontSize: 11,
-                    fontWeight: 600,
-                    background: colors.primaryBg,
-                    color: colors.primaryHover,
-                  }}
-                >
-                  {product.category}
-                </span>
-              </div>
-              <Package size={18} style={{ color: colors.textMuted, flexShrink: 0 }} />
-            </div>
-
-            {/* Details */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-              <div style={{ fontSize: 13, color: colors.textSecondary }}>
-                <span style={{ fontWeight: 500 }}>Chất liệu:</span> {product.material}
-              </div>
-              <div style={{ fontSize: 13, color: colors.textSecondary }}>
-                <span style={{ fontWeight: 500 }}>Xuất xứ:</span> {product.origin}
-              </div>
-              <div style={{ fontSize: 13, color: colors.textSecondary }}>
-                <span style={{ fontWeight: 500 }}>Bảo hành:</span> {product.warrantyYears} năm
-              </div>
-            </div>
-
-            {/* Price range */}
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: colors.primary,
-                fontFamily: fonts.heading,
-              }}
-            >
-              {formatPrice(product.priceMin)} - {formatPrice(product.priceMax)}
-            </div>
-
-            {/* Bottom row: status + actions */}
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                borderTop: `1px solid ${colors.border}`,
-                paddingTop: 10,
-                marginTop: 2,
-              }}
-            >
-              {/* Active toggle */}
-              <button
-                onClick={() => toggleActive(product.id)}
+              <div
                 style={{
                   display: 'flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  border: 'none',
-                  background: 'none',
-                  cursor: 'pointer',
-                  padding: 0,
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  gap: 8,
                 }}
               >
-                <div
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: colors.textPrimary,
+                      fontFamily: fonts.heading,
+                      marginBottom: 4,
+                    }}
+                  >
+                    {product.nameVi}
+                  </div>
+                  <span
+                    style={{
+                      display: 'inline-block',
+                      padding: '2px 10px',
+                      borderRadius: 12,
+                      fontSize: 11,
+                      fontWeight: 600,
+                      background: colors.primaryBg,
+                      color: colors.primaryHover,
+                    }}
+                  >
+                    {product.category?.nameVi || '—'}
+                  </span>
+                </div>
+                <Package size={18} style={{ color: colors.textMuted, flexShrink: 0 }} />
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ fontSize: 13, color: colors.textSecondary }}>
+                  <span style={{ fontWeight: 500 }}>Chất liệu:</span>{' '}
+                  {product.material || '—'}
+                </div>
+                <div style={{ fontSize: 13, color: colors.textSecondary }}>
+                  <span style={{ fontWeight: 500 }}>Xuất xứ:</span>{' '}
+                  {product.origin || '—'}
+                </div>
+                <div style={{ fontSize: 13, color: colors.textSecondary }}>
+                  <span style={{ fontWeight: 500 }}>Bảo hành:</span>{' '}
+                  {product.warrantyYears ? `${product.warrantyYears} năm` : '—'}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: colors.primary,
+                  fontFamily: fonts.heading,
+                }}
+              >
+                {priceRange
+                  ? priceRange.min === priceRange.max
+                    ? formatPrice(priceRange.min)
+                    : `${formatPrice(priceRange.min)} - ${formatPrice(priceRange.max)}`
+                  : 'Chưa có giá'}
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  borderTop: `1px solid ${colors.border}`,
+                  paddingTop: 10,
+                  marginTop: 2,
+                }}
+              >
+                <button
+                  onClick={() => toggleActive(product)}
                   style={{
-                    width: 36,
-                    height: 20,
-                    borderRadius: 10,
-                    background: product.active ? colors.success : colors.textMuted,
-                    position: 'relative',
-                    transition: transitions.fast,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                    border: 'none',
+                    background: 'none',
+                    cursor: 'pointer',
+                    padding: 0,
                   }}
                 >
                   <div
                     style={{
-                      width: 16,
-                      height: 16,
-                      borderRadius: '50%',
-                      background: colors.white,
-                      position: 'absolute',
-                      top: 2,
-                      left: product.active ? 18 : 2,
+                      width: 36,
+                      height: 20,
+                      borderRadius: 10,
+                      background: product.isActive ? colors.success : colors.textMuted,
+                      position: 'relative',
                       transition: transitions.fast,
-                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                     }}
-                  />
-                </div>
-                <span
-                  style={{
-                    fontSize: 12,
-                    color: product.active ? colors.success : colors.textMuted,
-                    fontWeight: 500,
-                    fontFamily: fonts.body,
-                  }}
-                >
-                  {product.active ? 'Đang bán' : 'Ngừng bán'}
-                </span>
-              </button>
+                  >
+                    <div
+                      style={{
+                        width: 16,
+                        height: 16,
+                        borderRadius: '50%',
+                        background: colors.white,
+                        position: 'absolute',
+                        top: 2,
+                        left: product.isActive ? 18 : 2,
+                        transition: transitions.fast,
+                        boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                      }}
+                    />
+                  </div>
+                  <span
+                    style={{
+                      fontSize: 12,
+                      color: product.isActive ? colors.success : colors.textMuted,
+                      fontWeight: 500,
+                      fontFamily: fonts.body,
+                    }}
+                  >
+                    {product.isActive ? 'Đang bán' : 'Ngừng bán'}
+                  </span>
+                </button>
 
-              {/* Action buttons */}
-              <div style={{ display: 'flex', gap: 4 }}>
-                <button
-                  onClick={() => openEdit(product)}
-                  style={{
-                    background: colors.infoBg,
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '6px 8px',
-                    cursor: 'pointer',
-                    color: colors.info,
-                    transition: transitions.fast,
-                  }}
-                  title="Chỉnh sửa"
-                >
-                  <Edit2 size={14} />
-                </button>
-                <button
-                  onClick={() => handleDelete(product.id)}
-                  style={{
-                    background: colors.dangerBg,
-                    border: 'none',
-                    borderRadius: 6,
-                    padding: '6px 8px',
-                    cursor: 'pointer',
-                    color: colors.danger,
-                    transition: transitions.fast,
-                  }}
-                  title="Xoá"
-                >
-                  <Trash2 size={14} />
-                </button>
+                <div style={{ display: 'flex', gap: 4 }}>
+                  <button
+                    onClick={() => openEdit(product)}
+                    style={{
+                      background: colors.infoBg,
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 8px',
+                      cursor: 'pointer',
+                      color: colors.info,
+                      transition: transitions.fast,
+                    }}
+                    title="Chỉnh sửa"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(product.id)}
+                    style={{
+                      background: colors.dangerBg,
+                      border: 'none',
+                      borderRadius: 6,
+                      padding: '6px 8px',
+                      cursor: 'pointer',
+                      color: colors.danger,
+                      transition: transitions.fast,
+                    }}
+                    title="Xoá"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Empty state */}
-      {filtered.length === 0 && (
+      {!loading && filtered.length === 0 && (
         <div
           style={{
             ...cardStyle,
@@ -500,15 +544,16 @@ export default function ProductsPage() {
         >
           <Package size={40} style={{ marginBottom: 12, opacity: 0.4 }} />
           <div style={{ fontSize: 14, fontWeight: 500 }}>
-            Không tìm thấy sản phẩm nào
+            {products.length === 0 ? 'Chưa có sản phẩm nào' : 'Không tìm thấy sản phẩm nào'}
           </div>
           <div style={{ fontSize: 13, marginTop: 4 }}>
-            Thử thay đổi bộ lọc hoặc từ khoá tìm kiếm
+            {products.length === 0 && categories.length === 0
+              ? 'Hãy tạo danh mục trước khi thêm sản phẩm'
+              : 'Thử thay đổi bộ lọc hoặc từ khoá tìm kiếm'}
           </div>
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -519,8 +564,8 @@ export default function ProductsPage() {
           <Input
             label="Tên sản phẩm"
             placeholder="Nhập tên sản phẩm"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            value={form.nameVi}
+            onChange={(e) => setForm({ ...form, nameVi: e.target.value })}
           />
 
           <div style={{ marginBottom: 12 }}>
@@ -538,12 +583,13 @@ export default function ProductsPage() {
             </label>
             <select
               style={{ ...inputStyle, cursor: 'pointer' }}
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              value={form.categoryId}
+              onChange={(e) => setForm({ ...form, categoryId: e.target.value })}
             >
-              {CATEGORIES.filter((c) => c !== 'Tất cả').map((cat) => (
-                <option key={cat} value={cat}>
-                  {cat}
+              <option value="">— Chọn danh mục —</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.nameVi}
                 </option>
               ))}
             </select>
@@ -577,14 +623,57 @@ export default function ProductsPage() {
           <Textarea
             label="Mô tả"
             placeholder="Mô tả chi tiết sản phẩm..."
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            value={form.descriptionVi}
+            onChange={(e) => setForm({ ...form, descriptionVi: e.target.value })}
           />
 
-          {/* Active toggle */}
+          {!editingId && (
+            <div
+              style={{
+                borderTop: `1px solid ${colors.border}`,
+                paddingTop: 12,
+                marginTop: 8,
+                marginBottom: 4,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: colors.textPrimary,
+                  marginBottom: 10,
+                  fontFamily: fonts.heading,
+                }}
+              >
+                Giá (tạo biến thể đầu tiên)
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <Input
+                  label="Giá thấp nhất (VNĐ)"
+                  type="number"
+                  min={0}
+                  value={form.variantPriceMin}
+                  onChange={(e) =>
+                    setForm({ ...form, variantPriceMin: parseInt(e.target.value) || 0 })
+                  }
+                />
+                <Input
+                  label="Giá cao nhất (VNĐ)"
+                  type="number"
+                  min={0}
+                  value={form.variantPriceMax}
+                  onChange={(e) =>
+                    setForm({ ...form, variantPriceMax: parseInt(e.target.value) || 0 })
+                  }
+                />
+              </div>
+            </div>
+          )}
+
           <div
             style={{
               marginBottom: 16,
+              marginTop: 12,
               display: 'flex',
               alignItems: 'center',
               gap: 10,
@@ -598,11 +687,11 @@ export default function ProductsPage() {
                 fontFamily: fonts.body,
               }}
             >
-              Trạng thái
+              Nổi bật
             </label>
             <button
               type="button"
-              onClick={() => setForm({ ...form, active: !form.active })}
+              onClick={() => setForm({ ...form, isFeatured: !form.isFeatured })}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -618,7 +707,7 @@ export default function ProductsPage() {
                   width: 36,
                   height: 20,
                   borderRadius: 10,
-                  background: form.active ? colors.success : colors.textMuted,
+                  background: form.isFeatured ? colors.success : colors.textMuted,
                   position: 'relative',
                   transition: transitions.fast,
                 }}
@@ -631,7 +720,7 @@ export default function ProductsPage() {
                     background: colors.white,
                     position: 'absolute',
                     top: 2,
-                    left: form.active ? 18 : 2,
+                    left: form.isFeatured ? 18 : 2,
                     transition: transitions.fast,
                     boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
                   }}
@@ -641,17 +730,16 @@ export default function ProductsPage() {
                 style={{
                   fontSize: 12,
                   fontWeight: 500,
-                  color: form.active ? colors.success : colors.textMuted,
+                  color: form.isFeatured ? colors.success : colors.textMuted,
                   fontFamily: fonts.body,
                 }}
               >
-                {form.active ? 'Đang bán' : 'Ngừng bán'}
+                {form.isFeatured ? 'Hiển thị trang chủ' : 'Không nổi bật'}
               </span>
             </button>
           </div>
         </div>
 
-        {/* Modal actions */}
         <div
           style={{
             display: 'flex',
@@ -662,10 +750,12 @@ export default function ProductsPage() {
             paddingTop: 16,
           }}
         >
-          <Button variant="secondary" onClick={() => setModalOpen(false)}>
+          <Button variant="secondary" onClick={() => setModalOpen(false)} disabled={saving}>
             Huỷ
           </Button>
-          <Button onClick={handleSave}>Lưu sản phẩm</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? 'Đang lưu...' : 'Lưu sản phẩm'}
+          </Button>
         </div>
       </Modal>
     </div>

@@ -1,48 +1,41 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   colors,
   fonts,
   cardStyle,
-  primaryButton,
-  secondaryButton,
   inputStyle,
   pageTitle,
-  pageSubtitle,
   transitions,
   getBadgeStyle,
 } from '@/lib/styles';
 import {
-  Users,
   Phone,
   Mail,
-  MessageSquare,
   Calendar,
-  ChevronDown,
-  Globe,
   UserCheck,
   Search,
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
-import { Input, Textarea } from '@/components/ui/Input';
+import { apiGet, apiPut, ApiError } from '@/lib/api-client';
 
 type LeadStatus = 'new' | 'contacted' | 'qualified' | 'converted';
 type LeadSource = 'website' | 'facebook' | 'zalo' | 'phone';
 
 interface Lead {
-  id: number;
+  id: string;
   contactName: string;
-  labName: string;
-  phone: string;
-  email: string;
+  labName: string | null;
+  phone: string | null;
+  email: string | null;
   source: LeadSource;
   status: LeadStatus;
-  message: string;
-  dateReceived: string;
+  message: string | null;
+  createdAt: string;
   assignedTo: string | null;
-  productInterest: string;
+  productInterest: string | null;
 }
 
 const salesReps = ['Tú', 'Thái', 'Hưng', 'Nghĩa', 'Trí', 'Thanh Nhàn'];
@@ -84,146 +77,39 @@ const statusLabels: Record<LeadStatus, string> = {
   converted: 'Đã chuyển đổi',
 };
 
-const initialLeads: Lead[] = [
-  {
-    id: 1,
-    contactName: 'Nguyễn Văn An',
-    labName: 'Nha khoa Sài Gòn Smile',
-    phone: '0912 345 678',
-    email: 'an.nguyen@saigonsmile.vn',
-    source: 'website',
-    status: 'new',
-    message: 'Tôi muốn tìm hiểu về răng sứ Zirconia và bảng giá cho đơn hàng lớn. Phòng khám chúng tôi đang cần đối tác labo uy tín.',
-    dateReceived: '14/04/2026',
-    assignedTo: null,
-    productInterest: 'Răng sứ Zirconia',
-  },
-  {
-    id: 2,
-    contactName: 'Trần Thị Bích',
-    labName: 'Nha khoa Kim Cương',
-    phone: '0987 654 321',
-    email: 'bich.tran@kimcuong.vn',
-    source: 'facebook',
-    status: 'contacted',
-    message: 'Đã thấy quảng cáo trên Facebook, muốn biết thêm về dịch vụ CAD/CAM và thời gian giao hàng.',
-    dateReceived: '13/04/2026',
-    assignedTo: 'Tú',
-    productInterest: 'CAD/CAM',
-  },
-  {
-    id: 3,
-    contactName: 'Lê Minh Đức',
-    labName: 'Nha khoa Răng Xinh',
-    phone: '0903 111 222',
-    email: 'duc.le@rangxinh.com',
-    source: 'zalo',
-    status: 'qualified',
-    message: 'Cần báo giá cho 50 đơn vị răng sứ mỗi tháng. Đã làm việc với labo khác nhưng muốn chuyển sang Alpha.',
-    dateReceived: '12/04/2026',
-    assignedTo: 'Thái',
-    productInterest: 'Răng sứ toàn hàm',
-  },
-  {
-    id: 4,
-    contactName: 'Phạm Hoàng Nam',
-    labName: 'Phòng khám ABC Dental',
-    phone: '0976 543 210',
-    email: 'nam.pham@abcdental.vn',
-    source: 'phone',
-    status: 'converted',
-    message: 'Đã ký hợp đồng, bắt đầu gửi đơn hàng từ tháng 4.',
-    dateReceived: '10/04/2026',
-    assignedTo: 'Hưng',
-    productInterest: 'Toàn bộ dịch vụ',
-  },
-  {
-    id: 5,
-    contactName: 'Võ Thị Cẩm Tú',
-    labName: 'Nha khoa Đông Á',
-    phone: '0918 876 543',
-    email: 'tu.vo@dongadental.vn',
-    source: 'website',
-    status: 'new',
-    message: 'Quan tâm đến công nghệ in 3D cho mô hình nha khoa. Xin gửi tài liệu và bảng giá.',
-    dateReceived: '14/04/2026',
-    assignedTo: null,
-    productInterest: 'In 3D nha khoa',
-  },
-  {
-    id: 6,
-    contactName: 'Hoàng Quốc Việt',
-    labName: 'Labo Răng Đẹp',
-    phone: '0933 222 444',
-    email: 'viet.hoang@rangdep.com',
-    source: 'facebook',
-    status: 'contacted',
-    message: 'Đang tìm labo có thể gia công implant abutment tùy chỉnh. Cần gặp để thảo luận.',
-    dateReceived: '11/04/2026',
-    assignedTo: 'Nghĩa',
-    productInterest: 'Implant abutment',
-  },
-  {
-    id: 7,
-    contactName: 'Đặng Thanh Sơn',
-    labName: 'Nha khoa Thuận An',
-    phone: '0945 666 777',
-    email: 'son.dang@thuanan.vn',
-    source: 'zalo',
-    status: 'new',
-    message: 'Mới mở phòng khám, cần labo đồng hành lâu dài. Muốn tham quan cơ sở Alpha Digital Center.',
-    dateReceived: '13/04/2026',
-    assignedTo: null,
-    productInterest: 'Tham quan cơ sở',
-  },
-  {
-    id: 8,
-    contactName: 'Bùi Văn Khánh',
-    labName: 'Nha khoa Quốc Tế',
-    phone: '0966 888 999',
-    email: 'khanh.bui@quocte.dental',
-    source: 'phone',
-    status: 'qualified',
-    message: 'Đã nhận mẫu thử, chất lượng tốt. Muốn biết thêm về chính sách đại lý và chiết khấu.',
-    dateReceived: '09/04/2026',
-    assignedTo: 'Trí',
-    productInterest: 'Chính sách đại lý',
-  },
-  {
-    id: 9,
-    contactName: 'Nguyễn Thị Lan',
-    labName: 'Nha khoa Mỹ Đức',
-    phone: '0901 333 555',
-    email: 'lan.nguyen@myduc.vn',
-    source: 'website',
-    status: 'contacted',
-    message: 'Cần tư vấn về các loại vật liệu làm răng sứ phù hợp cho bệnh nhân lớn tuổi.',
-    dateReceived: '12/04/2026',
-    assignedTo: 'Thanh Nhàn',
-    productInterest: 'Răng sứ cho người già',
-  },
-  {
-    id: 10,
-    contactName: 'Trần Quang Huy',
-    labName: 'Labo Nha Khoa Miền Nam',
-    phone: '0978 111 000',
-    email: 'huy.tran@labomiennam.vn',
-    source: 'facebook',
-    status: 'new',
-    message: 'Labo nhỏ đang muốn hợp tác gia công. Hiện tại có khoảng 20-30 case/tháng.',
-    dateReceived: '14/04/2026',
-    assignedTo: null,
-    productInterest: 'Hợp tác gia công',
-  },
-];
+function formatVnDate(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  return `${dd}/${mm}/${d.getFullYear()}`;
+}
 
 export default function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<LeadStatus | 'all'>('all');
   const [sourceFilter, setSourceFilter] = useState<LeadSource | 'all'>('all');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+
+  const loadLeads = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await apiGet<Lead[]>('/api/admin/leads');
+      setLeads(data);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Không tải được danh sách khách hàng');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadLeads();
+  }, [loadLeads]);
 
   const filteredLeads = leads.filter((lead) => {
     if (statusFilter !== 'all' && lead.status !== statusFilter) return false;
@@ -232,30 +118,37 @@ export default function LeadsPage() {
       const q = searchQuery.toLowerCase();
       return (
         lead.contactName.toLowerCase().includes(q) ||
-        lead.labName.toLowerCase().includes(q) ||
-        lead.phone.includes(q) ||
-        lead.email.toLowerCase().includes(q)
+        (lead.labName || '').toLowerCase().includes(q) ||
+        (lead.phone || '').includes(q) ||
+        (lead.email || '').toLowerCase().includes(q)
       );
     }
     return true;
   });
 
-  const handleStatusChange = (leadId: number, newStatus: LeadStatus) => {
-    setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, status: newStatus } : l))
-    );
+  const patchLead = async (leadId: string, patch: Partial<Pick<Lead, 'status' | 'assignedTo'>>) => {
+    const previous = leads;
+    setLeads((prev) => prev.map((l) => (l.id === leadId ? { ...l, ...patch } : l)));
     if (selectedLead?.id === leadId) {
-      setSelectedLead((prev) => (prev ? { ...prev, status: newStatus } : null));
+      setSelectedLead((prev) => (prev ? { ...prev, ...patch } : null));
+    }
+    try {
+      await apiPut(`/api/admin/leads/${leadId}`, patch);
+    } catch (e) {
+      setLeads(previous);
+      if (selectedLead?.id === leadId) {
+        setSelectedLead(previous.find((l) => l.id === leadId) || null);
+      }
+      setError(e instanceof ApiError ? e.message : 'Cập nhật thất bại');
     }
   };
 
-  const handleAssign = (leadId: number, rep: string | null) => {
-    setLeads((prev) =>
-      prev.map((l) => (l.id === leadId ? { ...l, assignedTo: rep } : l))
-    );
-    if (selectedLead?.id === leadId) {
-      setSelectedLead((prev) => (prev ? { ...prev, assignedTo: rep } : null));
-    }
+  const handleStatusChange = (leadId: string, newStatus: LeadStatus) => {
+    patchLead(leadId, { status: newStatus });
+  };
+
+  const handleAssign = (leadId: string, rep: string | null) => {
+    patchLead(leadId, { assignedTo: rep });
   };
 
   const openDetail = (lead: Lead) => {
@@ -265,7 +158,6 @@ export default function LeadsPage() {
 
   return (
     <div style={{ padding: 0 }}>
-      {/* Page Header */}
       <div
         style={{
           display: 'flex',
@@ -295,7 +187,22 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Search */}
+      {error && (
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: 16,
+            background: colors.dangerBg,
+            borderColor: 'rgba(225,29,72,0.2)',
+            color: colors.danger,
+            fontSize: 13,
+            fontFamily: fonts.body,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       <div style={{ marginBottom: 16 }}>
         <div style={{ position: 'relative', maxWidth: 360 }}>
           <Search
@@ -312,7 +219,6 @@ export default function LeadsPage() {
         </div>
       </div>
 
-      {/* Filter Bar */}
       <div
         style={{
           ...cardStyle,
@@ -323,7 +229,6 @@ export default function LeadsPage() {
           flexWrap: 'wrap',
         }}
       >
-        {/* Status Tabs */}
         <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
           {statusTabs.map((tab) => (
             <button
@@ -356,7 +261,6 @@ export default function LeadsPage() {
           }}
         />
 
-        {/* Source Filter */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ fontSize: 13, color: colors.textMuted, fontFamily: fonts.body }}>
             Nguồn:
@@ -388,9 +292,22 @@ export default function LeadsPage() {
         </span>
       </div>
 
-      {/* Leads List */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {filteredLeads.length === 0 && (
+        {loading && (
+          <div
+            style={{
+              ...cardStyle,
+              padding: 40,
+              textAlign: 'center',
+              color: colors.textMuted,
+              fontSize: 14,
+              fontFamily: fonts.body,
+            }}
+          >
+            Đang tải...
+          </div>
+        )}
+        {!loading && filteredLeads.length === 0 && (
           <div
             style={{
               ...cardStyle,
@@ -418,7 +335,6 @@ export default function LeadsPage() {
             }}
             onClick={() => openDetail(lead)}
           >
-            {/* Avatar */}
             <div
               style={{
                 width: 42,
@@ -438,7 +354,6 @@ export default function LeadsPage() {
               {lead.contactName.charAt(0)}
             </div>
 
-            {/* Main Info */}
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
                 <span
@@ -451,9 +366,11 @@ export default function LeadsPage() {
                 >
                   {lead.contactName}
                 </span>
-                <span style={{ fontSize: 13, color: colors.textSecondary, fontFamily: fonts.body }}>
-                  - {lead.labName}
-                </span>
+                {lead.labName && (
+                  <span style={{ fontSize: 13, color: colors.textSecondary, fontFamily: fonts.body }}>
+                    - {lead.labName}
+                  </span>
+                )}
               </div>
 
               <div
@@ -465,50 +382,55 @@ export default function LeadsPage() {
                   flexWrap: 'wrap',
                 }}
               >
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontSize: 12,
-                    color: colors.textMuted,
-                    fontFamily: fonts.body,
-                  }}
-                >
-                  <Phone size={12} />
-                  {lead.phone}
-                </span>
-                <span
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: 4,
-                    fontSize: 12,
-                    color: colors.textMuted,
-                    fontFamily: fonts.body,
-                  }}
-                >
-                  <Mail size={12} />
-                  {lead.email}
-                </span>
+                {lead.phone && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontSize: 12,
+                      color: colors.textMuted,
+                      fontFamily: fonts.body,
+                    }}
+                  >
+                    <Phone size={12} />
+                    {lead.phone}
+                  </span>
+                )}
+                {lead.email && (
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontSize: 12,
+                      color: colors.textMuted,
+                      fontFamily: fonts.body,
+                    }}
+                  >
+                    <Mail size={12} />
+                    {lead.email}
+                  </span>
+                )}
               </div>
 
-              <div
-                style={{
-                  fontSize: 13,
-                  color: colors.textSecondary,
-                  fontFamily: fonts.body,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  maxWidth: 500,
-                }}
-              >
-                {lead.message}
-              </div>
+              {lead.message && (
+                <div
+                  style={{
+                    fontSize: 13,
+                    color: colors.textSecondary,
+                    fontFamily: fonts.body,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: 500,
+                  }}
+                >
+                  {lead.message}
+                </div>
+              )}
             </div>
 
-            {/* Right Side: Badges + Meta */}
             <div
               style={{
                 display: 'flex',
@@ -519,7 +441,6 @@ export default function LeadsPage() {
               }}
             >
               <div style={{ display: 'flex', gap: 6 }}>
-                {/* Source badge */}
                 <span
                   style={{
                     display: 'inline-block',
@@ -534,7 +455,6 @@ export default function LeadsPage() {
                 >
                   {sourceLabels[lead.source]}
                 </span>
-                {/* Status badge */}
                 <span style={getBadgeStyle(lead.status)}>
                   {statusLabels[lead.status]}
                 </span>
@@ -551,7 +471,7 @@ export default function LeadsPage() {
                 }}
               >
                 <Calendar size={12} />
-                {lead.dateReceived}
+                {formatVnDate(lead.createdAt)}
               </div>
 
               <div
@@ -570,7 +490,6 @@ export default function LeadsPage() {
               </div>
             </div>
 
-            {/* Actions - stop propagation */}
             <div
               style={{
                 display: 'flex',
@@ -627,7 +546,6 @@ export default function LeadsPage() {
         ))}
       </div>
 
-      {/* Detail Modal */}
       <Modal
         isOpen={showDetailModal}
         onClose={() => setShowDetailModal(false)}
@@ -665,15 +583,17 @@ export default function LeadsPage() {
                 >
                   {selectedLead.contactName}
                 </div>
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: colors.textSecondary,
-                    fontFamily: fonts.body,
-                  }}
-                >
-                  {selectedLead.labName}
-                </div>
+                {selectedLead.labName && (
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: colors.textSecondary,
+                      fontFamily: fonts.body,
+                    }}
+                  >
+                    {selectedLead.labName}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -690,7 +610,7 @@ export default function LeadsPage() {
                   Điện thoại
                 </div>
                 <div style={{ fontSize: 14, color: colors.textPrimary, fontFamily: fonts.body, fontWeight: 500 }}>
-                  {selectedLead.phone}
+                  {selectedLead.phone || '—'}
                 </div>
               </div>
               <div>
@@ -698,7 +618,7 @@ export default function LeadsPage() {
                   Email
                 </div>
                 <div style={{ fontSize: 14, color: colors.textPrimary, fontFamily: fonts.body, fontWeight: 500 }}>
-                  {selectedLead.email}
+                  {selectedLead.email || '—'}
                 </div>
               </div>
               <div>
@@ -725,7 +645,7 @@ export default function LeadsPage() {
                   Ngày nhận
                 </div>
                 <div style={{ fontSize: 14, color: colors.textPrimary, fontFamily: fonts.body, fontWeight: 500 }}>
-                  {selectedLead.dateReceived}
+                  {formatVnDate(selectedLead.createdAt)}
                 </div>
               </div>
               <div>
@@ -733,29 +653,31 @@ export default function LeadsPage() {
                   Sản phẩm quan tâm
                 </div>
                 <div style={{ fontSize: 14, color: colors.textPrimary, fontFamily: fonts.body, fontWeight: 500 }}>
-                  {selectedLead.productInterest}
+                  {selectedLead.productInterest || '—'}
                 </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: colors.textMuted, fontFamily: fonts.body, marginBottom: 4 }}>
-                Tin nhắn
+            {selectedLead.message && (
+              <div style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: 12, color: colors.textMuted, fontFamily: fonts.body, marginBottom: 4 }}>
+                  Tin nhắn
+                </div>
+                <div
+                  style={{
+                    background: colors.pageBg,
+                    borderRadius: 8,
+                    padding: 12,
+                    fontSize: 13,
+                    color: colors.textPrimary,
+                    fontFamily: fonts.body,
+                    lineHeight: 1.5,
+                  }}
+                >
+                  {selectedLead.message}
+                </div>
               </div>
-              <div
-                style={{
-                  background: colors.pageBg,
-                  borderRadius: 8,
-                  padding: 12,
-                  fontSize: 13,
-                  color: colors.textPrimary,
-                  fontFamily: fonts.body,
-                  lineHeight: 1.5,
-                }}
-              >
-                {selectedLead.message}
-              </div>
-            </div>
+            )}
 
             <div
               style={{

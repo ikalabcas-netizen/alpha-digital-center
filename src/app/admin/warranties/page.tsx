@@ -1,11 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Plus,
   Search,
   Edit2,
-  Eye,
   Shield,
   CheckCircle,
   Clock,
@@ -19,33 +18,57 @@ import {
   pageSubtitle,
   inputStyle,
   transitions,
-  getBadgeStyle,
 } from '@/lib/styles';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
-
-// --- Types ---
+import { apiGet, apiPost, apiPut, ApiError } from '@/lib/api-client';
 
 type WarrantyStatus = 'active' | 'claimed' | 'expired';
 
+interface Variant {
+  id: string;
+  nameVi: string;
+}
+
+interface ProductLite {
+  id: string;
+  nameVi: string;
+  variants: Variant[];
+}
+
 interface WarrantyRecord {
   id: string;
-  code: string;
-  productName: string;
-  variant: string;
+  warrantyCode: string;
+  patientName: string | null;
+  dentistName: string | null;
+  labName: string | null;
+  productId: string | null;
+  variantId: string | null;
+  product: { id: string; nameVi: string } | null;
+  variant: { id: string; nameVi: string } | null;
+  teethPositions: string | null;
+  shade: string | null;
+  productionDate: string;
+  warrantyExpiry: string;
+  status: WarrantyStatus;
+  notes: string | null;
+}
+
+interface WarrantyForm {
+  warrantyCode: string;
+  productId: string;
+  variantId: string;
   labName: string;
-  dentist: string;
+  dentistName: string;
   patientName: string;
-  toothPosition: string;
+  teethPositions: string;
   shade: string;
   productionDate: string;
-  expiryDate: string;
+  warrantyExpiry: string;
   notes: string;
   status: WarrantyStatus;
 }
-
-// --- Constants ---
 
 const WARRANTY_STATUS_STYLES: Record<
   WarrantyStatus,
@@ -56,193 +79,81 @@ const WARRANTY_STATUS_STYLES: Record<
   expired: { bg: '#fff1f2', color: '#e11d48', label: 'Hết hạn' },
 };
 
-const PRODUCTS_LIST = [
-  'Zirconia Multilayer Premium',
-  'Emax Press',
-  'PFM Crown Standard',
-  'Hàm tháo lắp nhựa dẻo',
-  'Implant Abutment Titanium',
-  'Zirconia HT Monolithic',
-  'Sứ ép Celtra Press',
-  'Hàm khung kim loại',
-];
-
-const VARIANT_LIST = [
-  'Tiêu chuẩn',
-  'Cao cấp',
-  'Premium',
-  'Siêu trong suốt',
-  'Đơn sắc',
-  'Đa lớp',
-];
-
-const SAMPLE_WARRANTIES: WarrantyRecord[] = [
-  {
-    id: '1',
-    code: 'ADC-2024-00142',
-    productName: 'Zirconia Multilayer Premium',
-    variant: 'Cao cấp',
-    labName: 'Nha khoa Kim Cương',
-    dentist: 'BS. Nguyễn Văn An',
-    patientName: 'Trần Thị Mai',
-    toothPosition: '11, 21',
-    shade: 'A2',
-    productionDate: '2024-01-15',
-    expiryDate: '2034-01-15',
-    notes: 'Cầu răng 2 đơn vị, check lại sau 6 tháng.',
-    status: 'active',
-  },
-  {
-    id: '2',
-    code: 'ADC-2024-00138',
-    productName: 'Emax Press',
-    variant: 'Premium',
-    labName: 'Labo Hoàng Gia',
-    dentist: 'BS. Lê Minh Tuấn',
-    patientName: 'Phạm Quang Huy',
-    toothPosition: '14, 15',
-    shade: 'A3',
-    productionDate: '2024-01-10',
-    expiryDate: '2031-01-10',
-    notes: '',
-    status: 'active',
-  },
-  {
-    id: '3',
-    code: 'ADC-2023-00087',
-    productName: 'PFM Crown Standard',
-    variant: 'Tiêu chuẩn',
-    labName: 'Nha khoa Sài Gòn Smile',
-    dentist: 'BS. Trần Hữu Phước',
-    patientName: 'Nguyễn Thanh Tùng',
-    toothPosition: '36',
-    shade: 'B2',
-    productionDate: '2023-06-20',
-    expiryDate: '2028-06-20',
-    notes: 'Mão đơn lẻ.',
-    status: 'claimed',
-  },
-  {
-    id: '4',
-    code: 'ADC-2022-00034',
-    productName: 'Hàm tháo lắp nhựa dẻo',
-    variant: 'Tiêu chuẩn',
-    labName: 'Phòng khám Đông Á',
-    dentist: 'BS. Võ Thị Lan',
-    patientName: 'Lê Văn Bình',
-    toothPosition: 'Hàm trên toàn bộ',
-    shade: 'A3.5',
-    productionDate: '2022-03-05',
-    expiryDate: '2025-03-05',
-    notes: 'Hàm toàn hàm trên.',
-    status: 'expired',
-  },
-  {
-    id: '5',
-    code: 'ADC-2024-00156',
-    productName: 'Implant Abutment Titanium',
-    variant: 'Cao cấp',
-    labName: 'Nha khoa Quốc Tế',
-    dentist: 'BS. Đặng Hoàng Nam',
-    patientName: 'Hoàng Minh Châu',
-    toothPosition: '46',
-    shade: 'A1',
-    productionDate: '2024-02-20',
-    expiryDate: '2039-02-20',
-    notes: 'Implant Osstem, abutment custom titanium.',
-    status: 'active',
-  },
-  {
-    id: '6',
-    code: 'ADC-2023-00102',
-    productName: 'Zirconia HT Monolithic',
-    variant: 'Đơn sắc',
-    labName: 'Labo Việt Đức',
-    dentist: 'BS. Phan Thị Hồng',
-    patientName: 'Vũ Đức Minh',
-    toothPosition: '25, 26, 27',
-    shade: 'A2',
-    productionDate: '2023-09-12',
-    expiryDate: '2031-09-12',
-    notes: 'Cầu 3 đơn vị răng sau.',
-    status: 'active',
-  },
-  {
-    id: '7',
-    code: 'ADC-2023-00065',
-    productName: 'Sứ ép Celtra Press',
-    variant: 'Premium',
-    labName: 'Nha khoa Ánh Sáng',
-    dentist: 'BS. Nguyễn Thị Hạnh',
-    patientName: 'Trịnh Văn Khoa',
-    toothPosition: '11',
-    shade: 'BL2',
-    productionDate: '2023-05-08',
-    expiryDate: '2030-05-08',
-    notes: 'Veneer răng cửa, yêu cầu thẩm mỹ cao.',
-    status: 'claimed',
-  },
-  {
-    id: '8',
-    code: 'ADC-2021-00018',
-    productName: 'PFM Crown Standard',
-    variant: 'Tiêu chuẩn',
-    labName: 'Phòng khám Bảo Anh',
-    dentist: 'BS. Lý Quốc Tuấn',
-    patientName: 'Đỗ Thị Thu',
-    toothPosition: '46, 47',
-    shade: 'C2',
-    productionDate: '2021-11-15',
-    expiryDate: '2026-11-15',
-    notes: '',
-    status: 'expired',
-  },
-];
-
 function generateCode(): string {
   const year = new Date().getFullYear();
   const num = Math.floor(10000 + Math.random() * 90000);
   return `ADC-${year}-${num}`;
 }
 
-const EMPTY_FORM: Omit<WarrantyRecord, 'id'> = {
-  code: '',
-  productName: PRODUCTS_LIST[0],
-  variant: VARIANT_LIST[0],
+const EMPTY_FORM: WarrantyForm = {
+  warrantyCode: '',
+  productId: '',
+  variantId: '',
   labName: '',
-  dentist: '',
+  dentistName: '',
   patientName: '',
-  toothPosition: '',
+  teethPositions: '',
   shade: '',
   productionDate: new Date().toISOString().split('T')[0],
-  expiryDate: '',
+  warrantyExpiry: '',
   notes: '',
   status: 'active',
 };
 
-function formatDate(dateStr: string): string {
+function formatDate(dateStr: string | null): string {
   if (!dateStr) return '';
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return new Date(dateStr).toLocaleDateString('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
 }
 
-// --- Component ---
+function toDateInputValue(dateStr: string | null): string {
+  if (!dateStr) return '';
+  return new Date(dateStr).toISOString().split('T')[0];
+}
 
 export default function WarrantiesPage() {
-  const [warranties, setWarranties] = useState<WarrantyRecord[]>(SAMPLE_WARRANTIES);
+  const [warranties, setWarranties] = useState<WarrantyRecord[]>([]);
+  const [products, setProducts] = useState<ProductLite[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<WarrantyRecord, 'id'>>(EMPTY_FORM);
+  const [form, setForm] = useState<WarrantyForm>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [ws, ps] = await Promise.all([
+        apiGet<WarrantyRecord[]>('/api/admin/warranties'),
+        apiGet<ProductLite[]>('/api/admin/products'),
+      ]);
+      setWarranties(ws);
+      setProducts(ps);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Không tải được dữ liệu');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     if (!searchQuery) return warranties;
     const q = searchQuery.toLowerCase();
     return warranties.filter(
       (w) =>
-        w.code.toLowerCase().includes(q) ||
-        w.labName.toLowerCase().includes(q) ||
-        w.patientName.toLowerCase().includes(q)
+        w.warrantyCode.toLowerCase().includes(q) ||
+        (w.labName || '').toLowerCase().includes(q) ||
+        (w.patientName || '').toLowerCase().includes(q)
     );
   }, [warranties, searchQuery]);
 
@@ -254,44 +165,70 @@ export default function WarrantiesPage() {
     return counts;
   }, [warranties]);
 
+  const variantsOfSelected = useMemo(() => {
+    const p = products.find((x) => x.id === form.productId);
+    return p?.variants || [];
+  }, [products, form.productId]);
+
   function openAdd() {
     setEditingId(null);
-    setForm({ ...EMPTY_FORM, code: generateCode() });
+    setForm({ ...EMPTY_FORM, warrantyCode: generateCode() });
     setModalOpen(true);
   }
 
   function openEdit(record: WarrantyRecord) {
     setEditingId(record.id);
     setForm({
-      code: record.code,
-      productName: record.productName,
-      variant: record.variant,
-      labName: record.labName,
-      dentist: record.dentist,
-      patientName: record.patientName,
-      toothPosition: record.toothPosition,
-      shade: record.shade,
-      productionDate: record.productionDate,
-      expiryDate: record.expiryDate,
-      notes: record.notes,
+      warrantyCode: record.warrantyCode,
+      productId: record.productId || '',
+      variantId: record.variantId || '',
+      labName: record.labName || '',
+      dentistName: record.dentistName || '',
+      patientName: record.patientName || '',
+      teethPositions: record.teethPositions || '',
+      shade: record.shade || '',
+      productionDate: toDateInputValue(record.productionDate),
+      warrantyExpiry: toDateInputValue(record.warrantyExpiry),
+      notes: record.notes || '',
       status: record.status,
     });
     setModalOpen(true);
   }
 
-  function handleSave() {
-    if (editingId) {
-      setWarranties((prev) =>
-        prev.map((w) => (w.id === editingId ? { ...w, ...form } : w))
-      );
-    } else {
-      const newRecord: WarrantyRecord = {
-        id: Date.now().toString(),
-        ...form,
-      };
-      setWarranties((prev) => [...prev, newRecord]);
+  async function handleSave() {
+    if (!form.warrantyCode || !form.productionDate || !form.warrantyExpiry) {
+      setError('Mã bảo hành, ngày sản xuất và ngày hết hạn là bắt buộc');
+      return;
     }
-    setModalOpen(false);
+    setSaving(true);
+    setError(null);
+    const payload = {
+      warrantyCode: form.warrantyCode,
+      productId: form.productId || null,
+      variantId: form.variantId || null,
+      labName: form.labName || null,
+      dentistName: form.dentistName || null,
+      patientName: form.patientName || null,
+      teethPositions: form.teethPositions || null,
+      shade: form.shade || null,
+      productionDate: form.productionDate,
+      warrantyExpiry: form.warrantyExpiry,
+      notes: form.notes || null,
+      status: form.status,
+    };
+    try {
+      if (editingId) {
+        await apiPut(`/api/admin/warranties/${editingId}`, payload);
+      } else {
+        await apiPost('/api/admin/warranties', payload);
+      }
+      setModalOpen(false);
+      await load();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Lưu thất bại');
+    } finally {
+      setSaving(false);
+    }
   }
 
   const kpiCards: {
@@ -326,7 +263,6 @@ export default function WarrantiesPage() {
 
   return (
     <div>
-      {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -349,7 +285,22 @@ export default function WarrantiesPage() {
         </Button>
       </div>
 
-      {/* Search */}
+      {error && (
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: 16,
+            background: colors.dangerBg,
+            borderColor: 'rgba(225,29,72,0.2)',
+            color: colors.danger,
+            fontSize: 13,
+            fontFamily: fonts.body,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       <div style={{ position: 'relative', marginBottom: 20, maxWidth: 420 }}>
         <Search
           size={16}
@@ -369,7 +320,6 @@ export default function WarrantiesPage() {
         />
       </div>
 
-      {/* Stats KPI row */}
       <div
         style={{
           display: 'grid',
@@ -429,7 +379,19 @@ export default function WarrantiesPage() {
         ))}
       </div>
 
-      {/* Warranty list */}
+      {loading && (
+        <div
+          style={{
+            ...cardStyle,
+            textAlign: 'center',
+            padding: '48px 24px',
+            color: colors.textMuted,
+          }}
+        >
+          Đang tải...
+        </div>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {filtered.map((record) => {
           const statusStyle = WARRANTY_STATUS_STYLES[record.status];
@@ -445,7 +407,6 @@ export default function WarrantiesPage() {
                 flexWrap: 'wrap',
               }}
             >
-              {/* Left info */}
               <div style={{ flex: 1, minWidth: 220 }}>
                 <div
                   style={{
@@ -464,7 +425,7 @@ export default function WarrantiesPage() {
                       letterSpacing: 0.5,
                     }}
                   >
-                    {record.code}
+                    {record.warrantyCode}
                   </span>
                   <span
                     style={{
@@ -488,7 +449,8 @@ export default function WarrantiesPage() {
                     marginBottom: 4,
                   }}
                 >
-                  {record.productName}
+                  {record.product?.nameVi || '—'}
+                  {record.variant ? ` · ${record.variant.nameVi}` : ''}
                 </div>
                 <div
                   style={{
@@ -499,16 +461,19 @@ export default function WarrantiesPage() {
                     color: colors.textSecondary,
                   }}
                 >
-                  <span>
-                    <span style={{ fontWeight: 500 }}>Labo:</span> {record.labName}
-                  </span>
-                  <span>
-                    <span style={{ fontWeight: 500 }}>BN:</span> {record.patientName}
-                  </span>
+                  {record.labName && (
+                    <span>
+                      <span style={{ fontWeight: 500 }}>Labo:</span> {record.labName}
+                    </span>
+                  )}
+                  {record.patientName && (
+                    <span>
+                      <span style={{ fontWeight: 500 }}>BN:</span> {record.patientName}
+                    </span>
+                  )}
                 </div>
               </div>
 
-              {/* Date range */}
               <div
                 style={{
                   textAlign: 'center',
@@ -525,11 +490,10 @@ export default function WarrantiesPage() {
                     fontWeight: 500,
                   }}
                 >
-                  {formatDate(record.productionDate)} &rarr; {formatDate(record.expiryDate)}
+                  {formatDate(record.productionDate)} &rarr; {formatDate(record.warrantyExpiry)}
                 </div>
               </div>
 
-              {/* Action buttons */}
               <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
                 <button
                   onClick={() => openEdit(record)}
@@ -552,8 +516,7 @@ export default function WarrantiesPage() {
         })}
       </div>
 
-      {/* Empty state */}
-      {filtered.length === 0 && (
+      {!loading && filtered.length === 0 && (
         <div
           style={{
             ...cardStyle,
@@ -564,15 +527,14 @@ export default function WarrantiesPage() {
         >
           <Shield size={40} style={{ marginBottom: 12, opacity: 0.4 }} />
           <div style={{ fontSize: 14, fontWeight: 500 }}>
-            Không tìm thấy phiếu bảo hành
+            {warranties.length === 0 ? 'Chưa có phiếu bảo hành' : 'Không tìm thấy phiếu bảo hành'}
           </div>
           <div style={{ fontSize: 13, marginTop: 4 }}>
-            Thử thay đổi từ khoá tìm kiếm
+            {warranties.length === 0 ? 'Tạo phiếu mới để bắt đầu' : 'Thử thay đổi từ khoá tìm kiếm'}
           </div>
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -583,8 +545,9 @@ export default function WarrantiesPage() {
           <Input
             label="Mã bảo hành"
             placeholder="ADC-YYYY-XXXXX"
-            value={form.code}
-            onChange={(e) => setForm({ ...form, code: e.target.value })}
+            value={form.warrantyCode}
+            onChange={(e) => setForm({ ...form, warrantyCode: e.target.value })}
+            disabled={!!editingId}
           />
 
           <div style={{ marginBottom: 12 }}>
@@ -598,46 +561,52 @@ export default function WarrantiesPage() {
                 fontFamily: fonts.body,
               }}
             >
-              Tên sản phẩm
+              Sản phẩm
             </label>
             <select
               style={{ ...inputStyle, cursor: 'pointer' }}
-              value={form.productName}
-              onChange={(e) => setForm({ ...form, productName: e.target.value })}
+              value={form.productId}
+              onChange={(e) =>
+                setForm({ ...form, productId: e.target.value, variantId: '' })
+              }
             >
-              {PRODUCTS_LIST.map((p) => (
-                <option key={p} value={p}>
-                  {p}
+              <option value="">— Chọn sản phẩm —</option>
+              {products.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.nameVi}
                 </option>
               ))}
             </select>
           </div>
 
-          <div style={{ marginBottom: 12 }}>
-            <label
-              style={{
-                display: 'block',
-                fontSize: 13,
-                fontWeight: 500,
-                color: colors.textSecondary,
-                marginBottom: 4,
-                fontFamily: fonts.body,
-              }}
-            >
-              Biến thể
-            </label>
-            <select
-              style={{ ...inputStyle, cursor: 'pointer' }}
-              value={form.variant}
-              onChange={(e) => setForm({ ...form, variant: e.target.value })}
-            >
-              {VARIANT_LIST.map((v) => (
-                <option key={v} value={v}>
-                  {v}
-                </option>
-              ))}
-            </select>
-          </div>
+          {variantsOfSelected.length > 0 && (
+            <div style={{ marginBottom: 12 }}>
+              <label
+                style={{
+                  display: 'block',
+                  fontSize: 13,
+                  fontWeight: 500,
+                  color: colors.textSecondary,
+                  marginBottom: 4,
+                  fontFamily: fonts.body,
+                }}
+              >
+                Biến thể
+              </label>
+              <select
+                style={{ ...inputStyle, cursor: 'pointer' }}
+                value={form.variantId}
+                onChange={(e) => setForm({ ...form, variantId: e.target.value })}
+              >
+                <option value="">— Không chọn —</option>
+                {variantsOfSelected.map((v) => (
+                  <option key={v.id} value={v.id}>
+                    {v.nameVi}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
             <Input
@@ -649,8 +618,8 @@ export default function WarrantiesPage() {
             <Input
               label="Bác sĩ"
               placeholder="Nhập tên bác sĩ"
-              value={form.dentist}
-              onChange={(e) => setForm({ ...form, dentist: e.target.value })}
+              value={form.dentistName}
+              onChange={(e) => setForm({ ...form, dentistName: e.target.value })}
             />
           </div>
 
@@ -665,8 +634,8 @@ export default function WarrantiesPage() {
             <Input
               label="Vị trí răng"
               placeholder="VD: 11, 21"
-              value={form.toothPosition}
-              onChange={(e) => setForm({ ...form, toothPosition: e.target.value })}
+              value={form.teethPositions}
+              onChange={(e) => setForm({ ...form, teethPositions: e.target.value })}
             />
             <Input
               label="Shade"
@@ -686,8 +655,8 @@ export default function WarrantiesPage() {
             <Input
               label="Ngày hết hạn"
               type="date"
-              value={form.expiryDate}
-              onChange={(e) => setForm({ ...form, expiryDate: e.target.value })}
+              value={form.warrantyExpiry}
+              onChange={(e) => setForm({ ...form, warrantyExpiry: e.target.value })}
             />
           </div>
 
@@ -725,7 +694,6 @@ export default function WarrantiesPage() {
           </div>
         </div>
 
-        {/* Modal actions */}
         <div
           style={{
             display: 'flex',
@@ -736,10 +704,12 @@ export default function WarrantiesPage() {
             paddingTop: 16,
           }}
         >
-          <Button variant="secondary" onClick={() => setModalOpen(false)}>
+          <Button variant="secondary" onClick={() => setModalOpen(false)} disabled={saving}>
             Huỷ
           </Button>
-          <Button onClick={handleSave}>Lưu phiếu bảo hành</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? 'Đang lưu...' : 'Lưu phiếu bảo hành'}
+          </Button>
         </div>
       </Modal>
     </div>

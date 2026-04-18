@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import {
   Plus,
-  Search,
   Edit2,
   Trash2,
   FileText,
@@ -25,27 +24,39 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
-
-// --- Types ---
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
 
 type BlogStatus = 'draft' | 'scheduled' | 'published';
 type BlogCategory = 'tin-tuc' | 'kien-thuc' | 'cong-nghe' | 'tuyen-dung';
 
 interface BlogPost {
   id: string;
-  title: string;
-  excerpt: string;
-  content: string;
-  category: BlogCategory;
+  titleVi: string;
+  slug: string;
+  excerptVi: string | null;
+  contentVi: string;
+  featuredImageUrl: string | null;
+  category: string | null;
+  tags: string[];
   status: BlogStatus;
-  tags: string;
-  seoTitle: string;
-  seoDescription: string;
-  date: string;
-  views: number;
+  publishedAt: string | null;
+  scheduledAt: string | null;
+  seoTitle: string | null;
+  seoDescription: string | null;
+  viewCount: number;
+  createdAt: string;
 }
 
-// --- Constants ---
+interface BlogForm {
+  titleVi: string;
+  excerptVi: string;
+  contentVi: string;
+  category: BlogCategory;
+  status: BlogStatus;
+  tagsText: string;
+  seoTitle: string;
+  seoDescription: string;
+}
 
 const CATEGORY_LABELS: Record<BlogCategory, string> = {
   'tin-tuc': 'Tin tức',
@@ -68,118 +79,48 @@ const STATUS_TABS: { key: 'all' | BlogStatus; label: string }[] = [
   { key: 'published', label: 'Đã xuất bản' },
 ];
 
-const SAMPLE_POSTS: BlogPost[] = [
-  {
-    id: '1',
-    title: 'Xu hướng phục hình răng sứ Zirconia 2024 - Công nghệ CAD/CAM tối ưu',
-    excerpt:
-      'Phân tích chi tiết các công nghệ Zirconia mới nhất được ứng dụng trong labo nha khoa, từ multilayer đến ultra-translucent.',
-    content: '',
-    category: 'cong-nghe',
-    status: 'published',
-    tags: 'zirconia, cad/cam, công nghệ',
-    seoTitle: 'Xu hướng Zirconia 2024 | Alpha Digital Center',
-    seoDescription: 'Phân tích công nghệ Zirconia mới nhất trong labo nha khoa.',
-    date: '2024-03-15',
-    views: 1245,
-  },
-  {
-    id: '2',
-    title: 'Hướng dẫn chọn shade răng sứ chính xác cho bác sĩ nha khoa',
-    excerpt:
-      'Quy trình chọn shade chuẩn, so màu kỹ thuật số và các lưu ý quan trọng khi gửi case cho labo.',
-    content: '',
-    category: 'kien-thuc',
-    status: 'published',
-    tags: 'shade, hướng dẫn, bác sĩ',
-    seoTitle: 'Hướng dẫn chọn shade răng sứ | Alpha Digital Center',
-    seoDescription: 'Hướng dẫn chọn shade răng sứ chính xác cho bác sĩ.',
-    date: '2024-03-10',
-    views: 832,
-  },
-  {
-    id: '3',
-    title: 'Alpha Digital Center khai trương showroom mới tại TP.HCM',
-    excerpt:
-      'Sự kiện khai trương showroom trưng bày các sản phẩm phục hình nha khoa cao cấp tại quận 1.',
-    content: '',
-    category: 'tin-tuc',
-    status: 'published',
-    tags: 'sự kiện, showroom, tp.hcm',
-    seoTitle: 'Khai trương showroom TP.HCM | Alpha Digital Center',
-    seoDescription: 'Alpha Digital Center khai trương showroom mới tại TP.HCM.',
-    date: '2024-02-28',
-    views: 567,
-  },
-  {
-    id: '4',
-    title: 'Tuyển kỹ thuật viên labo nha khoa - Kinh nghiệm CAD/CAM ưu tiên',
-    excerpt:
-      'Alpha Digital Center tuyển dụng kỹ thuật viên labo có kinh nghiệm vận hành máy phay CAD/CAM.',
-    content: '',
-    category: 'tuyen-dung',
-    status: 'draft',
-    tags: 'tuyển dụng, kỹ thuật viên, cad/cam',
-    seoTitle: 'Tuyển kỹ thuật viên labo | Alpha Digital Center',
-    seoDescription: 'Tuyển kỹ thuật viên labo nha khoa tại Alpha Digital Center.',
-    date: '2024-03-18',
-    views: 0,
-  },
-  {
-    id: '5',
-    title: 'So sánh Emax và Zirconia: Khi nào nên chọn loại nào?',
-    excerpt:
-      'Bài viết phân tích ưu nhược điểm của hai loại sứ phổ biến nhất trong phục hình nha khoa hiện đại.',
-    content: '',
-    category: 'kien-thuc',
-    status: 'scheduled',
-    tags: 'emax, zirconia, so sánh',
-    seoTitle: 'Emax vs Zirconia | Alpha Digital Center',
-    seoDescription: 'So sánh Emax và Zirconia trong phục hình nha khoa.',
-    date: '2024-03-25',
-    views: 0,
-  },
-  {
-    id: '6',
-    title: 'Ứng dụng AI trong thiết kế phục hình nha khoa - Tương lai đã đến',
-    excerpt:
-      'Tìm hiểu cách trí tuệ nhân tạo đang thay đổi quy trình thiết kế trong labo nha khoa hiện đại.',
-    content: '',
-    category: 'cong-nghe',
-    status: 'draft',
-    tags: 'AI, thiết kế, tương lai',
-    seoTitle: 'AI trong nha khoa | Alpha Digital Center',
-    seoDescription: 'Ứng dụng AI trong thiết kế phục hình nha khoa.',
-    date: '2024-03-20',
-    views: 0,
-  },
-];
-
-const EMPTY_FORM: Omit<BlogPost, 'id' | 'views'> = {
-  title: '',
-  excerpt: '',
-  content: '',
+const EMPTY_FORM: BlogForm = {
+  titleVi: '',
+  excerptVi: '',
+  contentVi: '',
   category: 'tin-tuc',
   status: 'draft',
-  tags: '',
+  tagsText: '',
   seoTitle: '',
   seoDescription: '',
-  date: new Date().toISOString().split('T')[0],
 };
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+function formatDate(iso: string | null): string {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-// --- Component ---
-
 export default function BlogPage() {
-  const [posts, setPosts] = useState<BlogPost[]>(SAMPLE_POSTS);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<'all' | BlogStatus>('all');
   const [modalOpen, setModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<Omit<BlogPost, 'id' | 'views'>>(EMPTY_FORM);
+  const [form, setForm] = useState<BlogForm>(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await apiGet<BlogPost[]>('/api/admin/blog');
+      setPosts(data);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Không tải được danh sách bài viết');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     if (statusFilter === 'all') return posts;
@@ -203,42 +144,65 @@ export default function BlogPage() {
   function openEdit(post: BlogPost) {
     setEditingId(post.id);
     setForm({
-      title: post.title,
-      excerpt: post.excerpt,
-      content: post.content,
-      category: post.category,
+      titleVi: post.titleVi,
+      excerptVi: post.excerptVi || '',
+      contentVi: post.contentVi,
+      category: (post.category as BlogCategory) || 'tin-tuc',
       status: post.status,
-      tags: post.tags,
-      seoTitle: post.seoTitle,
-      seoDescription: post.seoDescription,
-      date: post.date,
+      tagsText: (post.tags || []).join(', '),
+      seoTitle: post.seoTitle || '',
+      seoDescription: post.seoDescription || '',
     });
     setModalOpen(true);
   }
 
-  function handleSave() {
-    if (editingId) {
-      setPosts((prev) =>
-        prev.map((p) => (p.id === editingId ? { ...p, ...form } : p))
-      );
-    } else {
-      const newPost: BlogPost = {
-        id: Date.now().toString(),
-        ...form,
-        views: 0,
-      };
-      setPosts((prev) => [...prev, newPost]);
+  async function handleSave() {
+    if (!form.titleVi.trim() || !form.contentVi.trim()) {
+      setError('Tiêu đề và nội dung là bắt buộc');
+      return;
     }
-    setModalOpen(false);
+    setSaving(true);
+    setError(null);
+    const payload = {
+      titleVi: form.titleVi,
+      excerptVi: form.excerptVi || null,
+      contentVi: form.contentVi,
+      category: form.category,
+      status: form.status,
+      tags: form.tagsText
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean),
+      seoTitle: form.seoTitle || null,
+      seoDescription: form.seoDescription || null,
+    };
+    try {
+      if (editingId) {
+        await apiPut(`/api/admin/blog/${editingId}`, payload);
+      } else {
+        await apiPost('/api/admin/blog', payload);
+      }
+      setModalOpen(false);
+      await load();
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Lưu thất bại');
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function handleDelete(id: string) {
-    setPosts((prev) => prev.filter((p) => p.id !== id));
+  async function handleDelete(id: string) {
+    if (!confirm('Xoá bài viết này?')) return;
+    try {
+      await apiDelete(`/api/admin/blog/${id}`);
+      setPosts((prev) => prev.filter((p) => p.id !== id));
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : 'Xoá thất bại');
+    }
   }
 
   return (
     <div>
-      {/* Header */}
       <div
         style={{
           display: 'flex',
@@ -259,7 +223,22 @@ export default function BlogPage() {
         </Button>
       </div>
 
-      {/* Status tabs */}
+      {error && (
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: 16,
+            background: colors.dangerBg,
+            borderColor: 'rgba(225,29,72,0.2)',
+            color: colors.danger,
+            fontSize: 13,
+            fontFamily: fonts.body,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
       <div
         style={{
           display: 'flex',
@@ -307,96 +286,96 @@ export default function BlogPage() {
         })}
       </div>
 
-      {/* Posts list */}
+      {loading && (
+        <div
+          style={{
+            ...cardStyle,
+            textAlign: 'center',
+            padding: '48px 24px',
+            color: colors.textMuted,
+          }}
+        >
+          Đang tải...
+        </div>
+      )}
+
       <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {filtered.map((post) => (
-          <div
-            key={post.id}
-            style={{
-              ...cardStyle,
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'flex-start',
-              gap: 16,
-            }}
-          >
-            {/* Left content */}
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
-                style={{
-                  fontSize: 15,
-                  fontWeight: 700,
-                  color: colors.textPrimary,
-                  fontFamily: fonts.heading,
-                  marginBottom: 6,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {post.title}
-              </div>
-
-              <div
-                style={{
-                  fontSize: 13,
-                  color: colors.textSecondary,
-                  marginBottom: 10,
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                  lineHeight: '1.5',
-                }}
-              >
-                {post.excerpt}
-              </div>
-
-              {/* Badges & meta row */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  flexWrap: 'wrap',
-                }}
-              >
-                {/* Category badge */}
-                <span
+        {filtered.map((post) => {
+          const catKey = (post.category as BlogCategory) in CATEGORY_LABELS
+            ? (post.category as BlogCategory)
+            : null;
+          return (
+            <div
+              key={post.id}
+              style={{
+                ...cardStyle,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'flex-start',
+                gap: 16,
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
                   style={{
-                    display: 'inline-block',
-                    padding: '2px 10px',
-                    borderRadius: 12,
-                    fontSize: 11,
-                    fontWeight: 600,
-                    background: CATEGORY_COLORS[post.category].bg,
-                    color: CATEGORY_COLORS[post.category].color,
+                    fontSize: 15,
+                    fontWeight: 700,
+                    color: colors.textPrimary,
+                    fontFamily: fonts.heading,
+                    marginBottom: 6,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
                   }}
                 >
-                  {CATEGORY_LABELS[post.category]}
-                </span>
+                  {post.titleVi}
+                </div>
 
-                {/* Status badge */}
-                <span style={getBadgeStyle(post.status as StatusKey)}>
-                  {statusMap[post.status as StatusKey].label}
-                </span>
+                {post.excerptVi && (
+                  <div
+                    style={{
+                      fontSize: 13,
+                      color: colors.textSecondary,
+                      marginBottom: 10,
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      lineHeight: '1.5',
+                    }}
+                  >
+                    {post.excerptVi}
+                  </div>
+                )}
 
-                {/* Date */}
-                <span
+                <div
                   style={{
-                    display: 'inline-flex',
+                    display: 'flex',
                     alignItems: 'center',
-                    gap: 4,
-                    fontSize: 12,
-                    color: colors.textMuted,
+                    gap: 8,
+                    flexWrap: 'wrap',
                   }}
                 >
-                  <Calendar size={12} />
-                  {formatDate(post.date)}
-                </span>
+                  {catKey && (
+                    <span
+                      style={{
+                        display: 'inline-block',
+                        padding: '2px 10px',
+                        borderRadius: 12,
+                        fontSize: 11,
+                        fontWeight: 600,
+                        background: CATEGORY_COLORS[catKey].bg,
+                        color: CATEGORY_COLORS[catKey].color,
+                      }}
+                    >
+                      {CATEGORY_LABELS[catKey]}
+                    </span>
+                  )}
 
-                {/* Views */}
-                {post.views > 0 && (
+                  <span style={getBadgeStyle(post.status as StatusKey)}>
+                    {statusMap[post.status as StatusKey].label}
+                  </span>
+
                   <span
                     style={{
                       display: 'inline-flex',
@@ -406,52 +385,65 @@ export default function BlogPage() {
                       color: colors.textMuted,
                     }}
                   >
-                    <Eye size={12} />
-                    {post.views.toLocaleString('vi-VN')}
+                    <Calendar size={12} />
+                    {formatDate(post.publishedAt || post.createdAt)}
                   </span>
-                )}
+
+                  {post.viewCount > 0 && (
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: 4,
+                        fontSize: 12,
+                        color: colors.textMuted,
+                      }}
+                    >
+                      <Eye size={12} />
+                      {post.viewCount.toLocaleString('vi-VN')}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
+                <button
+                  onClick={() => openEdit(post)}
+                  style={{
+                    background: colors.infoBg,
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '6px 8px',
+                    cursor: 'pointer',
+                    color: colors.info,
+                    transition: transitions.fast,
+                  }}
+                  title="Chỉnh sửa"
+                >
+                  <Edit2 size={14} />
+                </button>
+                <button
+                  onClick={() => handleDelete(post.id)}
+                  style={{
+                    background: colors.dangerBg,
+                    border: 'none',
+                    borderRadius: 6,
+                    padding: '6px 8px',
+                    cursor: 'pointer',
+                    color: colors.danger,
+                    transition: transitions.fast,
+                  }}
+                  title="Xoá"
+                >
+                  <Trash2 size={14} />
+                </button>
               </div>
             </div>
-
-            {/* Action buttons */}
-            <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
-              <button
-                onClick={() => openEdit(post)}
-                style={{
-                  background: colors.infoBg,
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '6px 8px',
-                  cursor: 'pointer',
-                  color: colors.info,
-                  transition: transitions.fast,
-                }}
-                title="Chỉnh sửa"
-              >
-                <Edit2 size={14} />
-              </button>
-              <button
-                onClick={() => handleDelete(post.id)}
-                style={{
-                  background: colors.dangerBg,
-                  border: 'none',
-                  borderRadius: 6,
-                  padding: '6px 8px',
-                  cursor: 'pointer',
-                  color: colors.danger,
-                  transition: transitions.fast,
-                }}
-                title="Xoá"
-              >
-                <Trash2 size={14} />
-              </button>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      {/* Empty state */}
-      {filtered.length === 0 && (
+      {!loading && filtered.length === 0 && (
         <div
           style={{
             ...cardStyle,
@@ -472,7 +464,6 @@ export default function BlogPage() {
         </div>
       )}
 
-      {/* Add/Edit Modal */}
       <Modal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
@@ -483,8 +474,8 @@ export default function BlogPage() {
           <Input
             label="Tiêu đề"
             placeholder="Nhập tiêu đề bài viết"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            value={form.titleVi}
+            onChange={(e) => setForm({ ...form, titleVi: e.target.value })}
           />
 
           <div style={{ marginBottom: 12 }}>
@@ -518,26 +509,25 @@ export default function BlogPage() {
           <Textarea
             label="Nội dung tóm tắt"
             placeholder="Tóm tắt ngắn cho bài viết (hiển thị ở danh sách)..."
-            value={form.excerpt}
-            onChange={(e) => setForm({ ...form, excerpt: e.target.value })}
+            value={form.excerptVi}
+            onChange={(e) => setForm({ ...form, excerptVi: e.target.value })}
           />
 
           <Textarea
             label="Nội dung chi tiết"
-            placeholder="Viết nội dung bài viết... (Tiptap editor sẽ được tích hợp sau)"
-            value={form.content}
-            onChange={(e) => setForm({ ...form, content: e.target.value })}
+            placeholder="Viết nội dung bài viết..."
+            value={form.contentVi}
+            onChange={(e) => setForm({ ...form, contentVi: e.target.value })}
             style={{ minHeight: 200 }}
           />
 
           <Input
             label="Tags"
             placeholder="Nhập tags, phân cách bằng dấu phẩy (VD: zirconia, công nghệ, labo)"
-            value={form.tags}
-            onChange={(e) => setForm({ ...form, tags: e.target.value })}
+            value={form.tagsText}
+            onChange={(e) => setForm({ ...form, tagsText: e.target.value })}
           />
 
-          {/* SEO section */}
           <div
             style={{
               borderTop: `1px solid ${colors.border}`,
@@ -573,7 +563,6 @@ export default function BlogPage() {
             />
           </div>
 
-          {/* Status */}
           <div style={{ marginBottom: 12 }}>
             <label
               style={{
@@ -601,7 +590,6 @@ export default function BlogPage() {
           </div>
         </div>
 
-        {/* Modal actions */}
         <div
           style={{
             display: 'flex',
@@ -612,10 +600,12 @@ export default function BlogPage() {
             paddingTop: 16,
           }}
         >
-          <Button variant="secondary" onClick={() => setModalOpen(false)}>
+          <Button variant="secondary" onClick={() => setModalOpen(false)} disabled={saving}>
             Huỷ
           </Button>
-          <Button onClick={handleSave}>Lưu bài viết</Button>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? 'Đang lưu...' : 'Lưu bài viết'}
+          </Button>
         </div>
       </Modal>
     </div>

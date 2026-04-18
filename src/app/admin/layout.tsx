@@ -14,6 +14,7 @@ import {
   Briefcase,
   Settings,
   UserCog,
+  MessageSquareQuote,
 } from 'lucide-react';
 import { colors, fonts } from '@/lib/styles';
 
@@ -25,6 +26,7 @@ const ADMIN_NAV: NavItem[] = [
   { to: '/admin/about', icon: Info, label: 'Giới thiệu' },
   { to: '/admin/warranties', icon: Shield, label: 'Bảo hành' },
   { to: '/admin/leads', icon: Users, label: 'Khách hàng' },
+  { to: '/admin/testimonials', icon: MessageSquareQuote, label: 'Ý kiến khách hàng' },
   { to: '/admin/recruitment', icon: Briefcase, label: 'Tuyển dụng' },
   { to: '/admin/settings', icon: Settings, label: 'Cài đặt' },
   { to: '/admin/users', icon: UserCog, label: 'Hệ thống' },
