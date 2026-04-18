@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter, Space_Grotesk, Playfair_Display, JetBrains_Mono } from 'next/font/google';
 import { Providers } from '@/components/Providers';
+import { ErrorTracker } from '@/components/ErrorTracker';
 import './globals.css';
 
 const inter = Inter({
@@ -68,7 +69,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" className={`${inter.variable} ${spaceGrotesk.variable} ${playfair.variable} ${jetbrains.variable}`}>
-      <body><Providers>{children}</Providers></body>
+      <body>
+        <ErrorTracker />
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
