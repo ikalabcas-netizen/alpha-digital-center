@@ -2,6 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, unauthorized, badRequest, slugify } from '@/lib/api-auth';
 
+function serializeBigInt(obj: any) {
+  return JSON.parse(
+    JSON.stringify(obj, (_key, value) =>
+      typeof value === 'bigint' ? value.toString() : value
+    )
+  );
+}
+
 export async function GET(req: NextRequest) {
   const session = await requireAdmin();
   if (!session) return unauthorized();
@@ -33,7 +41,7 @@ export async function GET(req: NextRequest) {
     orderBy: { displayOrder: 'asc' },
   });
 
-  return NextResponse.json(products);
+  return NextResponse.json(serializeBigInt(products));
 }
 
 export async function POST(req: NextRequest) {
@@ -96,12 +104,5 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  // Serialize BigInt to string
-  const serialized = JSON.parse(
-    JSON.stringify(product, (_key, value) =>
-      typeof value === 'bigint' ? value.toString() : value
-    )
-  );
-
-  return NextResponse.json(serialized, { status: 201 });
+  return NextResponse.json(serializeBigInt(product), { status: 201 });
 }
