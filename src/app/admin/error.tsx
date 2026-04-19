@@ -17,6 +17,21 @@ export default function AdminError({
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.error('[admin error boundary]', error);
+    try {
+      const body = JSON.stringify({
+        type: 'error',
+        message: `[admin error boundary] ${error.message || 'unknown'}`,
+        url: typeof window !== 'undefined' ? window.location.href : undefined,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        stack: error.stack,
+        extra: { digest: error.digest, boundary: 'admin' },
+      });
+      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        navigator.sendBeacon('/api/log', new Blob([body], { type: 'application/json' }));
+      } else {
+        fetch('/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+      }
+    } catch {}
   }, [error]);
 
   return (

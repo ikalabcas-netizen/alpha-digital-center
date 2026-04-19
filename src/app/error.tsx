@@ -17,9 +17,23 @@ export default function PublicError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // In dev, browser sẽ hiện chi tiết; prod chỉ có digest.
     // eslint-disable-next-line no-console
     console.error('[public error boundary]', error);
+    try {
+      const body = JSON.stringify({
+        type: 'error',
+        message: `[public error boundary] ${error.message || 'unknown'}`,
+        url: typeof window !== 'undefined' ? window.location.href : undefined,
+        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : undefined,
+        stack: error.stack,
+        extra: { digest: error.digest, boundary: 'public' },
+      });
+      if (typeof navigator !== 'undefined' && 'sendBeacon' in navigator) {
+        navigator.sendBeacon('/api/log', new Blob([body], { type: 'application/json' }));
+      } else {
+        fetch('/api/log', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+      }
+    } catch {}
   }, [error]);
 
   return (
