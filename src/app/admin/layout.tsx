@@ -51,6 +51,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const isPendingPage = pathname === '/admin/pending';
   const editorBlocked = role === 'editor' && EDITOR_BLOCKED_PREFIXES.some((p) => pathname.startsWith(p));
 
+  const [logoSrc, setLogoSrc] = useState<string | undefined>();
+
   useEffect(() => {
     if (status !== 'authenticated' || !role) return;
     if (role === 'rejected') {
@@ -69,6 +71,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       window.location.href = '/admin/dashboard';
     }
   }, [status, role, isPendingPage, editorBlocked]);
+
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    apiGet<any[]>('/api/admin/settings?group=general')
+      .then((rows) => {
+        const logo = rows.find((r: any) => r.key === 'site.logoUrl')?.value;
+        if (logo) setLogoSrc(logo);
+      })
+      .catch(() => {});
+  }, [status]);
 
   if (isLoginPage) {
     return <>{children}</>;
@@ -142,17 +154,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const roleLabel =
     role === 'super_admin' ? 'Super Admin' : role === 'editor' ? 'Biên tập viên' : 'Quản trị viên';
-
-  const [logoSrc, setLogoSrc] = useState<string | undefined>();
-  useEffect(() => {
-    if (status !== 'authenticated') return;
-    apiGet<any[]>('/api/admin/settings?group=general')
-      .then((rows) => {
-        const logo = rows.find((r: any) => r.key === 'site.logoUrl')?.value;
-        if (logo) setLogoSrc(logo);
-      })
-      .catch(() => {});
-  }, [status]);
 
   return (
     <ResponsiveShell
