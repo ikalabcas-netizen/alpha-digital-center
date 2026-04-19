@@ -28,7 +28,7 @@ import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
 import PageHeroEditor from '@/components/admin/PageHeroEditor';
 
 type BlogStatus = 'draft' | 'scheduled' | 'published';
-type BlogCategory = 'tin-tuc' | 'kien-thuc' | 'cong-nghe' | 'tuyen-dung';
+type BlogCategory = 'tin-tuc' | 'kien-thuc' | 'cong-nghe' | 'tuyen-dung' | 'san-pham';
 
 interface BlogPost {
   id: string;
@@ -64,6 +64,7 @@ const CATEGORY_LABELS: Record<BlogCategory, string> = {
   'kien-thuc': 'Kiến thức',
   'cong-nghe': 'Công nghệ',
   'tuyen-dung': 'Tuyển dụng',
+  'san-pham': 'Chi tiết sản phẩm',
 };
 
 const CATEGORY_COLORS: Record<BlogCategory, { bg: string; color: string }> = {
@@ -71,6 +72,7 @@ const CATEGORY_COLORS: Record<BlogCategory, { bg: string; color: string }> = {
   'kien-thuc': { bg: '#f3f0ff', color: '#7c3aed' },
   'cong-nghe': { bg: '#eff6ff', color: '#2563eb' },
   'tuyen-dung': { bg: '#fffbeb', color: '#d97706' },
+  'san-pham': { bg: '#fef3c7', color: '#b45309' },
 };
 
 const STATUS_TABS: { key: 'all' | BlogStatus; label: string }[] = [

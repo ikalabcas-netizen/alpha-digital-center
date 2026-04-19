@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 type Product = {
   id: string;
@@ -48,16 +49,19 @@ export function ProductsGrid({ categories, products }: { categories: Category[];
           {filt.map((p, i) => {
             const isFlagship = i === 0 && p.isFeatured;
             return (
-              <article
+              <Link
                 key={p.id}
+                href={`/san-pham/${p.slug}`}
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block', gridColumn: isFlagship ? 'span 2' : 'auto', gridRow: isFlagship ? 'span 2' : 'auto' }}
+              >
+              <article
                 style={{
                   background: '#fff',
                   border: '1px solid var(--line)',
                   borderRadius: 'var(--r-lg)',
                   boxShadow: 'var(--sh-sm)',
                   overflow: 'hidden',
-                  gridColumn: isFlagship ? 'span 2' : 'auto',
-                  gridRow: isFlagship ? 'span 2' : 'auto',
+                  height: '100%',
                 }}
               >
                 <div style={{ height: isFlagship ? 380 : 200, overflow: 'hidden', background: '#f0f2f6', position: 'relative' }}>
@@ -93,6 +97,7 @@ export function ProductsGrid({ categories, products }: { categories: Category[];
                   </div>
                 </div>
               </article>
+              </Link>
             );
           })}
         </div>
