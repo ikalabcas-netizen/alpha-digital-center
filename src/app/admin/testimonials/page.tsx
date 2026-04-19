@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
 import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
+import ImageUpload from '@/components/admin/ImageUpload';
 
 interface Testimonial {
   id: string;
@@ -464,12 +465,17 @@ export default function TestimonialsPage() {
             </div>
           </div>
 
-          <Input
-            label="URL ảnh đại diện (tuỳ chọn)"
-            placeholder="https://..."
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-          />
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 6, color: colors.textPrimary }}>
+              Ảnh đại diện (tuỳ chọn)
+            </div>
+            <ImageUpload
+              value={form.imageUrl || null}
+              onChange={(url) => setForm({ ...form, imageUrl: url || '' })}
+              prefix="testimonials"
+              height={160}
+            />
+          </div>
 
           <Input
             label="Thứ tự hiển thị"

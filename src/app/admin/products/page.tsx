@@ -21,6 +21,7 @@ import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
 import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
+import PageHeroEditor from '@/components/admin/PageHeroEditor';
 
 interface Category {
   id: string;
@@ -242,6 +243,14 @@ export default function ProductsPage() {
 
   return (
     <div>
+      <details style={{ marginBottom: 20, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 12 }}>
+        <summary style={{ cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+          Sửa Hero của trang <code>/san-pham</code>
+        </summary>
+        <div style={{ marginTop: 12 }}>
+          <PageHeroEditor pageSlug="products" uploadPrefix="products" />
+        </div>
+      </details>
       <div
         style={{
           display: 'flex',

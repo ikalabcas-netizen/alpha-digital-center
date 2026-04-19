@@ -29,7 +29,9 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
-import { apiGet, apiPost, apiPut, ApiError } from '@/lib/api-client';
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
+import PageHeroEditor from '@/components/admin/PageHeroEditor';
+import { JobPerksSection } from './JobPerksSection';
 
 type ActiveTab = 'postings' | 'applications';
 
@@ -232,6 +234,24 @@ export default function RecruitmentPage() {
 
   return (
     <div style={{ padding: 0 }}>
+      <details style={{ marginBottom: 16, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 12 }}>
+        <summary style={{ cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+          Sửa Hero của trang <code>/tuyen-dung</code>
+        </summary>
+        <div style={{ marginTop: 12 }}>
+          <PageHeroEditor pageSlug="careers" uploadPrefix="team" />
+        </div>
+      </details>
+
+      <details style={{ marginBottom: 20, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 12 }}>
+        <summary style={{ cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+          Phúc lợi hiển thị trên /tuyen-dung (Why Alpha)
+        </summary>
+        <div style={{ marginTop: 12 }}>
+          <JobPerksSection />
+        </div>
+      </details>
+
       <div style={{ marginBottom: 24 }}>
         <h1 style={pageTitle}>Quản lý Tuyển dụng</h1>
         <p style={pageSubtitle}>

@@ -16,6 +16,8 @@ import {
   Settings,
   UserCog,
   MessageSquareQuote,
+  Tag,
+  Phone,
 } from 'lucide-react';
 import { colors, fonts } from '@/lib/styles';
 
@@ -23,12 +25,14 @@ const ADMIN_NAV: NavItem[] = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/homepage', icon: Home, label: 'Trang chủ' },
   { to: '/admin/products', icon: Package, label: 'Sản phẩm' },
+  { to: '/admin/categories', icon: Tag, label: 'Danh mục SP' },
   { to: '/admin/blog', icon: FileText, label: 'Bài viết' },
   { to: '/admin/about', icon: Info, label: 'Giới thiệu' },
   { to: '/admin/warranties', icon: Shield, label: 'Bảo hành' },
   { to: '/admin/leads', icon: Users, label: 'Khách hàng' },
   { to: '/admin/testimonials', icon: MessageSquareQuote, label: 'Ý kiến khách hàng' },
   { to: '/admin/recruitment', icon: Briefcase, label: 'Tuyển dụng' },
+  { to: '/admin/contact', icon: Phone, label: 'Liên hệ' },
   { to: '/admin/settings', icon: Settings, label: 'Cài đặt' },
   { to: '/admin/users', icon: UserCog, label: 'Hệ thống' },
 ];

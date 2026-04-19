@@ -22,7 +22,9 @@ import {
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
 import { Input, Textarea } from '@/components/ui/Input';
-import { apiGet, apiPost, apiPut, ApiError } from '@/lib/api-client';
+import { apiGet, apiPost, apiPut, apiDelete, ApiError } from '@/lib/api-client';
+import PageHeroEditor from '@/components/admin/PageHeroEditor';
+import { WarrantyPolicySection } from './WarrantyPolicySection';
 
 type WarrantyStatus = 'active' | 'claimed' | 'expired';
 
@@ -263,6 +265,24 @@ export default function WarrantiesPage() {
 
   return (
     <div>
+      <details style={{ marginBottom: 16, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 12 }}>
+        <summary style={{ cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+          Sửa Hero của trang <code>/bao-hanh</code>
+        </summary>
+        <div style={{ marginTop: 12 }}>
+          <PageHeroEditor pageSlug="warranty" uploadPrefix="misc" hideImage />
+        </div>
+      </details>
+
+      <details style={{ marginBottom: 20, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, padding: 12 }}>
+        <summary style={{ cursor: 'pointer', fontSize: 13, fontWeight: 600, color: '#334155' }}>
+          Chính sách bảo hành (nhóm sản phẩm hiển thị trên /bao-hanh)
+        </summary>
+        <div style={{ marginTop: 12 }}>
+          <WarrantyPolicySection />
+        </div>
+      </details>
+
       <div
         style={{
           display: 'flex',
@@ -274,7 +294,7 @@ export default function WarrantiesPage() {
         }}
       >
         <div>
-          <h1 style={pageTitle}>Quản lý Bảo hành</h1>
+          <h1 style={pageTitle}>Quản lý Bảo hành — Phiếu</h1>
           <p style={pageSubtitle}>
             {warranties.length} phiếu bảo hành trong hệ thống
           </p>
