@@ -377,3 +377,109 @@ ALTER TABLE "job_applications" ADD CONSTRAINT "job_applications_job_id_fkey" FOR
 -- AddForeignKey
 ALTER TABLE "content_calendar" ADD CONSTRAINT "content_calendar_campaign_id_fkey" FOREIGN KEY ("campaign_id") REFERENCES "campaigns"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- ==================== CMS CONTENT tables (added 2026-04-19) ====================
+
+CREATE TABLE "cms_page_hero" (
+    "id" TEXT NOT NULL,
+    "page_slug" TEXT NOT NULL,
+    "eyebrow" TEXT NOT NULL,
+    "title_lead" TEXT NOT NULL,
+    "title_accent" TEXT,
+    "title_tail" TEXT,
+    "subtitle" TEXT,
+    "image_url" TEXT,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    CONSTRAINT "cms_page_hero_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "cms_page_hero_page_slug_key" ON "cms_page_hero"("page_slug");
+
+CREATE TABLE "cms_tech_cards" (
+    "id" TEXT NOT NULL,
+    "tag" TEXT NOT NULL,
+    "meta" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "image_url" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT "cms_tech_cards_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cms_materials" (
+    "id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "country" TEXT NOT NULL,
+    "material" TEXT NOT NULL,
+    "since_year" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT "cms_materials_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cms_core_values" (
+    "id" TEXT NOT NULL,
+    "number" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "cms_core_values_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cms_timeline_entries" (
+    "id" TEXT NOT NULL,
+    "year" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "cms_timeline_entries_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cms_story_blocks" (
+    "id" TEXT NOT NULL,
+    "page_slug" TEXT NOT NULL,
+    "image_url_1" TEXT,
+    "image_url_2" TEXT,
+    "paragraph1" TEXT NOT NULL,
+    "paragraph2" TEXT NOT NULL,
+    "founded_year" TEXT NOT NULL,
+    CONSTRAINT "cms_story_blocks_pkey" PRIMARY KEY ("id")
+);
+CREATE UNIQUE INDEX "cms_story_blocks_page_slug_key" ON "cms_story_blocks"("page_slug");
+
+CREATE TABLE "cms_warranty_policy_groups" (
+    "id" TEXT NOT NULL,
+    "category_name" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "cms_warranty_policy_groups_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cms_warranty_policy_items" (
+    "id" TEXT NOT NULL,
+    "group_id" TEXT NOT NULL,
+    "product_name" TEXT NOT NULL,
+    "warranty_text" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "cms_warranty_policy_items_pkey" PRIMARY KEY ("id")
+);
+ALTER TABLE "cms_warranty_policy_items" ADD CONSTRAINT "cms_warranty_policy_items_group_id_fkey" FOREIGN KEY ("group_id") REFERENCES "cms_warranty_policy_groups"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+CREATE TABLE "cms_contact_channels" (
+    "id" TEXT NOT NULL,
+    "label" TEXT NOT NULL,
+    "value" TEXT NOT NULL,
+    "subtitle" TEXT NOT NULL,
+    "icon_key" TEXT NOT NULL,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    "is_active" BOOLEAN NOT NULL DEFAULT true,
+    CONSTRAINT "cms_contact_channels_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "cms_job_perks" (
+    "id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "icon_key" TEXT,
+    "display_order" INTEGER NOT NULL DEFAULT 0,
+    CONSTRAINT "cms_job_perks_pkey" PRIMARY KEY ("id")
+);
+

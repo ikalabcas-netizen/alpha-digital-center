@@ -338,3 +338,118 @@ model AiSetting {
 
   @@map("ai_settings")
 }
+
+// ==================== CMS CONTENT (editable qua admin) ====================
+
+model CmsPageHero {
+  id          String    @id @default(uuid())
+  pageSlug    String    @unique @map("page_slug") // "home","about","products","news","warranty","careers","contact"
+  eyebrow     String
+  titleLead   String    @map("title_lead")
+  titleAccent String?   @map("title_accent")
+  titleTail   String?   @map("title_tail")
+  subtitle    String?   @db.Text
+  imageUrl    String?   @map("image_url")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  @@map("cms_page_hero")
+}
+
+model CmsTechCard {
+  id           String    @id @default(uuid())
+  tag          String
+  meta         String
+  title        String
+  description  String    @db.Text
+  imageUrl     String    @map("image_url")
+  displayOrder Int       @default(0) @map("display_order")
+  isActive     Boolean   @default(true) @map("is_active")
+
+  @@map("cms_tech_cards")
+}
+
+model CmsMaterial {
+  id           String    @id @default(uuid())
+  name         String
+  country      String
+  material     String
+  sinceYear    String    @map("since_year")
+  displayOrder Int       @default(0) @map("display_order")
+  isActive     Boolean   @default(true) @map("is_active")
+
+  @@map("cms_materials")
+}
+
+model CmsCoreValue {
+  id           String    @id @default(uuid())
+  number       String
+  title        String
+  description  String    @db.Text
+  displayOrder Int       @default(0) @map("display_order")
+
+  @@map("cms_core_values")
+}
+
+model CmsTimelineEntry {
+  id           String    @id @default(uuid())
+  year         String
+  title        String
+  description  String    @db.Text
+  displayOrder Int       @default(0) @map("display_order")
+
+  @@map("cms_timeline_entries")
+}
+
+model CmsStoryBlock {
+  id          String    @id @default(uuid())
+  pageSlug    String    @unique @map("page_slug") // "about"
+  imageUrl1   String?   @map("image_url_1")
+  imageUrl2   String?   @map("image_url_2")
+  paragraph1  String    @db.Text
+  paragraph2  String    @db.Text
+  foundedYear String    @map("founded_year")
+
+  @@map("cms_story_blocks")
+}
+
+model CmsWarrantyPolicyGroup {
+  id           String                   @id @default(uuid())
+  categoryName String                   @map("category_name")
+  displayOrder Int                      @default(0) @map("display_order")
+  items        CmsWarrantyPolicyItem[]
+
+  @@map("cms_warranty_policy_groups")
+}
+
+model CmsWarrantyPolicyItem {
+  id           String                 @id @default(uuid())
+  groupId      String                 @map("group_id")
+  group        CmsWarrantyPolicyGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  productName  String                 @map("product_name")
+  warrantyText String                 @map("warranty_text")
+  displayOrder Int                    @default(0) @map("display_order")
+
+  @@map("cms_warranty_policy_items")
+}
+
+model CmsContactChannel {
+  id           String   @id @default(uuid())
+  label        String
+  value        String
+  subtitle     String
+  iconKey      String   @map("icon_key") // "phone" | "mail" | "zalo" | "clock"
+  displayOrder Int      @default(0) @map("display_order")
+  isActive     Boolean  @default(true) @map("is_active")
+
+  @@map("cms_contact_channels")
+}
+
+model CmsJobPerk {
+  id           String   @id @default(uuid())
+  title        String
+  description  String   @db.Text
+  iconKey      String?  @map("icon_key")
+  displayOrder Int      @default(0) @map("display_order")
+
+  @@map("cms_job_perks")
+}

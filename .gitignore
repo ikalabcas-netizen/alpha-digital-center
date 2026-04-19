@@ -56,3 +56,8 @@ next-env.d.ts
 # binary uploads (source designs)
 contex/*.zip
 contex/*.xlsx
+
+# local dev tooling artifacts
+scripts/mc.exe
+scripts/cors.json
+scripts/cors.xml
