@@ -6,11 +6,11 @@ BEGIN;
 -- ========== Page Hero (7 rows, upsert by page_slug) ==========
 INSERT INTO cms_page_hero (id, page_slug, eyebrow, title_lead, title_accent, title_tail, subtitle, image_url, updated_at)
 VALUES
-  (gen_random_uuid(), 'home', 'Digital dental laboratory · Est. 2014', 'Nơi tinh hoa', 'nha khoa', 'kỹ thuật số được kiến tạo.',
+  (gen_random_uuid(), 'home', 'Digital dental laboratory · Est. 2020', 'Nơi tinh hoa', 'nha khoa', 'kỹ thuật số được kiến tạo.',
    'Alpha Digital Center — đối tác gia công bán thành phẩm cao cấp cho labo và phòng khám. Công nghệ CAD/CAM chính xác, vật liệu Đức/Mỹ, bảo hành đến 19 năm.',
    'https://images.unsplash.com/photo-1606811971618-4486d14f3f99?w=1400&q=80', NOW()),
   (gen_random_uuid(), 'about', 'About us · Về chúng tôi', 'Hơn một', 'xưởng gia công —', 'một đối tác kỹ thuật.',
-   'Alpha Digital Center thành lập năm 2014 tại TP.HCM. Chúng tôi đồng hành cùng labo và phòng khám nha khoa bằng dịch vụ gia công số chất lượng, minh bạch, bảo hành dài hạn.',
+   'Alpha Digital Center thành lập năm 2020 tại TP.HCM. Chúng tôi đồng hành cùng labo và phòng khám nha khoa bằng dịch vụ gia công số chất lượng, minh bạch, bảo hành dài hạn.',
    'https://images.unsplash.com/photo-1551076805-e1869033e561?w=1400&q=80', NOW()),
   (gen_random_uuid(), 'products', 'Products · Sản phẩm', 'Danh mục', 'sản phẩm gia công —', 'đầy đủ & chính hãng.',
    'Từ sứ Zirconia cao cấp đến custom abutment titanium — toàn bộ vật liệu có Certificate of Authenticity từ nhà sản xuất.',
@@ -34,9 +34,9 @@ INSERT INTO cms_story_blocks (id, page_slug, image_url_1, image_url_2, paragraph
 VALUES (gen_random_uuid(), 'about',
   'https://images.unsplash.com/photo-1551076805-e1869033e561?w=1400&q=80',
   'https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=1200&q=80',
-  'Alpha Digital Center được thành lập năm 2014 tại TP.HCM bởi nhóm kỹ thuật viên trẻ đam mê nha khoa số. Ban đầu chỉ là một xưởng gia công nhỏ phục vụ 20 phòng khám nội thành, chúng tôi dần tạo dựng uy tín bằng chất lượng ổn định và dịch vụ tận tâm.',
+  'Alpha Digital Center được thành lập năm 2020 tại TP.HCM bởi nhóm kỹ thuật viên trẻ đam mê nha khoa số. Ban đầu chỉ là một xưởng gia công nhỏ phục vụ 20 phòng khám nội thành, chúng tôi dần tạo dựng uy tín bằng chất lượng ổn định và dịch vụ tận tâm.',
   'Sau hơn 12 năm, Alpha Digital Center đã trở thành đối tác gia công tin cậy của hơn 500 labo, phòng khám trên cả nước. Đội ngũ 45 kỹ thuật viên, 3 xưởng sản xuất chuẩn ISO 13485, hàng chục máy CNC 5 trục và scanner 3D — tất cả phục vụ sứ mệnh: giúp nha sĩ và labo tập trung vào điều trị, để Alpha lo phần kỹ thuật.',
-  '2014')
+  '2020')
 ON CONFLICT (page_slug) DO NOTHING;
 
 -- ========== Tech Cards (skip if table has rows) ==========
@@ -81,7 +81,7 @@ WHERE NOT EXISTS (SELECT 1 FROM cms_core_values);
 INSERT INTO cms_timeline_entries (id, year, title, description, display_order)
 SELECT gen_random_uuid(), year, title, description, display_order
 FROM (VALUES
-  ('2014', 'Thành lập', 'Mở xưởng gia công đầu tiên tại TP.HCM với 3 kỹ thuật viên, phục vụ 20 phòng khám nội thành.', 1),
+  ('2020', 'Thành lập', 'Mở xưởng gia công đầu tiên tại TP.HCM với 3 kỹ thuật viên, phục vụ 20 phòng khám nội thành.', 1),
   ('2016', 'Đối tác Dentsply', 'Chính thức trở thành đối tác chiến lược của Dentsply Sirona tại khu vực phía Nam.', 2),
   ('2018', 'Mở rộng CAD/CAM', 'Đầu tư 3 máy CNC 5 trục, 2 scanner E4, mở rộng đội ngũ lên 25 người.', 3),
   ('2020', '500 labo đối tác', 'Phủ sóng 63 tỉnh thành, trở thành đối tác gia công chủ lực cho labo inhouse và phòng khám lớn.', 4),
@@ -147,7 +147,7 @@ INSERT INTO site_settings (id, key, value, "group", updated_at) VALUES
   (gen_random_uuid(), 'contact.mapButton1Url', 'https://maps.google.com/?q=242/12+Phạm+Văn+Hai,+Tân+Bình,+TP.HCM', 'contact', NOW()),
   (gen_random_uuid(), 'contact.mapButton2Url', 'https://www.google.com/maps/dir/?api=1&destination=242/12+Phạm+Văn+Hai,+Tân+Bình,+TP.HCM', 'contact', NOW()),
   (gen_random_uuid(), 'site.companyName', 'Alpha Digital Center', 'general', NOW()),
-  (gen_random_uuid(), 'site.tagline', 'Digital dental laboratory — Est. 2014', 'general', NOW()),
+  (gen_random_uuid(), 'site.tagline', 'Digital dental laboratory — Est. 2020', 'general', NOW()),
   (gen_random_uuid(), 'stats.years', '12+', 'stats', NOW()),
   (gen_random_uuid(), 'stats.labs', '500+', 'stats', NOW()),
   (gen_random_uuid(), 'stats.warrantyMax', '19 năm', 'stats', NOW()),

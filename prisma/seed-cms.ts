@@ -23,7 +23,7 @@ const IMG = {
 const PAGE_HEROES = [
   {
     pageSlug: 'home',
-    eyebrow: 'Digital dental laboratory · Est. 2014',
+    eyebrow: 'Digital dental laboratory · Est. 2020',
     titleLead: 'Nơi tinh hoa',
     titleAccent: 'nha khoa',
     titleTail: 'kỹ thuật số được kiến tạo.',
@@ -38,7 +38,7 @@ const PAGE_HEROES = [
     titleAccent: 'xưởng gia công —',
     titleTail: 'một đối tác kỹ thuật.',
     subtitle:
-      'Alpha Digital Center thành lập năm 2014 tại TP.HCM. Chúng tôi đồng hành cùng labo và phòng khám nha khoa bằng dịch vụ gia công số chất lượng, minh bạch, bảo hành dài hạn.',
+      'Alpha Digital Center thành lập năm 2020 tại TP.HCM. Chúng tôi đồng hành cùng labo và phòng khám nha khoa bằng dịch vụ gia công số chất lượng, minh bạch, bảo hành dài hạn.',
     imageUrl: IMG.office,
   },
   {
@@ -138,7 +138,7 @@ const CORE_VALUES = [
 ];
 
 const TIMELINE = [
-  { year: '2014', title: 'Thành lập', description: 'Mở xưởng gia công đầu tiên tại TP.HCM với 3 kỹ thuật viên, phục vụ 20 phòng khám nội thành.', displayOrder: 1 },
+  { year: '2020', title: 'Thành lập', description: 'Mở xưởng gia công đầu tiên tại TP.HCM với 3 kỹ thuật viên, phục vụ 20 phòng khám nội thành.', displayOrder: 1 },
   { year: '2016', title: 'Đối tác Dentsply', description: 'Chính thức trở thành đối tác chiến lược của Dentsply Sirona tại khu vực phía Nam.', displayOrder: 2 },
   { year: '2018', title: 'Mở rộng CAD/CAM', description: 'Đầu tư 3 máy CNC 5 trục, 2 scanner E4, mở rộng đội ngũ lên 25 người.', displayOrder: 3 },
   { year: '2020', title: '500 labo đối tác', description: 'Phủ sóng 63 tỉnh thành, trở thành đối tác gia công chủ lực cho labo inhouse và phòng khám lớn.', displayOrder: 4 },
@@ -151,10 +151,10 @@ const STORY_ABOUT = {
   imageUrl1: IMG.office,
   imageUrl2: IMG.hands,
   paragraph1:
-    'Alpha Digital Center được thành lập năm 2014 tại TP.HCM bởi nhóm kỹ thuật viên trẻ đam mê nha khoa số. Ban đầu chỉ là một xưởng gia công nhỏ phục vụ 20 phòng khám nội thành, chúng tôi dần tạo dựng uy tín bằng chất lượng ổn định và dịch vụ tận tâm.',
+    'Alpha Digital Center được thành lập năm 2020 tại TP.HCM bởi nhóm kỹ thuật viên trẻ đam mê nha khoa số. Ban đầu chỉ là một xưởng gia công nhỏ phục vụ 20 phòng khám nội thành, chúng tôi dần tạo dựng uy tín bằng chất lượng ổn định và dịch vụ tận tâm.',
   paragraph2:
     'Sau hơn 12 năm, Alpha Digital Center đã trở thành đối tác gia công tin cậy của hơn 500 labo, phòng khám trên cả nước. Đội ngũ 45 kỹ thuật viên, 3 xưởng sản xuất chuẩn ISO 13485, hàng chục máy CNC 5 trục và scanner 3D — tất cả phục vụ sứ mệnh: giúp nha sĩ và labo tập trung vào điều trị, để Alpha lo phần kỹ thuật.',
-  foundedYear: '2014',
+  foundedYear: '2020',
 };
 
 const WARRANTY_GROUPS = [
@@ -214,7 +214,7 @@ const SITE_SETTINGS = [
   { key: 'contact.mapButton1Url', value: 'https://maps.google.com/?q=242/12+Phạm+Văn+Hai,+Tân+Bình,+TP.HCM', group: 'contact' },
   { key: 'contact.mapButton2Url', value: 'https://www.google.com/maps/dir/?api=1&destination=242/12+Phạm+Văn+Hai,+Tân+Bình,+TP.HCM', group: 'contact' },
   { key: 'site.companyName', value: 'Alpha Digital Center', group: 'general' },
-  { key: 'site.tagline', value: 'Digital dental laboratory — Est. 2014', group: 'general' },
+  { key: 'site.tagline', value: 'Digital dental laboratory — Est. 2020', group: 'general' },
   { key: 'stats.years', value: '12+', group: 'stats' },
   { key: 'stats.labs', value: '500+', group: 'stats' },
   { key: 'stats.warrantyMax', value: '19 năm', group: 'stats' },

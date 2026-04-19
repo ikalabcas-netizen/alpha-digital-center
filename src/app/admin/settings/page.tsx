@@ -22,7 +22,7 @@ const sectionTitle: CSSProperties = { fontSize: 15, fontWeight: 700, marginBotto
 
 const GENERAL_KEYS = [
   { key: 'site.companyName', label: 'Tên công ty', placeholder: 'Alpha Digital Center', group: 'general' },
-  { key: 'site.tagline', label: 'Tagline', placeholder: 'Digital dental laboratory — Est. 2014', group: 'general' },
+  { key: 'site.tagline', label: 'Tagline', placeholder: 'Digital dental laboratory — Est. 2020', group: 'general' },
 ];
 const SEO_KEYS = [
   { key: 'seo.defaultTitle', label: 'Title mặc định (<title>)', group: 'seo' },

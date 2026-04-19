@@ -49,7 +49,7 @@ export default async function HomePage() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 28 }}>
                 <span style={{ width: 36, height: 1, background: 'var(--gold)' }} />
                 <span className="eyebrow" style={{ color: 'var(--gold-light)' }}>
-                  {hero?.eyebrow || 'Digital dental laboratory · Est. 2014'}
+                  {hero?.eyebrow || 'Digital dental laboratory · Est. 2020'}
                 </span>
               </div>
               <h1 className="display" style={{ fontSize: 'clamp(42px, 5.4vw, 72px)', margin: 0, color: '#fff', fontWeight: 500 }}>

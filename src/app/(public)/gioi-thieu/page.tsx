@@ -46,7 +46,7 @@ export default async function GioiThieuPage() {
               )}
               <div style={{ position: 'absolute', top: 260, right: 20, padding: 20, background: '#fff', border: '1px solid var(--line)', borderRadius: 12, boxShadow: 'var(--sh-lg)' }}>
                 <div className="display" style={{ fontSize: 36, color: 'var(--accent)', fontWeight: 500 }}>
-                  {story.foundedYear || '2014'}
+                  {story.foundedYear || '2020'}
                 </div>
                 <div style={{ fontSize: 12, color: 'var(--ink-500)', marginTop: 8, fontFamily: 'var(--font-mono)' }}>
                   FOUNDED

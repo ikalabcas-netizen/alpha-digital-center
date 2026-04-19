@@ -40,7 +40,7 @@ export function TopBar({ phone, email, address }: Props) {
               fontSize: 10,
             }}
           >
-            EST. 2014
+            EST. 2020
           </span>
         </div>
       </div>
