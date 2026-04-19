@@ -5,13 +5,22 @@ export async function getSession() {
   return auth();
 }
 
-const APPROVED_ROLES = ['super_admin', 'admin', 'editor', 'viewer'];
+const APPROVED_ROLES = ['super_admin', 'admin', 'editor'];
+const ADMIN_OR_ABOVE = ['super_admin', 'admin'];
 
 export async function requireAdmin() {
   const session = await getSession();
   if (!session?.user) return null;
   const role = (session.user as any)?.role;
   if (!APPROVED_ROLES.includes(role)) return null;
+  return session;
+}
+
+export async function requireAdminOrAbove() {
+  const session = await getSession();
+  if (!session?.user) return null;
+  const role = (session.user as any)?.role;
+  if (!ADMIN_OR_ABOVE.includes(role)) return null;
   return session;
 }
 

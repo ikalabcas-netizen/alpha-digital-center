@@ -33,7 +33,9 @@ const ADMIN_NAV: NavItem[] = [
   { to: '/admin/users', icon: UserCog, label: 'Hệ thống' },
 ];
 
-const APPROVED_ROLES = ['super_admin', 'admin', 'editor', 'viewer'];
+const APPROVED_ROLES = ['super_admin', 'admin', 'editor'];
+const AWAITING_ROLES = ['pending', 'viewer']; // viewer is deprecated — treat as pending
+const EDITOR_BLOCKED_PREFIXES = ['/admin/settings', '/admin/users'];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -42,6 +44,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const isLoginPage = pathname === '/admin/login';
   const isPendingPage = pathname === '/admin/pending';
+  const editorBlocked = role === 'editor' && EDITOR_BLOCKED_PREFIXES.some((p) => pathname.startsWith(p));
 
   useEffect(() => {
     if (status !== 'authenticated' || !role) return;
@@ -49,14 +52,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       signOut({ callbackUrl: '/admin/login?rejected=1' });
       return;
     }
-    if (role === 'pending' && !isPendingPage) {
+    if (AWAITING_ROLES.includes(role) && !isPendingPage) {
       window.location.href = '/admin/pending';
       return;
     }
     if (APPROVED_ROLES.includes(role) && isPendingPage) {
       window.location.href = '/admin/dashboard';
+      return;
     }
-  }, [status, role, isPendingPage]);
+    if (editorBlocked) {
+      window.location.href = '/admin/dashboard';
+    }
+  }, [status, role, isPendingPage, editorBlocked]);
 
   if (isLoginPage) {
     return <>{children}</>;
@@ -86,7 +93,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
-  if (role === 'pending' || role === 'rejected') {
+  if (AWAITING_ROLES.includes(role || '') || role === 'rejected') {
     if (isPendingPage) {
       return <>{children}</>;
     }
@@ -106,11 +113,36 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  if (editorBlocked) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          fontFamily: fonts.body,
+          color: colors.textMuted,
+        }}
+      >
+        Đang chuyển hướng...
+      </div>
+    );
+  }
+
+  const visibleNav =
+    role === 'editor'
+      ? ADMIN_NAV.filter((item) => !EDITOR_BLOCKED_PREFIXES.some((p) => item.to.startsWith(p)))
+      : ADMIN_NAV;
+
+  const roleLabel =
+    role === 'super_admin' ? 'Super Admin' : role === 'editor' ? 'Biên tập viên' : 'Quản trị viên';
+
   return (
     <ResponsiveShell
-      navItems={ADMIN_NAV}
+      navItems={visibleNav}
       accentColor="#06b6d4"
-      roleLabel={role === 'super_admin' ? 'Super Admin' : 'Quản trị viên'}
+      roleLabel={roleLabel}
       userName={session.user?.name || undefined}
       userEmail={session.user?.email || undefined}
       userImage={session.user?.image || undefined}

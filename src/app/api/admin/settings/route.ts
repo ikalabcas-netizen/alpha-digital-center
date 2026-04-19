@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { requireAdmin, unauthorized } from '@/lib/api-auth';
+import { requireAdminOrAbove, unauthorized } from '@/lib/api-auth';
 
 export async function GET(req: NextRequest) {
-  const session = await requireAdmin();
+  const session = await requireAdminOrAbove();
   if (!session) return unauthorized();
 
   const { searchParams } = new URL(req.url);
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const session = await requireAdmin();
+  const session = await requireAdminOrAbove();
   if (!session) return unauthorized();
 
   const body = await req.json();

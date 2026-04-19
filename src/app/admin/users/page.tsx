@@ -93,7 +93,7 @@ const TABS: { key: 'pending' | 'active' | 'rejected' | 'all'; label: string; fil
   { key: 'all', label: 'Tất cả', filter: () => true },
 ];
 
-const ASSIGNABLE_ROLES: Role[] = ['super_admin', 'admin', 'editor', 'viewer'];
+const ASSIGNABLE_ROLES: Role[] = ['super_admin', 'admin', 'editor'];
 
 export default function UsersPage() {
   const { data: session } = useSession();
