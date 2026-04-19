@@ -44,7 +44,7 @@ model User {
   email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
-  role          String    @default("viewer") // super_admin, admin, editor, viewer
+  role          String    @default("pending") // super_admin, admin, editor, viewer, pending, rejected
   accounts      Account[]
   sessions      Session[]
   createdAt     DateTime  @default(now()) @map("created_at")

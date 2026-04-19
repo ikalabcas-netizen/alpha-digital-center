@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { ResponsiveShell, NavItem } from '@/components/layout/ResponsiveShell';
@@ -32,16 +33,35 @@ const ADMIN_NAV: NavItem[] = [
   { to: '/admin/users', icon: UserCog, label: 'Hệ thống' },
 ];
 
+const APPROVED_ROLES = ['super_admin', 'admin', 'editor', 'viewer'];
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
+  const role = (session?.user as any)?.role as string | undefined;
 
-  // Login page doesn't need the shell
-  if (pathname === '/admin/login') {
+  const isLoginPage = pathname === '/admin/login';
+  const isPendingPage = pathname === '/admin/pending';
+
+  useEffect(() => {
+    if (status !== 'authenticated' || !role) return;
+    if (role === 'rejected') {
+      signOut({ callbackUrl: '/admin/login?rejected=1' });
+      return;
+    }
+    if (role === 'pending' && !isPendingPage) {
+      window.location.href = '/admin/pending';
+      return;
+    }
+    if (APPROVED_ROLES.includes(role) && isPendingPage) {
+      window.location.href = '/admin/dashboard';
+    }
+  }, [status, role, isPendingPage]);
+
+  if (isLoginPage) {
     return <>{children}</>;
   }
 
-  // Loading state
   if (status === 'loading') {
     return (
       <div
@@ -59,7 +79,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Not authenticated — redirect to login
   if (!session) {
     if (typeof window !== 'undefined') {
       window.location.href = '/admin/login';
@@ -67,11 +86,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     return null;
   }
 
+  if (role === 'pending' || role === 'rejected') {
+    if (isPendingPage) {
+      return <>{children}</>;
+    }
+    return (
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: '100vh',
+          fontFamily: fonts.body,
+          color: colors.textMuted,
+        }}
+      >
+        Đang chuyển hướng...
+      </div>
+    );
+  }
+
   return (
     <ResponsiveShell
       navItems={ADMIN_NAV}
       accentColor="#06b6d4"
-      roleLabel={(session.user as any)?.role === 'super_admin' ? 'Super Admin' : 'Quản trị viên'}
+      roleLabel={role === 'super_admin' ? 'Super Admin' : 'Quản trị viên'}
       userName={session.user?.name || undefined}
       userEmail={session.user?.email || undefined}
       userImage={session.user?.image || undefined}

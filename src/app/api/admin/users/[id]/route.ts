@@ -16,7 +16,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const body = await req.json();
   const { role } = body;
 
-  const validRoles = ['super_admin', 'admin', 'editor', 'viewer'];
+  const validRoles = ['super_admin', 'admin', 'editor', 'viewer', 'pending', 'rejected'];
   if (!role || !validRoles.includes(role)) {
     return badRequest(`role must be one of: ${validRoles.join(', ')}`);
   }

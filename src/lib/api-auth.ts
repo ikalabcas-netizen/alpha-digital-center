@@ -5,14 +5,30 @@ export async function getSession() {
   return auth();
 }
 
+const APPROVED_ROLES = ['super_admin', 'admin', 'editor', 'viewer'];
+
 export async function requireAdmin() {
   const session = await getSession();
   if (!session?.user) return null;
+  const role = (session.user as any)?.role;
+  if (!APPROVED_ROLES.includes(role)) return null;
+  return session;
+}
+
+export async function requireSuperAdmin() {
+  const session = await getSession();
+  if (!session?.user) return null;
+  const role = (session.user as any)?.role;
+  if (role !== 'super_admin') return null;
   return session;
 }
 
 export function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+}
+
+export function forbidden(message = 'Forbidden') {
+  return NextResponse.json({ error: message }, { status: 403 });
 }
 
 export function badRequest(message: string) {

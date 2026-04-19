@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import {
   UserCog,
@@ -11,9 +11,11 @@ import {
   Crown,
   Trash2,
   Search,
-  UserPlus,
-  Copy,
   Check,
+  X,
+  Clock,
+  Ban,
+  RotateCcw,
 } from 'lucide-react';
 import {
   colors,
@@ -26,6 +28,7 @@ import {
 } from '@/lib/styles';
 import { Button } from '@/components/ui/Button';
 import { Modal } from '@/components/ui/Modal';
+import { apiGet, apiPut, apiDelete, ApiError } from '@/lib/api-client';
 
 interface User {
   id: string;
@@ -36,7 +39,7 @@ interface User {
   createdAt: string;
 }
 
-type Role = 'super_admin' | 'admin' | 'editor' | 'viewer';
+type Role = 'super_admin' | 'admin' | 'editor' | 'viewer' | 'pending' | 'rejected';
 
 const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon: React.ElementType; description: string }> = {
   super_admin: {
@@ -67,7 +70,30 @@ const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon
     icon: Eye,
     description: 'Chỉ xem dữ liệu, không chỉnh sửa',
   },
+  pending: {
+    label: 'Chờ duyệt',
+    color: '#d97706',
+    bg: '#fffbeb',
+    icon: Clock,
+    description: 'Đang chờ Super Admin duyệt',
+  },
+  rejected: {
+    label: 'Từ chối',
+    color: '#e11d48',
+    bg: '#fff1f2',
+    icon: Ban,
+    description: 'Đã bị từ chối truy cập hệ thống',
+  },
 };
+
+const TABS: { key: 'pending' | 'active' | 'rejected' | 'all'; label: string; filter: (r: string) => boolean }[] = [
+  { key: 'pending', label: 'Chờ duyệt', filter: (r) => r === 'pending' },
+  { key: 'active', label: 'Đang hoạt động', filter: (r) => ['super_admin', 'admin', 'editor', 'viewer'].includes(r) },
+  { key: 'rejected', label: 'Từ chối', filter: (r) => r === 'rejected' },
+  { key: 'all', label: 'Tất cả', filter: () => true },
+];
+
+const ASSIGNABLE_ROLES: Role[] = ['super_admin', 'admin', 'editor', 'viewer'];
 
 export default function UsersPage() {
   const { data: session } = useSession();
@@ -76,22 +102,22 @@ export default function UsersPage() {
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'rejected' | 'all'>('pending');
   const [search, setSearch] = useState('');
   const [editUser, setEditUser] = useState<User | null>(null);
   const [editRole, setEditRole] = useState<Role>('viewer');
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [saving, setSaving] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/admin/users');
-      if (res.ok) {
-        const data = await res.json();
-        setUsers(data);
-      }
+      const data = await apiGet<User[]>('/api/admin/users');
+      setUsers(data);
     } catch (e) {
-      console.error('Failed to fetch users', e);
+      setError(e instanceof ApiError ? e.message : 'Không tải được danh sách');
     } finally {
       setLoading(false);
     }
@@ -101,61 +127,55 @@ export default function UsersPage() {
     fetchUsers();
   }, [fetchUsers]);
 
-  const handleRoleChange = async () => {
+  async function updateRole(user: User, role: Role) {
+    const previous = users;
+    setUsers((prev) => prev.map((u) => (u.id === user.id ? { ...u, role } : u)));
+    try {
+      await apiPut(`/api/admin/users/${user.id}`, { role });
+    } catch (e) {
+      setUsers(previous);
+      setError(e instanceof ApiError ? e.message : 'Cập nhật thất bại');
+    }
+  }
+
+  async function handleSaveRole() {
     if (!editUser) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/users/${editUser.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: editRole }),
-      });
-      if (res.ok) {
-        setUsers(prev => prev.map(u => u.id === editUser.id ? { ...u, role: editRole } : u));
-        setEditUser(null);
-      }
-    } catch (e) {
-      console.error('Failed to update role', e);
+      await updateRole(editUser, editRole);
+      setEditUser(null);
     } finally {
       setSaving(false);
     }
-  };
+  }
 
-  const handleDelete = async () => {
+  async function handleDelete() {
     if (!deleteUser) return;
     setSaving(true);
     try {
-      const res = await fetch(`/api/admin/users/${deleteUser.id}`, { method: 'DELETE' });
-      if (res.ok) {
-        setUsers(prev => prev.filter(u => u.id !== deleteUser.id));
-        setDeleteUser(null);
-      }
+      await apiDelete(`/api/admin/users/${deleteUser.id}`);
+      setUsers((prev) => prev.filter((u) => u.id !== deleteUser.id));
+      setDeleteUser(null);
     } catch (e) {
-      console.error('Failed to delete user', e);
+      setError(e instanceof ApiError ? e.message : 'Xoá thất bại');
     } finally {
       setSaving(false);
     }
-  };
+  }
 
-  const copyInviteInfo = () => {
-    const text = `Truy cập CMS: https://www.alphacenter.vn/admin/login\nĐăng nhập bằng tài khoản Google đã được duyệt.`;
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+  const stats = useMemo(() => ({
+    pending: users.filter((u) => u.role === 'pending').length,
+    active: users.filter((u) => ['super_admin', 'admin', 'editor', 'viewer'].includes(u.role)).length,
+    rejected: users.filter((u) => u.role === 'rejected').length,
+  }), [users]);
 
-  const filteredUsers = users.filter(u => {
+  const filtered = users.filter((u) => {
+    const tab = TABS.find((t) => t.key === activeTab);
+    if (tab && !tab.filter(u.role)) return false;
     if (!search) return true;
     const q = search.toLowerCase();
     return (u.name?.toLowerCase().includes(q)) || (u.email?.toLowerCase().includes(q));
   });
-
-  const roleStats = {
-    super_admin: users.filter(u => u.role === 'super_admin').length,
-    admin: users.filter(u => u.role === 'admin').length,
-    editor: users.filter(u => u.role === 'editor').length,
-    viewer: users.filter(u => u.role === 'viewer').length,
-  };
 
   if (!isSuperAdmin && currentRole !== 'admin') {
     return (
@@ -169,65 +189,130 @@ export default function UsersPage() {
 
   return (
     <div>
-      {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12, marginBottom: 24 }}>
         <div>
           <h1 style={pageTitle}>
             <UserCog size={24} style={{ marginRight: 8, verticalAlign: 'middle' }} />
             Quản trị hệ thống
           </h1>
-          <p style={pageSubtitle}>Quản lý thành viên và phân quyền truy cập CMS</p>
+          <p style={pageSubtitle}>Duyệt thành viên mới và phân quyền truy cập CMS</p>
         </div>
-        <Button variant="secondary" onClick={copyInviteInfo} style={{ fontSize: 13 }}>
-          {copied ? <Check size={14} /> : <Copy size={14} />}
-          {copied ? 'Đã copy' : 'Copy link mời'}
-        </Button>
       </div>
 
-      {/* Role stats cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12, marginBottom: 24 }}>
-        {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([key, config]) => {
-          const Icon = config.icon;
+      {error && (
+        <div
+          style={{
+            ...cardStyle,
+            marginBottom: 16,
+            background: colors.dangerBg,
+            borderColor: 'rgba(225,29,72,0.2)',
+            color: colors.danger,
+            fontSize: 13,
+            fontFamily: fonts.body,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 12, marginBottom: 20 }}>
+        <div style={{ ...cardStyle, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: '#fffbeb', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d97706' }}>
+            <Clock size={20} />
+          </div>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: fonts.heading, color: colors.textPrimary, lineHeight: 1 }}>{stats.pending}</div>
+            <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>Chờ duyệt</div>
+          </div>
+        </div>
+        <div style={{ ...cardStyle, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.successBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.success }}>
+            <ShieldCheck size={20} />
+          </div>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: fonts.heading, color: colors.textPrimary, lineHeight: 1 }}>{stats.active}</div>
+            <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>Đang hoạt động</div>
+          </div>
+        </div>
+        <div style={{ ...cardStyle, display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: colors.dangerBg, display: 'flex', alignItems: 'center', justifyContent: 'center', color: colors.danger }}>
+            <Ban size={20} />
+          </div>
+          <div>
+            <div style={{ fontSize: 22, fontWeight: 700, fontFamily: fonts.heading, color: colors.textPrimary, lineHeight: 1 }}>{stats.rejected}</div>
+            <div style={{ fontSize: 12, color: colors.textMuted, marginTop: 2 }}>Từ chối</div>
+          </div>
+        </div>
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 4,
+          marginBottom: 16,
+          borderBottom: `1px solid ${colors.border}`,
+        }}
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.key;
+          const count = tab.key === 'all' ? users.length : users.filter((u) => tab.filter(u.role)).length;
           return (
-            <div key={key} style={{ ...cardStyle, padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: 10, background: config.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Icon size={20} color={config.color} />
-              </div>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 700, fontFamily: fonts.heading, color: colors.textPrimary }}>
-                  {roleStats[key]}
-                </div>
-                <div style={{ fontSize: 12, color: colors.textMuted }}>{config.label}</div>
-              </div>
-            </div>
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              style={{
+                padding: '10px 18px',
+                border: 'none',
+                borderBottom: isActive ? `2px solid ${colors.primary}` : '2px solid transparent',
+                background: 'none',
+                color: isActive ? colors.primary : colors.textSecondary,
+                fontSize: 13,
+                fontWeight: isActive ? 600 : 400,
+                cursor: 'pointer',
+                fontFamily: fonts.body,
+                transition: transitions.fast,
+              }}
+            >
+              {tab.label}
+              <span
+                style={{
+                  marginLeft: 6,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  background: isActive ? colors.primaryBg : '#f1f5f9',
+                  color: isActive ? colors.primary : colors.textMuted,
+                  padding: '1px 7px',
+                  borderRadius: 10,
+                }}
+              >
+                {count}
+              </span>
+            </button>
           );
         })}
       </div>
 
-      {/* Search */}
-      <div style={{ marginBottom: 20 }}>
+      <div style={{ marginBottom: 16 }}>
         <div style={{ position: 'relative', maxWidth: 360 }}>
           <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: colors.textMuted }} />
           <input
             type="text"
             placeholder="Tìm theo tên hoặc email..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             style={{ ...inputStyle, paddingLeft: 36, width: '100%' }}
           />
         </div>
       </div>
 
-      {/* Users table */}
       <div style={{ ...cardStyle, padding: 0, overflow: 'hidden' }}>
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: colors.textMuted, fontFamily: fonts.body }}>
             Đang tải danh sách thành viên...
           </div>
-        ) : filteredUsers.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div style={{ padding: 40, textAlign: 'center', color: colors.textMuted, fontFamily: fonts.body }}>
-            <UserPlus size={32} style={{ marginBottom: 8, opacity: 0.4 }} />
-            <p>Chưa có thành viên nào. Thêm email vào danh sách cho phép trên Coolify.</p>
+            {activeTab === 'pending' ? 'Không có yêu cầu nào đang chờ duyệt' : 'Không tìm thấy thành viên'}
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -242,11 +327,13 @@ export default function UsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {filteredUsers.map(user => {
+                {filtered.map((user) => {
                   const role = user.role as Role;
-                  const config = ROLE_CONFIG[role] || ROLE_CONFIG.viewer;
+                  const config = ROLE_CONFIG[role] || ROLE_CONFIG.pending;
                   const Icon = config.icon;
                   const isCurrentUser = (session?.user as any)?.id === user.id;
+                  const isPending = user.role === 'pending';
+                  const isRejected = user.role === 'rejected';
 
                   return (
                     <tr
@@ -296,18 +383,47 @@ export default function UsersPage() {
                       </td>
                       {isSuperAdmin && (
                         <td style={{ ...tdStyle, textAlign: 'center' }}>
-                          <div style={{ display: 'flex', justifyContent: 'center', gap: 6 }}>
-                            <button
-                              onClick={() => { setEditUser(user); setEditRole(user.role as Role); }}
-                              style={actionBtnStyle}
-                              title="Đổi vai trò"
-                            >
-                              <Shield size={15} />
-                            </button>
+                          <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap' }}>
+                            {isPending && (
+                              <>
+                                <button
+                                  onClick={() => updateRole(user, 'admin')}
+                                  style={{ ...actionBtnStyle, background: colors.successBg, color: colors.success, border: '1px solid rgba(22,163,74,0.2)' }}
+                                  title="Duyệt (cấp quyền Admin)"
+                                >
+                                  <Check size={15} />
+                                </button>
+                                <button
+                                  onClick={() => updateRole(user, 'rejected')}
+                                  style={{ ...actionBtnStyle, background: colors.dangerBg, color: colors.danger, border: '1px solid rgba(225,29,72,0.2)' }}
+                                  title="Từ chối"
+                                >
+                                  <X size={15} />
+                                </button>
+                              </>
+                            )}
+                            {isRejected && (
+                              <button
+                                onClick={() => updateRole(user, 'pending')}
+                                style={{ ...actionBtnStyle, background: '#fffbeb', color: '#d97706', border: '1px solid rgba(217,119,6,0.2)' }}
+                                title="Khôi phục về hàng đợi"
+                              >
+                                <RotateCcw size={15} />
+                              </button>
+                            )}
+                            {!isPending && !isRejected && (
+                              <button
+                                onClick={() => { setEditUser(user); setEditRole(user.role as Role); }}
+                                style={actionBtnStyle}
+                                title="Đổi vai trò"
+                              >
+                                <Shield size={15} />
+                              </button>
+                            )}
                             {!isCurrentUser && (
                               <button
                                 onClick={() => setDeleteUser(user)}
-                                style={{ ...actionBtnStyle, color: '#ef4444' }}
+                                style={{ ...actionBtnStyle, color: colors.danger }}
                                 title="Xóa thành viên"
                               >
                                 <Trash2 size={15} />
@@ -325,20 +441,18 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Add member guide */}
       <div style={{ ...cardStyle, marginTop: 20, padding: '16px 20px', background: '#f0f9ff', borderLeft: `3px solid ${colors.primary}` }}>
         <div style={{ fontWeight: 600, fontSize: 14, color: colors.textPrimary, marginBottom: 6, fontFamily: fonts.heading }}>
-          Thêm thành viên mới
+          Cách thêm thành viên mới
         </div>
         <div style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 1.6 }}>
-          1. Vào Coolify → App ADC Marketing → Environment Variables<br />
-          2. Sửa <code style={{ background: '#e0f2fe', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>ADMIN_ALLOWED_EMAILS</code> → thêm email mới (phân cách bằng dấu phẩy)<br />
-          3. Redeploy app → thành viên mới đăng nhập bằng Google OAuth<br />
-          4. Quay lại đây để phân quyền cho thành viên
+          1. Gửi link <code style={{ background: '#e0f2fe', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>https://www.alphacenter.vn/admin/login</code> cho người cần truy cập<br />
+          2. Họ đăng nhập bằng Google → tài khoản vào hàng đợi "Chờ duyệt"<br />
+          3. Super Admin vào tab này, nhấn ✓ để duyệt (cấp quyền Admin) hoặc ✗ để từ chối<br />
+          4. Có thể đổi vai trò sau bằng icon khiên ở cột thao tác
         </div>
       </div>
 
-      {/* Edit role modal */}
       {editUser && (
         <Modal isOpen={true} onClose={() => setEditUser(null)} title="Đổi vai trò thành viên">
           <div style={{ marginBottom: 16 }}>
@@ -358,7 +472,8 @@ export default function UsersPage() {
 
             <div style={{ fontSize: 13, fontWeight: 600, color: colors.textSecondary, marginBottom: 8 }}>Chọn vai trò:</div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              {(Object.entries(ROLE_CONFIG) as [Role, typeof ROLE_CONFIG[Role]][]).map(([key, config]) => {
+              {ASSIGNABLE_ROLES.map((key) => {
+                const config = ROLE_CONFIG[key];
                 const Icon = config.icon;
                 const selected = editRole === key;
                 return (
@@ -399,17 +514,13 @@ export default function UsersPage() {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, marginTop: 20 }}>
             <Button variant="secondary" onClick={() => setEditUser(null)}>Hủy</Button>
-            <Button
-              onClick={handleRoleChange}
-              disabled={saving || editRole === editUser.role}
-            >
+            <Button onClick={handleSaveRole} disabled={saving || editRole === editUser.role}>
               {saving ? 'Đang lưu...' : 'Lưu thay đổi'}
             </Button>
           </div>
         </Modal>
       )}
 
-      {/* Delete confirmation modal */}
       {deleteUser && (
         <Modal isOpen={true} onClose={() => setDeleteUser(null)} title="Xác nhận xóa thành viên">
           <div style={{ marginBottom: 20 }}>

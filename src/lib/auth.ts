@@ -21,31 +21,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   events: {
     async createUser({ user }) {
-      // Auto-assign super_admin role on first login
-      if (user.email === SUPER_ADMIN_EMAIL) {
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { role: 'super_admin' },
-        });
-      }
+      // Super admin email: auto-upgrade. All other new users: pending — await super admin approval.
+      const role = user.email === SUPER_ADMIN_EMAIL ? 'super_admin' : 'pending';
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { role },
+      });
     },
   },
   callbacks: {
     async signIn({ user }) {
-      const allowedEmails = (process.env.ADMIN_ALLOWED_EMAILS || '').split(',').map(e => e.trim()).filter(Boolean);
-      const allowedDomains = (process.env.ADMIN_ALLOWED_DOMAINS || '').split(',').map(d => d.trim()).filter(Boolean);
-
       if (!user.email) return false;
-      if (allowedEmails.length === 0 && allowedDomains.length === 0) return true;
-      if (allowedEmails.includes(user.email)) return true;
-      const domain = user.email.split('@')[1];
-      if (allowedDomains.includes(domain)) return true;
-      return false;
+      // Block re-login for rejected users
+      const existing = await prisma.user.findUnique({
+        where: { email: user.email },
+        select: { role: true },
+      });
+      if (existing?.role === 'rejected') return false;
+      return true;
     },
     async session({ session, user }: any) {
       if (session.user && user) {
         session.user.id = user.id;
-        session.user.role = user.role || 'viewer';
+        session.user.role = user.role || 'pending';
       }
       return session;
     },
