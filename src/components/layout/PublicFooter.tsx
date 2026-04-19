@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { Logo } from './Logo';
 import { PUBLIC_NAV } from './publicNav';
 import { colors, fonts } from '@/lib/styles';
-import { prisma } from '@/lib/prisma';
+import type { PublicLayoutData } from '@/lib/public-layout-data';
 
 const SERVICES = [
   'Sứ Zirconia',
@@ -12,31 +12,8 @@ const SERVICES = [
   'Hàm tháo lắp',
 ];
 
-async function getFooterData() {
-  const [channels, settings] = await Promise.all([
-    prisma.cmsContactChannel.findMany({ where: { isActive: true }, orderBy: { displayOrder: 'asc' } }),
-    prisma.siteSetting.findMany({ where: { OR: [{ group: 'contact' }, { group: 'general' }] } }),
-  ]);
-  const phone = channels.find((c) => c.iconKey === 'phone')?.value;
-  const email = channels.find((c) => c.iconKey === 'mail')?.value;
-  const zalo = channels.find((c) => c.iconKey === 'zalo')?.value;
-  const hours = channels.find((c) => c.iconKey === 'clock');
-  const line1 = settings.find((s) => s.key === 'contact.officeAddressLine1')?.value;
-  const line2 = settings.find((s) => s.key === 'contact.officeAddressLine2')?.value;
-  const tagline = settings.find((s) => s.key === 'site.tagline')?.value;
-  return {
-    phone: phone || '0378 422 496',
-    email: email || 'info@alphacenter.vn',
-    zalo: zalo || null,
-    hoursLabel: hours ? `${hours.value}${hours.subtitle ? ` · ${hours.subtitle}` : ''}` : null,
-    line1: line1 || '242/12 Phạm Văn Hai',
-    line2: line2 || 'P.5, Q. Tân Bình, TP.HCM',
-    tagline: tagline || 'Trung tâm gia công nha khoa kỹ thuật số hàng đầu Việt Nam. Cam kết chất lượng — bảo hành đến 19 năm — công nghệ CAD/CAM hiện đại.',
-  };
-}
-
-export async function PublicFooter() {
-  const { phone, email, zalo, hoursLabel, line1, line2, tagline } = await getFooterData();
+export function PublicFooter({ data }: { data: PublicLayoutData }) {
+  const { logoUrl, companyName, tagline, phone, email, zalo, hoursValue, hoursSubtitle, addressLine1, addressLine2 } = data;
 
   return (
     <footer
@@ -59,7 +36,7 @@ export async function PublicFooter() {
           }}
         >
           <div>
-            <Logo variant="dark" size={44} />
+            <Logo variant="dark" size={44} imageUrl={logoUrl} companyName={companyName} tagline={tagline} />
             <p
               style={{
                 fontSize: 13.5,
@@ -69,7 +46,7 @@ export async function PublicFooter() {
                 color: 'rgba(255,255,255,0.6)',
               }}
             >
-              {tagline}
+              {tagline || 'Trung tâm gia công nha khoa kỹ thuật số hàng đầu Việt Nam. Cam kết chất lượng — bảo hành đến 19 năm — công nghệ CAD/CAM hiện đại.'}
             </p>
           </div>
 
@@ -119,15 +96,16 @@ export async function PublicFooter() {
             </div>
             <div style={{ fontSize: 13.5, lineHeight: 1.8, color: 'rgba(255,255,255,0.75)' }}>
               <div>
-                📍 {line1},<br />
-                {line2}
+                📍 {addressLine1},<br />
+                {addressLine2}
               </div>
               <div style={{ marginTop: 10 }}>📞 {phone}</div>
               <div style={{ marginTop: 10 }}>✉ {email}</div>
               {zalo && <div style={{ marginTop: 10 }}>💬 Zalo: {zalo}</div>}
-              {hoursLabel && (
+              {hoursValue && (
                 <div style={{ marginTop: 10, fontSize: 12, color: 'rgba(255,255,255,0.55)' }}>
-                  🕐 {hoursLabel}
+                  🕐 {hoursValue}
+                  {hoursSubtitle ? ` · ${hoursSubtitle}` : ''}
                 </div>
               )}
             </div>
@@ -152,7 +130,7 @@ export async function PublicFooter() {
               letterSpacing: '0.05em',
             }}
           >
-            © {new Date().getFullYear()} ALPHA DIGITAL CENTER · ALL RIGHTS RESERVED
+            © {new Date().getFullYear()} {companyName.toUpperCase()} · ALL RIGHTS RESERVED
           </div>
           <div style={{ display: 'flex', gap: 24, fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>
             <span>Chính sách bảo mật</span>

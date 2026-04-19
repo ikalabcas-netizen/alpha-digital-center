@@ -13,6 +13,7 @@ import {
 import { apiGet, apiPut } from '@/lib/api-client';
 import TabBar from '@/components/admin/TabBar';
 import ImageUpload from '@/components/admin/ImageUpload';
+import LogoUpload from '@/components/admin/LogoUpload';
 
 type SettingMap = Record<string, string>;
 
@@ -178,12 +179,31 @@ function LogoEditor() {
       <div style={sectionTitle}>Logo + OG Image</div>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 12 }}>
         <div>
-          <span style={label}>Logo công ty (header / footer)</span>
-          <ImageUpload value={logoUrl} onChange={setLogoUrl} prefix="misc" height={140} />
+          <LogoUpload
+            value={logoUrl}
+            onChange={setLogoUrl}
+            label="Logo công ty (header / footer)"
+            prefix="misc"
+            defaultAspect={3}
+            previewBg="#0b1220"
+            hint="Tỉ lệ khuyến nghị 3:1 hoặc 4:1 cho header/footer. Có thể kéo ảnh ra ngoài khung cắt để tạo padding."
+          />
         </div>
         <div>
-          <span style={label}>OG Image (share Facebook / Zalo)</span>
-          <ImageUpload value={ogImage} onChange={setOgImage} prefix="misc" height={140} />
+          <LogoUpload
+            value={ogImage}
+            onChange={setOgImage}
+            label="OG Image (share Facebook / Zalo)"
+            prefix="misc"
+            aspectPresets={[
+              { key: '16-9', label: '16:9 (1200×630 chuẩn OG)', ratio: 1200 / 630 },
+              { key: '1', label: '1:1 vuông', ratio: 1 },
+              { key: 'free', label: 'Tự do', ratio: null },
+            ]}
+            defaultAspect={1200 / 630}
+            previewBg="#111827"
+            hint="Chuẩn Open Graph là 1200×630 (tỉ lệ ~1.91:1)."
+          />
         </div>
       </div>
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>

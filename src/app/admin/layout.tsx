@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { usePathname } from 'next/navigation';
 import { ResponsiveShell, NavItem } from '@/components/layout/ResponsiveShell';
+import { apiGet } from '@/lib/api-client';
 import {
   LayoutDashboard,
   Home,
@@ -142,11 +143,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const roleLabel =
     role === 'super_admin' ? 'Super Admin' : role === 'editor' ? 'Biên tập viên' : 'Quản trị viên';
 
+  const [logoSrc, setLogoSrc] = useState<string | undefined>();
+  useEffect(() => {
+    if (status !== 'authenticated') return;
+    apiGet<any[]>('/api/admin/settings?group=general')
+      .then((rows) => {
+        const logo = rows.find((r: any) => r.key === 'site.logoUrl')?.value;
+        if (logo) setLogoSrc(logo);
+      })
+      .catch(() => {});
+  }, [status]);
+
   return (
     <ResponsiveShell
       navItems={visibleNav}
       accentColor="#06b6d4"
       roleLabel={roleLabel}
+      logoSrc={logoSrc}
       userName={session.user?.name || undefined}
       userEmail={session.user?.email || undefined}
       userImage={session.user?.image || undefined}

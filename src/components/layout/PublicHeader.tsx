@@ -7,7 +7,13 @@ import { Logo } from './Logo';
 import { PUBLIC_NAV } from './publicNav';
 import { colors, fonts, transitions } from '@/lib/styles';
 
-export function PublicHeader() {
+type Props = {
+  logoUrl: string | null;
+  companyName: string;
+  tagline: string;
+};
+
+export function PublicHeader({ logoUrl, companyName, tagline }: Props) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -44,7 +50,7 @@ export function PublicHeader() {
         }}
       >
         <Link href="/" aria-label="Trang chủ">
-          <Logo size={40} />
+          <Logo size={40} imageUrl={logoUrl} companyName={companyName} tagline={tagline} />
         </Link>
 
         <nav className="dn" style={{ display: 'flex', alignItems: 'center', gap: 2 }}>

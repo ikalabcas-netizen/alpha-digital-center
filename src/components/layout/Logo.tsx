@@ -1,16 +1,47 @@
+/* eslint-disable @next/next/no-img-element */
 import { colors, fonts } from '@/lib/styles';
 
 type LogoProps = {
   size?: number;
   variant?: 'light' | 'dark';
+  imageUrl?: string | null;
+  companyName?: string | null;
+  tagline?: string | null;
 };
 
-export function Logo({ size = 40, variant = 'light' }: LogoProps) {
+export function Logo({
+  size = 40,
+  variant = 'light',
+  imageUrl,
+  companyName,
+  tagline,
+}: LogoProps) {
   const dark = variant === 'dark';
   const strokeColor = dark ? colors.gold : colors.navy900;
   const pathFill = dark ? colors.goldLight : colors.navy900;
   const wordmarkColor = dark ? colors.white : colors.ink900;
   const eyebrowColor = dark ? 'rgba(255,255,255,0.5)' : colors.ink500;
+
+  if (imageUrl) {
+    return (
+      <div style={{ display: 'inline-flex', alignItems: 'center' }}>
+        <img
+          src={imageUrl}
+          alt={companyName || 'Logo'}
+          style={{
+            height: size,
+            width: 'auto',
+            maxWidth: size * 5,
+            objectFit: 'contain',
+            display: 'block',
+          }}
+        />
+      </div>
+    );
+  }
+
+  const name = companyName?.trim() ? companyName.split(' ')[0].toLowerCase() : 'alpha';
+  const sub = tagline?.trim() || 'Digital Center';
 
   return (
     <div style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
@@ -32,7 +63,8 @@ export function Logo({ size = 40, variant = 'light' }: LogoProps) {
             letterSpacing: '-0.02em',
           }}
         >
-          alpha<span style={{ color: colors.gold }}>.</span>
+          {name}
+          <span style={{ color: colors.gold }}>.</span>
         </span>
         <span
           style={{
@@ -44,7 +76,7 @@ export function Logo({ size = 40, variant = 'light' }: LogoProps) {
             textTransform: 'uppercase',
           }}
         >
-          Digital Center
+          {sub}
         </span>
       </div>
     </div>
