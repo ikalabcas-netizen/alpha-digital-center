@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -10,12 +10,15 @@
 !.yarn/releases
 !.yarn/versions
 
+# turbo
+.turbo/
+
 # testing
 /coverage
 
 # next.js
-/.next/
-/out/
+**/.next/
+**/out/
 
 # production
 /build
@@ -32,7 +35,7 @@ yarn-error.log*
 
 # env files
 .env*
-!docker/.env.example
+!apps/*/docker/.env.example
 
 # claude code
 .claude/
@@ -58,6 +61,6 @@ contex/*.zip
 contex/*.xlsx
 
 # local dev tooling artifacts
-scripts/mc.exe
-scripts/cors.json
-scripts/cors.xml
+apps/website/scripts/mc.exe
+apps/website/scripts/cors.json
+apps/website/scripts/cors.xml

@@ -1,44 +1,19 @@
 {
-  "name": "alpha-marketing",
-  "version": "0.1.0",
+  "name": "adc-platform",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
-  "dependencies": {
-    "@anthropic-ai/sdk": "^0.88.0",
-    "@auth/prisma-adapter": "^2.11.1",
-    "@aws-sdk/client-s3": "^3.750.0",
-    "@aws-sdk/s3-request-presigner": "^3.750.0",
-    "@google/generative-ai": "^0.24.1",
-    "@prisma/client": "^6.19.3",
-    "@tanstack/react-query": "^5.99.0",
-    "@tiptap/extension-image": "^3.22.3",
-    "@tiptap/extension-link": "^3.22.3",
-    "@tiptap/react": "^3.22.3",
-    "@tiptap/starter-kit": "^3.22.3",
-    "@trpc/client": "^11.16.0",
-    "@trpc/next": "^11.16.0",
-    "@trpc/react-query": "^11.16.0",
-    "@trpc/server": "^11.16.0",
-    "lucide-react": "^1.8.0",
-    "marked": "^18.0.2",
-    "next": "16.2.3",
-    "next-auth": "^5.0.0-beta.31",
-    "openai": "^6.34.0",
-    "prisma": "^6.19.3",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-easy-crop": "^5.5.7",
-    "zod": "^4.3.6"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "db:generate": "pnpm --filter @adc/database generate",
+    "db:migrate": "pnpm --filter @adc/database migrate",
+    "db:push": "pnpm --filter @adc/database push",
+    "db:seed": "pnpm --filter @adc/database seed",
+    "db:studio": "pnpm --filter @adc/database studio"
   },
   "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "docx": "^9.6.1",
-    "typescript": "^5"
-  }
+    "turbo": "^2"
+  },
+  "packageManager": "pnpm@9.15.0"
 }
