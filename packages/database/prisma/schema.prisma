@@ -7,7 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== AUTH (NextAuth + Google OAuth) ====================
+// ==================== AUTH (NextAuth + Google OAuth + SSO) ====================
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  HR_MANAGER
+  EMPLOYEE
+  ACCOUNTANT
+  SALES
+  CUSTOMER
+  PENDING
+  REJECTED
+}
 
 model Account {
   id                String  @id @default(uuid())
@@ -39,17 +52,53 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  role          String    @default("pending") // super_admin, admin, editor, viewer, pending, rejected
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now()) @map("created_at")
+  id              String           @id @default(uuid())
+  name            String?
+  email           String?          @unique
+  emailVerified   DateTime?        @map("email_verified")
+  image           String?
+  phone           String?
+  role            UserRole         @default(PENDING)
+  isActive        Boolean          @default(false) @map("is_active")
+  accounts        Account[]
+  sessions        Session[]
+  loginLogs       LoginLog[]
+  customerProfile CustomerProfile?
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
 
   @@map("users")
+}
+
+model LoginLog {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider  String   @default("google")
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent") @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("login_logs")
+}
+
+model CustomerProfile {
+  id              String   @id @default(uuid())
+  userId          String   @unique @map("user_id")
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  labName         String?  @map("lab_name")
+  taxCode         String?  @map("tax_code")
+  city            String?
+  district        String?
+  address         String?  @db.Text
+  dentistName    String?  @map("dentist_name")
+  source          String?  // "manual" | "lead_conversion" | "self_register"
+  convertedLeadId String?  @map("converted_lead_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("customer_profiles")
 }
 
 model VerificationToken {

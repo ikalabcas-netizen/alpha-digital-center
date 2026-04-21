@@ -38,39 +38,46 @@ const ADMIN_NAV: NavItem[] = [
   { to: '/admin/users', icon: UserCog, label: 'Hệ thống' },
 ];
 
-const APPROVED_ROLES = ['super_admin', 'admin', 'editor'];
-const AWAITING_ROLES = ['pending', 'viewer']; // viewer is deprecated — treat as pending
+const APPROVED_ROLES = ['SUPER_ADMIN', 'ADMIN', 'EDITOR'] as const;
 const EDITOR_BLOCKED_PREFIXES = ['/admin/settings', '/admin/users'];
+
+const ID_URL =
+  (typeof window !== 'undefined' && (window as any).__ADC_ID_URL__) ||
+  process.env.NEXT_PUBLIC_ID_URL ||
+  '';
+
+function redirectToId(path: string = '/') {
+  if (typeof window === 'undefined') return;
+  const target = ID_URL ? `${ID_URL.replace(/\/$/, '')}${path}` : path;
+  window.location.href = target;
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const role = (session?.user as any)?.role as string | undefined;
+  const role = session?.user?.role as string | undefined;
+  const isActive = Boolean((session?.user as any)?.isActive);
 
-  const isLoginPage = pathname === '/admin/login';
-  const isPendingPage = pathname === '/admin/pending';
-  const editorBlocked = role === 'editor' && EDITOR_BLOCKED_PREFIXES.some((p) => pathname.startsWith(p));
+  const editorBlocked =
+    role === 'EDITOR' && EDITOR_BLOCKED_PREFIXES.some((p) => pathname.startsWith(p));
 
   const [logoSrc, setLogoSrc] = useState<string | undefined>();
 
   useEffect(() => {
     if (status !== 'authenticated' || !role) return;
-    if (role === 'rejected') {
-      signOut({ callbackUrl: '/admin/login?rejected=1' });
+    if (role === 'REJECTED') {
+      signOut({ callbackUrl: ID_URL ? `${ID_URL}/?rejected=1` : '/' });
       return;
     }
-    if (AWAITING_ROLES.includes(role) && !isPendingPage) {
-      window.location.href = '/admin/pending';
-      return;
-    }
-    if (APPROVED_ROLES.includes(role) && isPendingPage) {
-      window.location.href = '/admin/dashboard';
+    // User exists but not yet approved → send to id.'s pending page.
+    if (!isActive) {
+      redirectToId('/pending');
       return;
     }
     if (editorBlocked) {
       window.location.href = '/admin/dashboard';
     }
-  }, [status, role, isPendingPage, editorBlocked]);
+  }, [status, role, isActive, editorBlocked]);
 
   useEffect(() => {
     if (status !== 'authenticated') return;
@@ -81,10 +88,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       })
       .catch(() => {});
   }, [status]);
-
-  if (isLoginPage) {
-    return <>{children}</>;
-  }
 
   if (status === 'loading') {
     return (
@@ -103,17 +106,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
+  // No session → send to id.alphacenter.vn for login.
   if (!session) {
     if (typeof window !== 'undefined') {
-      window.location.href = '/admin/login';
+      const callbackUrl = window.location.href;
+      const target = ID_URL
+        ? `${ID_URL.replace(/\/$/, '')}/?callbackUrl=${encodeURIComponent(callbackUrl)}`
+        : '/';
+      window.location.href = target;
     }
     return null;
   }
 
-  if (AWAITING_ROLES.includes(role || '') || role === 'rejected') {
-    if (isPendingPage) {
-      return <>{children}</>;
-    }
+  // Inactive or pending/rejected → holding screen while effect redirects.
+  if (!isActive || !APPROVED_ROLES.includes(role as any)) {
     return (
       <div
         style={{
@@ -148,12 +154,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const visibleNav =
-    role === 'editor'
+    role === 'EDITOR'
       ? ADMIN_NAV.filter((item) => !EDITOR_BLOCKED_PREFIXES.some((p) => item.to.startsWith(p)))
       : ADMIN_NAV;
 
   const roleLabel =
-    role === 'super_admin' ? 'Super Admin' : role === 'editor' ? 'Biên tập viên' : 'Quản trị viên';
+    role === 'SUPER_ADMIN' ? 'Super Admin' : role === 'EDITOR' ? 'Biên tập viên' : 'Quản trị viên';
 
   return (
     <ResponsiveShell
@@ -164,7 +170,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       userName={session.user?.name || undefined}
       userEmail={session.user?.email || undefined}
       userImage={session.user?.image || undefined}
-      onSignOut={() => signOut({ callbackUrl: '/admin/login' })}
+      onSignOut={() =>
+        signOut({ callbackUrl: ID_URL ? `${ID_URL}/?signedOut=1` : '/' })
+      }
     >
       {children}
     </ResponsiveShell>

@@ -36,48 +36,87 @@ interface User {
   email: string | null;
   image: string | null;
   role: string;
+  isActive: boolean;
   createdAt: string;
 }
 
-type Role = 'super_admin' | 'admin' | 'editor' | 'viewer' | 'pending' | 'rejected';
+type Role =
+  | 'SUPER_ADMIN'
+  | 'ADMIN'
+  | 'EDITOR'
+  | 'HR_MANAGER'
+  | 'EMPLOYEE'
+  | 'ACCOUNTANT'
+  | 'SALES'
+  | 'CUSTOMER'
+  | 'PENDING'
+  | 'REJECTED';
 
 const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon: React.ElementType; description: string }> = {
-  super_admin: {
+  SUPER_ADMIN: {
     label: 'Super Admin',
     color: '#dc2626',
     bg: '#fef2f2',
     icon: Crown,
     description: 'Toàn quyền hệ thống, quản lý thành viên & phân quyền',
   },
-  admin: {
+  ADMIN: {
     label: 'Admin',
     color: '#7c3aed',
     bg: '#f5f3ff',
     icon: ShieldCheck,
     description: 'Quản lý nội dung, duyệt bài, xem báo cáo',
   },
-  editor: {
+  EDITOR: {
     label: 'Biên tập viên',
     color: '#0891b2',
     bg: '#ecfeff',
     icon: Pencil,
     description: 'Tạo & chỉnh sửa nội dung, bài viết, sản phẩm',
   },
-  viewer: {
-    label: 'Xem',
-    color: '#6b7280',
-    bg: '#f3f4f6',
-    icon: Eye,
-    description: 'Chỉ xem dữ liệu, không chỉnh sửa',
+  HR_MANAGER: {
+    label: 'Quản lý nhân sự',
+    color: '#9333ea',
+    bg: '#faf5ff',
+    icon: UserCog,
+    description: 'Quản lý HRM — chấm công, xếp lịch, KPI',
   },
-  pending: {
+  EMPLOYEE: {
+    label: 'Nhân viên',
+    color: '#2563eb',
+    bg: '#eff6ff',
+    icon: Shield,
+    description: 'Nhân viên nội bộ — chấm công, xem KPI bản thân',
+  },
+  ACCOUNTANT: {
+    label: 'Kế toán',
+    color: '#0d9488',
+    bg: '#f0fdfa',
+    icon: Eye,
+    description: 'Xem báo cáo tài chính, công nợ',
+  },
+  SALES: {
+    label: 'Kinh doanh',
+    color: '#ea580c',
+    bg: '#fff7ed',
+    icon: Eye,
+    description: 'Quản lý leads, CRM, báo giá khách hàng',
+  },
+  CUSTOMER: {
+    label: 'Khách hàng',
+    color: '#475569',
+    bg: '#f1f5f9',
+    icon: Eye,
+    description: 'Labo/nha sĩ đặt hàng, tra bảo hành',
+  },
+  PENDING: {
     label: 'Chờ duyệt',
     color: '#d97706',
     bg: '#fffbeb',
     icon: Clock,
     description: 'Đang chờ Super Admin duyệt',
   },
-  rejected: {
+  REJECTED: {
     label: 'Từ chối',
     color: '#e11d48',
     bg: '#fff1f2',
@@ -86,19 +125,21 @@ const ROLE_CONFIG: Record<Role, { label: string; color: string; bg: string; icon
   },
 };
 
+const ACTIVE_ROLES: Role[] = ['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'HR_MANAGER', 'EMPLOYEE', 'ACCOUNTANT', 'SALES', 'CUSTOMER'];
+
 const TABS: { key: 'pending' | 'active' | 'rejected' | 'all'; label: string; filter: (r: string) => boolean }[] = [
-  { key: 'pending', label: 'Chờ duyệt', filter: (r) => r === 'pending' },
-  { key: 'active', label: 'Đang hoạt động', filter: (r) => ['super_admin', 'admin', 'editor', 'viewer'].includes(r) },
-  { key: 'rejected', label: 'Từ chối', filter: (r) => r === 'rejected' },
+  { key: 'pending', label: 'Chờ duyệt', filter: (r) => r === 'PENDING' },
+  { key: 'active', label: 'Đang hoạt động', filter: (r) => (ACTIVE_ROLES as string[]).includes(r) },
+  { key: 'rejected', label: 'Từ chối', filter: (r) => r === 'REJECTED' },
   { key: 'all', label: 'Tất cả', filter: () => true },
 ];
 
-const ASSIGNABLE_ROLES: Role[] = ['super_admin', 'admin', 'editor'];
+const ASSIGNABLE_ROLES: Role[] = ['SUPER_ADMIN', 'ADMIN', 'EDITOR', 'HR_MANAGER', 'EMPLOYEE', 'ACCOUNTANT', 'SALES', 'CUSTOMER'];
 
 export default function UsersPage() {
   const { data: session } = useSession();
   const currentRole = (session?.user as any)?.role;
-  const isSuperAdmin = currentRole === 'super_admin';
+  const isSuperAdmin = currentRole === 'SUPER_ADMIN';
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,7 +147,7 @@ export default function UsersPage() {
   const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'rejected' | 'all'>('pending');
   const [search, setSearch] = useState('');
   const [editUser, setEditUser] = useState<User | null>(null);
-  const [editRole, setEditRole] = useState<Role>('viewer');
+  const [editRole, setEditRole] = useState<Role>('EDITOR');
   const [deleteUser, setDeleteUser] = useState<User | null>(null);
   const [saving, setSaving] = useState(false);
 
@@ -164,9 +205,9 @@ export default function UsersPage() {
   }
 
   const stats = useMemo(() => ({
-    pending: users.filter((u) => u.role === 'pending').length,
-    active: users.filter((u) => ['super_admin', 'admin', 'editor', 'viewer'].includes(u.role)).length,
-    rejected: users.filter((u) => u.role === 'rejected').length,
+    pending: users.filter((u) => u.role === 'PENDING').length,
+    active: users.filter((u) => (ACTIVE_ROLES as string[]).includes(u.role)).length,
+    rejected: users.filter((u) => u.role === 'REJECTED').length,
   }), [users]);
 
   const filtered = users.filter((u) => {
@@ -177,7 +218,7 @@ export default function UsersPage() {
     return (u.name?.toLowerCase().includes(q)) || (u.email?.toLowerCase().includes(q));
   });
 
-  if (!isSuperAdmin && currentRole !== 'admin') {
+  if (!isSuperAdmin && currentRole !== 'ADMIN') {
     return (
       <div style={{ textAlign: 'center', padding: 60, color: colors.textMuted, fontFamily: fonts.body }}>
         <Shield size={48} style={{ marginBottom: 16, opacity: 0.4 }} />
@@ -329,11 +370,11 @@ export default function UsersPage() {
               <tbody>
                 {filtered.map((user) => {
                   const role = user.role as Role;
-                  const config = ROLE_CONFIG[role] || ROLE_CONFIG.pending;
+                  const config = ROLE_CONFIG[role] || ROLE_CONFIG.PENDING;
                   const Icon = config.icon;
                   const isCurrentUser = (session?.user as any)?.id === user.id;
-                  const isPending = user.role === 'pending';
-                  const isRejected = user.role === 'rejected';
+                  const isPending = user.role === 'PENDING';
+                  const isRejected = user.role === 'REJECTED';
 
                   return (
                     <tr
@@ -387,14 +428,14 @@ export default function UsersPage() {
                             {isPending && (
                               <>
                                 <button
-                                  onClick={() => updateRole(user, 'admin')}
+                                  onClick={() => updateRole(user, 'ADMIN')}
                                   style={{ ...actionBtnStyle, background: colors.successBg, color: colors.success, border: '1px solid rgba(22,163,74,0.2)' }}
                                   title="Duyệt (cấp quyền Admin)"
                                 >
                                   <Check size={15} />
                                 </button>
                                 <button
-                                  onClick={() => updateRole(user, 'rejected')}
+                                  onClick={() => updateRole(user, 'REJECTED')}
                                   style={{ ...actionBtnStyle, background: colors.dangerBg, color: colors.danger, border: '1px solid rgba(225,29,72,0.2)' }}
                                   title="Từ chối"
                                 >
@@ -404,7 +445,7 @@ export default function UsersPage() {
                             )}
                             {isRejected && (
                               <button
-                                onClick={() => updateRole(user, 'pending')}
+                                onClick={() => updateRole(user, 'PENDING')}
                                 style={{ ...actionBtnStyle, background: '#fffbeb', color: '#d97706', border: '1px solid rgba(217,119,6,0.2)' }}
                                 title="Khôi phục về hàng đợi"
                               >
@@ -446,7 +487,7 @@ export default function UsersPage() {
           Cách thêm thành viên mới
         </div>
         <div style={{ fontSize: 13, color: colors.textSecondary, lineHeight: 1.6 }}>
-          1. Gửi link <code style={{ background: '#e0f2fe', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>https://www.alphacenter.vn/admin/login</code> cho người cần truy cập<br />
+          1. Gửi link <code style={{ background: '#e0f2fe', padding: '1px 6px', borderRadius: 4, fontSize: 12 }}>https://id.alphacenter.vn</code> cho người cần truy cập<br />
           2. Họ đăng nhập bằng Google → tài khoản vào hàng đợi "Chờ duyệt"<br />
           3. Super Admin vào tab này, nhấn ✓ để duyệt (cấp quyền Admin) hoặc ✗ để từ chối<br />
           4. Có thể đổi vai trò sau bằng icon khiên ở cột thao tác

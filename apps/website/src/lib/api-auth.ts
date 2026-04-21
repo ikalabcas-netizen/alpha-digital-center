@@ -1,34 +1,35 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@adc/auth';
+import { UserRole } from '@adc/database';
 
 export async function getSession() {
-  const { auth } = await import('@/lib/auth');
   return auth();
 }
 
-const APPROVED_ROLES = ['super_admin', 'admin', 'editor'];
-const ADMIN_OR_ABOVE = ['super_admin', 'admin'];
+const APPROVED_ROLES: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.EDITOR];
+const ADMIN_OR_ABOVE: UserRole[] = [UserRole.SUPER_ADMIN, UserRole.ADMIN];
 
 export async function requireAdmin() {
   const session = await getSession();
   if (!session?.user) return null;
-  const role = (session.user as any)?.role;
-  if (!APPROVED_ROLES.includes(role)) return null;
+  if (!session.user.isActive) return null;
+  if (!APPROVED_ROLES.includes(session.user.role)) return null;
   return session;
 }
 
 export async function requireAdminOrAbove() {
   const session = await getSession();
   if (!session?.user) return null;
-  const role = (session.user as any)?.role;
-  if (!ADMIN_OR_ABOVE.includes(role)) return null;
+  if (!session.user.isActive) return null;
+  if (!ADMIN_OR_ABOVE.includes(session.user.role)) return null;
   return session;
 }
 
 export async function requireSuperAdmin() {
   const session = await getSession();
   if (!session?.user) return null;
-  const role = (session.user as any)?.role;
-  if (role !== 'super_admin') return null;
+  if (!session.user.isActive) return null;
+  if (session.user.role !== UserRole.SUPER_ADMIN) return null;
   return session;
 }
 

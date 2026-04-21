@@ -1,28 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const SESSION_COOKIES = [
-  'authjs.session-token',
   '__Secure-authjs.session-token',
-  'next-auth.session-token',
-  '__Secure-next-auth.session-token',
+  'authjs.session-token',
 ];
 
 export function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  if (pathname === '/admin/login' || pathname.startsWith('/admin/login/')) {
+  // Admin surface requires an active session on id.alphacenter.vn — otherwise
+  // redirect users there to log in, preserving where they wanted to go.
+  const hasSession = SESSION_COOKIES.some((name) => req.cookies.has(name));
+  if (hasSession) {
     return NextResponse.next();
   }
 
-  const hasSession = SESSION_COOKIES.some((name) => req.cookies.has(name));
-  if (!hasSession) {
-    const loginUrl = req.nextUrl.clone();
-    loginUrl.pathname = '/admin/login';
-    loginUrl.search = '';
-    return NextResponse.redirect(loginUrl);
+  const idUrl = process.env.NEXT_PUBLIC_ID_URL;
+  if (idUrl) {
+    const target = new URL(idUrl);
+    target.searchParams.set('callbackUrl', req.nextUrl.toString());
+    return NextResponse.redirect(target);
   }
 
-  return NextResponse.next();
+  // Dev fallback: if no ID service is configured, deny with 401 rather than
+  // looping back to a login page that no longer exists on this app.
+  return new NextResponse('Authentication required — id.alphacenter.vn not configured', { status: 401 });
 }
 
 export const config = {

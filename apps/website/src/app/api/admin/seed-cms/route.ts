@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAdmin, unauthorized } from '@/lib/api-auth';
 import { logger } from '@/lib/logger';
-import { seedCmsContent } from '../../../../../prisma/seed-cms';
+import { seedCmsContent } from '../../../../../../../packages/database/prisma/seed-cms';
 
 export const runtime = 'nodejs';
 
