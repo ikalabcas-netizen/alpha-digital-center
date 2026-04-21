@@ -6,9 +6,12 @@ import type { HrRole } from '@/lib/noibo/auth';
 export default async function NoiboLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requireNoibo();
 
-  // Chưa đăng nhập → quay về login admin (tạm; sẽ đổi sang id.alphacenter.vn ở Phase cuối)
+  // Middleware đã bảo vệ noibo routes (matcher + redirect về id.alphacenter.vn).
+  // Đây là fallback nếu user có cookie hết hạn/không hợp lệ nhưng middleware
+  // vẫn cho qua — đẩy về id để login lại.
   if (!ctx) {
-    redirect('/admin/login');
+    const idUrl = process.env.NEXT_PUBLIC_ID_URL;
+    redirect(idUrl || '/');
   }
 
   const employee = ctx.employee;

@@ -28,5 +28,15 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  // Bảo vệ cả admin marketing và surface nội bộ (noibo) — cả 2 đều redirect
+  // về id.alphacenter.vn nếu chưa đăng nhập.
+  matcher: [
+    '/admin/:path*',
+    '/dashboard',
+    '/profile',
+    '/org',
+    '/attendance/:path*',
+    '/leave',
+    '/manage/:path*',
+  ],
 };
