@@ -64,6 +64,7 @@ model User {
   sessions        Session[]
   loginLogs       LoginLog[]
   customerProfile CustomerProfile?
+  employee        HrmEmployee?
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime         @updatedAt @map("updated_at")
 
@@ -501,4 +502,171 @@ model CmsJobPerk {
   displayOrder Int      @default(0) @map("display_order")
 
   @@map("cms_job_perks")
+}
+
+// ==================== HRM (noibo.alphacenter.vn) — Phase 1: Org structure ====================
+
+model HrmDepartment {
+  id          String          @id @default(uuid())
+  code        String          @unique // "LAB", "SALES", "HR"
+  name        String
+  description String?         @db.Text
+  parentId    String?         @map("parent_id")
+  parent      HrmDepartment?  @relation("HrmDeptParent", fields: [parentId], references: [id])
+  children    HrmDepartment[] @relation("HrmDeptParent")
+  managerId   String?         @map("manager_id") // hrm_employees.id (no FK to avoid circular cascade)
+  positions   HrmPosition[]
+  employees   HrmEmployee[]
+  isActive    Boolean         @default(true) @map("is_active")
+  displayOrder Int            @default(0) @map("display_order")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  @@map("hrm_departments")
+}
+
+model HrmPosition {
+  id           String        @id @default(uuid())
+  departmentId String        @map("department_id")
+  department   HrmDepartment @relation(fields: [departmentId], references: [id])
+  code         String        @unique // "KTV_SR", "QC_LEAD"
+  title        String
+  description  String?       @db.Text
+  level        Int           @default(1) // 1..5 career ladder
+  isActive     Boolean       @default(true) @map("is_active")
+  employees    HrmEmployee[]
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  @@index([departmentId])
+  @@map("hrm_positions")
+}
+
+model HrmEmployee {
+  id               String        @id @default(uuid())
+  employeeCode     String        @unique @map("employee_code") // "ADC-0001"
+  userId           String?       @unique @map("user_id")
+  user             User?         @relation(fields: [userId], references: [id])
+  fullName         String        @map("full_name")
+  dob              DateTime?     @db.Date
+  gender           String? // "male" | "female" | "other"
+  phone            String?
+  personalEmail    String?       @map("personal_email")
+  workEmail        String        @unique @map("work_email")
+  nationalId       String?       @map("national_id") // CCCD
+  address          String?       @db.Text
+  avatarUrl        String?       @map("avatar_url")
+  departmentId     String        @map("department_id")
+  department       HrmDepartment @relation(fields: [departmentId], references: [id])
+  positionId       String        @map("position_id")
+  position         HrmPosition   @relation(fields: [positionId], references: [id])
+  managerId        String?       @map("manager_id")
+  manager          HrmEmployee?  @relation("HrmEmpManager", fields: [managerId], references: [id])
+  reports          HrmEmployee[] @relation("HrmEmpManager")
+  hireDate         DateTime      @map("hire_date") @db.Date
+  probationEndDate DateTime?     @map("probation_end_date") @db.Date
+  terminationDate  DateTime?     @map("termination_date") @db.Date
+  employmentStatus String        @default("probation") @map("employment_status")
+  // "probation" | "active" | "on_leave" | "terminated"
+  employmentType   String        @default("full_time") @map("employment_type")
+  // "full_time" | "part_time" | "contractor" | "intern"
+  hrRole           String        @default("employee") @map("hr_role")
+  // "hr_admin" | "hr_manager" | "manager" | "employee"
+  note             String?       @db.Text
+
+  shiftAssignments HrmShiftAssignment[]
+  attendances      HrmAttendance[]
+  leaveRequests    HrmLeaveRequest[]    @relation("LeaveOwner")
+  leavesApproved   HrmLeaveRequest[]    @relation("LeaveApprover")
+
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  @@index([departmentId])
+  @@index([positionId])
+  @@index([managerId])
+  @@map("hrm_employees")
+}
+
+// ==================== HRM Phase 2: Attendance + Leave ====================
+
+model HrmShiftTemplate {
+  id           String               @id @default(uuid())
+  code         String               @unique // "SHIFT_A", "SHIFT_NIGHT"
+  name         String
+  startTime    String               @map("start_time") // "HH:mm" — "08:00"
+  endTime      String               @map("end_time") // "HH:mm" — "17:00"
+  breakMinutes Int                  @default(60) @map("break_minutes")
+  shiftType    String               @default("day") // "day" | "night" | "flexible"
+  // Late/Early threshold in minutes
+  lateAfterMin Int                  @default(15) @map("late_after_min")
+  isActive     Boolean              @default(true) @map("is_active")
+  assignments  HrmShiftAssignment[]
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+
+  @@map("hrm_shift_templates")
+}
+
+model HrmShiftAssignment {
+  id         String           @id @default(uuid())
+  employeeId String           @map("employee_id")
+  employee   HrmEmployee      @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  templateId String           @map("template_id")
+  template   HrmShiftTemplate @relation(fields: [templateId], references: [id])
+  workDate   DateTime         @map("work_date") @db.Date
+  note       String?
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  @@unique([employeeId, workDate])
+  @@index([workDate])
+  @@map("hrm_shift_assignments")
+}
+
+model HrmAttendance {
+  id          String      @id @default(uuid())
+  employeeId  String      @map("employee_id")
+  employee    HrmEmployee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  workDate    DateTime    @map("work_date") @db.Date
+  clockInAt   DateTime?   @map("clock_in_at")
+  clockOutAt  DateTime?   @map("clock_out_at")
+  clockInLat  Float?      @map("clock_in_lat")
+  clockInLng  Float?      @map("clock_in_lng")
+  clockInIp   String?     @map("clock_in_ip")
+  clockOutLat Float?      @map("clock_out_lat")
+  clockOutLng Float?      @map("clock_out_lng")
+  clockOutIp  String?     @map("clock_out_ip")
+  status      String      @default("present") // "present"|"late"|"absent"|"half_day"|"remote"
+  workMinutes Int?        @map("work_minutes")
+  note        String?
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  @@unique([employeeId, workDate])
+  @@index([workDate])
+  @@map("hrm_attendances")
+}
+
+model HrmLeaveRequest {
+  id            String      @id @default(uuid())
+  employeeId    String      @map("employee_id")
+  employee      HrmEmployee @relation("LeaveOwner", fields: [employeeId], references: [id], onDelete: Cascade)
+  leaveType     String      @map("leave_type")
+  // "annual"|"sick"|"unpaid"|"maternity"|"wedding"|"bereavement"|"other"
+  startDate     DateTime    @map("start_date") @db.Date
+  endDate       DateTime    @map("end_date") @db.Date
+  totalDays     Float       @map("total_days") // hỗ trợ nửa ngày 0.5
+  reason        String?     @db.Text
+  attachmentUrl String?     @map("attachment_url")
+  status        String      @default("pending") // "pending"|"approved"|"rejected"|"cancelled"
+  approverId    String?     @map("approver_id")
+  approver      HrmEmployee? @relation("LeaveApprover", fields: [approverId], references: [id])
+  approvedAt    DateTime?   @map("approved_at")
+  rejectReason  String?     @map("reject_reason") @db.Text
+  createdAt     DateTime    @default(now()) @map("created_at")
+  updatedAt     DateTime    @updatedAt @map("updated_at")
+
+  @@index([employeeId, status])
+  @@index([startDate, endDate])
+  @@map("hrm_leave_requests")
 }

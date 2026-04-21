@@ -1,53 +1,65 @@
-# Stage 1: Install dependencies
+# syntax=docker/dockerfile:1.7
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 1: deps — pnpm workspace install
+# ─────────────────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
-WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+WORKDIR /repo
 
-COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+# Chỉ copy manifest để cache layer install
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json turbo.json ./
+COPY apps/website/package.json ./apps/website/package.json
+COPY packages/database/package.json ./packages/database/package.json
+COPY packages/auth/package.json ./packages/auth/package.json
 
-# Stage 2: Build the application
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 2: builder — copy source, generate Prisma, build Next
+# ─────────────────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS builder
-WORKDIR /app
+RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
+WORKDIR /repo
 
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /repo ./
 COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-# Generate Prisma client for build
-RUN npx prisma generate
-RUN npm run build
+# Prisma client phải generate sau khi copy schema
+RUN pnpm --filter @adc/database exec prisma generate
 
-# Stage 3: Production runner
+# Build qua turbo để chạy đúng deps topo (database → auth → website)
+RUN pnpm --filter website build
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Stage 3: runner — slim image
+# ─────────────────────────────────────────────────────────────────────────────
 FROM node:20-alpine AS runner
 WORKDIR /app
 
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser --system --uid 1001 nextjs
 
-COPY --from=builder /app/public ./public
+# Next.js standalone output (đã bundle deps + workspace packages nhờ outputFileTracingRoot)
+COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/.next/static ./apps/website/.next/static
+COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/public ./apps/website/public
 
-# Standalone output
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma runtime (client + schema + init.sql) for startup migration
-COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/scripts ./scripts
+# Prisma schema + init.sql + init-db.js (cho startup migration idempotent).
+# Standalone output đã bundle Prisma client engine trong node_modules/.pnpm — chỉ cần copy schema + scripts.
+COPY --from=builder --chown=nextjs:nodejs /repo/packages/database/prisma ./packages/database/prisma
+COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/scripts ./apps/website/scripts
 
 USER nextjs
-
 EXPOSE 3000
-
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Run init.sql (idempotent) then start server
-CMD sh -c "node scripts/init-db.js; node server.js"
+# init-db (idempotent init.sql) → start server
+CMD sh -c "node apps/website/scripts/init-db.js || true; node apps/website/server.js"

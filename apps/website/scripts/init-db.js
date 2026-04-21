@@ -30,11 +30,17 @@ function splitSqlStatements(sql) {
 }
 
 async function main() {
-  const sqlPath = path.join(__dirname, '..', 'prisma', 'init.sql');
-  if (!fs.existsSync(sqlPath)) {
-    console.error(`[init-db] init.sql not found at ${sqlPath}`);
+  // Try monorepo path first (packages/database/prisma), fallback to legacy co-located path.
+  const candidates = [
+    path.join(__dirname, '..', '..', '..', 'packages', 'database', 'prisma', 'init.sql'), // monorepo runtime
+    path.join(__dirname, '..', 'prisma', 'init.sql'),                                       // legacy/dev
+  ];
+  const sqlPath = candidates.find((p) => fs.existsSync(p));
+  if (!sqlPath) {
+    console.error(`[init-db] init.sql not found. Checked:\n  ${candidates.join('\n  ')}`);
     process.exit(0); // don't block app startup
   }
+  console.log(`[init-db] Using ${sqlPath}`);
 
   const sql = fs.readFileSync(sqlPath, 'utf8');
   const statements = splitSqlStatements(sql);
