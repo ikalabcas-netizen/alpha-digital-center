@@ -18,17 +18,25 @@ export function loadOfficeIps(): string[] {
 }
 
 /**
- * Lấy IP client thực từ request (xử lý proxy chain — Coolify/Traefik gắn x-forwarded-for).
+ * Lấy IP client thực từ request. Thứ tự ưu tiên:
+ *   1. CF-Connecting-IP — Cloudflare (khi noibo.alphacenter.vn bật CF proxy)
+ *   2. True-Client-IP — CF Enterprise
+ *   3. X-Forwarded-For — Traefik / standard proxy chain (lấy IP đầu)
+ *   4. X-Real-IP — Nginx convention
  */
 export function getClientIp(req: NextRequest): string | null {
+  const cfIp = req.headers.get('cf-connecting-ip');
+  if (cfIp) return cfIp.trim();
+
+  const trueIp = req.headers.get('true-client-ip');
+  if (trueIp) return trueIp.trim();
+
   const xff = req.headers.get('x-forwarded-for');
-  if (xff) {
-    // x-forwarded-for: "client, proxy1, proxy2" → lấy IP đầu
-    return xff.split(',')[0]!.trim();
-  }
+  if (xff) return xff.split(',')[0]!.trim();
+
   const xri = req.headers.get('x-real-ip');
   if (xri) return xri.trim();
-  // Next.js không expose req.ip trực tiếp ở route handler
+
   return null;
 }
 
