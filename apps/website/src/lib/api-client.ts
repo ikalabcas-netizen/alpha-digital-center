@@ -20,8 +20,10 @@ async function request<T>(url: string, init: RequestInit = {}): Promise<T> {
   });
 
   if (res.status === 401) {
-    if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin/login')) {
-      window.location.href = '/admin/login';
+    if (typeof window !== 'undefined') {
+      const idUrl = process.env.NEXT_PUBLIC_ID_URL || 'https://id.alphacenter.vn';
+      const callback = encodeURIComponent(window.location.href);
+      window.location.href = `${idUrl}/?callbackUrl=${callback}`;
     }
     throw new ApiError('Unauthorized', 401);
   }

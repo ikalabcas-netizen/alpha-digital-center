@@ -35,7 +35,12 @@ export function NoiboShell({
       userName={displayName}
       userEmail={displayEmail}
       userImage={displayImage}
-      onSignOut={() => signOut({ callbackUrl: '/admin/login' })}
+      onSignOut={() =>
+        signOut({
+          callbackUrl:
+            (process.env.NEXT_PUBLIC_ID_URL || 'https://id.alphacenter.vn') + '/?signedOut=1',
+        })
+      }
     >
       {children}
     </ResponsiveShell>

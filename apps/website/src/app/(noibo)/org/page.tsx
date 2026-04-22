@@ -6,7 +6,7 @@ import { pageTitle, pageSubtitle, colors, fonts } from '@/lib/styles';
 
 export default async function OrgPage() {
   const ctx = await requireNoibo();
-  if (!ctx) redirect('/admin/login');
+  if (!ctx) redirect(process.env.NEXT_PUBLIC_ID_URL || '/');
 
   const [departments, employees] = await Promise.all([
     prisma.hrmDepartment.findMany({
