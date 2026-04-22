@@ -43,6 +43,9 @@ WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
+# psql client để chạy migrations-manual/*.sql ở startup (idempotent)
+RUN apk add --no-cache postgresql-client
+
 RUN addgroup --system --gid 1001 nodejs \
  && adduser --system --uid 1001 nextjs
 
@@ -51,9 +54,10 @@ COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/.next/static ./apps/website/.next/static
 COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/public ./apps/website/public
 
-# Prisma schema + init.sql + init-db.js (cho startup migration idempotent).
+# Prisma schema + init.sql + init-db.js + boot.sh (cho startup migration idempotent).
 # Standalone output đã bundle Prisma client engine trong node_modules/.pnpm — chỉ cần copy schema + scripts.
 COPY --from=builder --chown=nextjs:nodejs /repo/packages/database/prisma ./packages/database/prisma
+COPY --from=builder --chown=nextjs:nodejs /repo/packages/database/migrations-manual ./packages/database/migrations-manual
 COPY --from=builder --chown=nextjs:nodejs /repo/apps/website/scripts ./apps/website/scripts
 
 USER nextjs
@@ -61,5 +65,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# init-db (idempotent init.sql) → start server
-CMD sh -c "node apps/website/scripts/init-db.js || true; node apps/website/server.js"
+# Startup: chạy migrations → init baseline → start server (xem boot.sh)
+CMD ["sh", "apps/website/scripts/boot.sh"]
