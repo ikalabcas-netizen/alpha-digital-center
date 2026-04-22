@@ -5,9 +5,48 @@ const SESSION_COOKIES = [
   'authjs.session-token',
 ];
 
+// Đường dẫn marketing công khai — KHÔNG yêu cầu session. Áp dụng trên apex/www.
+// Trên noibo.*, các path này vẫn hoạt động nhưng middleware sẽ rewrite → /dashboard ở root.
+const PUBLIC_PATHS_PREFIXES = ['/api/health', '/api/auth', '/api/log', '/_next', '/favicon', '/public'];
+
+function isPublicPath(pathname: string) {
+  return PUBLIC_PATHS_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
+
 export function middleware(req: NextRequest) {
-  // Admin surface requires an active session on id.alphacenter.vn — otherwise
-  // redirect users there to log in, preserving where they wanted to go.
+  const host =
+    req.headers.get('x-forwarded-host') ||
+    req.headers.get('host') ||
+    req.nextUrl.host;
+  const isNoibo = host.startsWith('noibo.');
+  const { pathname } = req.nextUrl;
+
+  // ─── Noibo subdomain routing ─────────────────────────────────────────
+  if (isNoibo) {
+    // noibo.alphacenter.vn/ → /dashboard (redirect để URL bar sạch)
+    if (pathname === '/') {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+    // Chặn /admin trên subdomain nội bộ (admin marketing ở www)
+    if (pathname.startsWith('/admin')) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+    // Các path nội bộ (dashboard, profile, attendance, leave, org, manage, api/noibo)
+    // tiếp tục xử lý qua auth guard bên dưới.
+  } else {
+    // Trên www / apex: nếu request path là "/" thì serve marketing home (public),
+    // không cần session → cho qua luôn.
+    if (pathname === '/') {
+      return NextResponse.next();
+    }
+  }
+
+  // Public paths (health, api/auth callback, static) → bypass auth
+  if (isPublicPath(pathname)) {
+    return NextResponse.next();
+  }
+
+  // ─── Auth guard ──────────────────────────────────────────────────────
   const hasSession = SESSION_COOKIES.some((name) => req.cookies.has(name));
   if (hasSession) {
     return NextResponse.next();
@@ -17,10 +56,6 @@ export function middleware(req: NextRequest) {
   if (idUrl) {
     // Reconstruct the public URL from forwarded headers — req.nextUrl reflects
     // the container's internal host (0.0.0.0:3000) behind Coolify's proxy.
-    const host =
-      req.headers.get('x-forwarded-host') ||
-      req.headers.get('host') ||
-      req.nextUrl.host;
     const proto =
       req.headers.get('x-forwarded-proto') ||
       (host.startsWith('localhost') ? 'http' : 'https');
@@ -37,15 +72,10 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  // Bảo vệ cả admin marketing và surface nội bộ (noibo) — cả 2 đều redirect
-  // về id.alphacenter.vn nếu chưa đăng nhập.
+  // Matcher rộng để bắt host=noibo.* trên mọi path. Exclude _next/static và public
+  // assets để tránh overhead. Các path cần auth/redirect xử lý trong body theo host.
   matcher: [
-    '/admin/:path*',
-    '/dashboard',
-    '/profile',
-    '/org',
-    '/attendance/:path*',
-    '/leave',
-    '/manage/:path*',
+    '/',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|svg|ico|webp|woff2?)$).*)',
   ],
 };
