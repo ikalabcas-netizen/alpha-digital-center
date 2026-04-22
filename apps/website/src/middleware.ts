@@ -6,8 +6,6 @@ const SESSION_COOKIES = [
 ];
 
 export function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
-
   // Admin surface requires an active session on id.alphacenter.vn — otherwise
   // redirect users there to log in, preserving where they wanted to go.
   const hasSession = SESSION_COOKIES.some((name) => req.cookies.has(name));
@@ -17,8 +15,19 @@ export function middleware(req: NextRequest) {
 
   const idUrl = process.env.NEXT_PUBLIC_ID_URL;
   if (idUrl) {
+    // Reconstruct the public URL from forwarded headers — req.nextUrl reflects
+    // the container's internal host (0.0.0.0:3000) behind Coolify's proxy.
+    const host =
+      req.headers.get('x-forwarded-host') ||
+      req.headers.get('host') ||
+      req.nextUrl.host;
+    const proto =
+      req.headers.get('x-forwarded-proto') ||
+      (host.startsWith('localhost') ? 'http' : 'https');
+    const publicCallback = `${proto}://${host}${req.nextUrl.pathname}${req.nextUrl.search}`;
+
     const target = new URL(idUrl);
-    target.searchParams.set('callbackUrl', req.nextUrl.toString());
+    target.searchParams.set('callbackUrl', publicCallback);
     return NextResponse.redirect(target);
   }
 
