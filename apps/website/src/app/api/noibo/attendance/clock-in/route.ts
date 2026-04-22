@@ -15,20 +15,24 @@ export async function POST(req: NextRequest) {
   const lat = typeof body.lat === 'number' ? body.lat : null;
   const lng = typeof body.lng === 'number' ? body.lng : null;
 
-  if (lat === null || lng === null) {
-    return badRequest('Cần truyền lat và lng (yêu cầu quyền truy cập vị trí trên trình duyệt)');
+  const geofenceConfigured = !!process.env.OFFICE_GEOFENCES?.trim();
+  let geoCheck: ReturnType<typeof checkInsideAnyOffice> | null = null;
+
+  // 1. Check geofence (skip nếu không có config — bypass cho dev/test)
+  if (geofenceConfigured) {
+    if (lat === null || lng === null) {
+      return badRequest('Cần truyền lat và lng (yêu cầu quyền truy cập vị trí trên trình duyệt)');
+    }
+    geoCheck = checkInsideAnyOffice(lat, lng);
+    if (!geoCheck.ok) {
+      return NextResponse.json(
+        { error: 'OUT_OF_OFFICE', message: geoCheck.message, distanceM: geoCheck.distanceM },
+        { status: 403 }
+      );
+    }
   }
 
-  // 1. Check geofence
-  const geoCheck = checkInsideAnyOffice(lat, lng);
-  if (!geoCheck.ok) {
-    return NextResponse.json(
-      { error: 'OUT_OF_OFFICE', message: geoCheck.message, distanceM: geoCheck.distanceM },
-      { status: 403 }
-    );
-  }
-
-  // 2. Check IP
+  // 2. Check IP (ip-whitelist.ts tự bypass nếu OFFICE_IPS trống)
   const ipCheck = checkIpWhitelist(req);
   if (!ipCheck.ok) {
     return NextResponse.json(
@@ -98,7 +102,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     attendance: row,
-    geo: { matchedOffice: geoCheck.matchedOffice?.name, distanceM: geoCheck.distanceM },
+    geo: geoCheck ? { matchedOffice: geoCheck.matchedOffice?.name, distanceM: geoCheck.distanceM } : { bypass: true },
     ip: ipCheck.ip,
     lateMinutes,
   });

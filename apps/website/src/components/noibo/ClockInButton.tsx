@@ -30,6 +30,19 @@ export function ClockInButton({ initialAttendance, shiftLabel, onChange }: Clock
   const isClockedOut = !!attendance?.clockOutAt;
   const action = isClockedOut ? 'done' : isClockedIn ? 'clock_out' : 'clock_in';
 
+  async function submitClockIn(lat: number | null, lng: number | null) {
+    setPhase('submitting');
+    setMessage(lat === null ? 'Đang gửi (không có vị trí)...' : 'Đang xác thực vị trí và IP...');
+
+    const url = action === 'clock_in' ? '/api/noibo/attendance/clock-in' : '/api/noibo/attendance/clock-out';
+    const result = await apiPost<{ ok: boolean; attendance: AttendanceRow }>(url, { lat, lng });
+
+    setAttendance(result.attendance);
+    onChange?.(result.attendance);
+    setPhase('success');
+    setMessage(action === 'clock_in' ? 'Đã chấm công vào ca.' : 'Đã chấm công ra ca.');
+  }
+
   async function handleClick() {
     if (action === 'done') return;
     setPhase('getting_location');
@@ -45,16 +58,16 @@ export function ClockInButton({ initialAttendance, shiftLabel, onChange }: Clock
         return;
       }
 
-      setPhase('submitting');
-      setMessage('Đang xác thực vị trí và IP...');
+      await submitClockIn(lat, lng);
+    } catch (e: any) {
+      setPhase('error');
+      setMessage(e.message || 'Có lỗi xảy ra');
+    }
+  }
 
-      const url = action === 'clock_in' ? '/api/noibo/attendance/clock-in' : '/api/noibo/attendance/clock-out';
-      const result = await apiPost<{ ok: boolean; attendance: AttendanceRow }>(url, { lat, lng });
-
-      setAttendance(result.attendance);
-      onChange?.(result.attendance);
-      setPhase('success');
-      setMessage(action === 'clock_in' ? 'Đã chấm công vào ca.' : 'Đã chấm công ra ca.');
+  async function handleSkipGps() {
+    try {
+      await submitClockIn(null, null);
     } catch (e: any) {
       setPhase('error');
       setMessage(e.message || 'Có lỗi xảy ra');
@@ -164,6 +177,28 @@ export function ClockInButton({ initialAttendance, shiftLabel, onChange }: Clock
           {phase === 'error' && <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 2 }} />}
           <span>{message}</span>
         </div>
+      )}
+
+      {phase === 'error' && action !== 'done' && (
+        <button
+          onClick={handleSkipGps}
+          style={{
+            marginTop: 10,
+            width: '100%',
+            padding: '10px 16px',
+            background: 'transparent',
+            color: colors.textSecondary,
+            border: `1px dashed ${colors.border}`,
+            borderRadius: 10,
+            fontSize: 12.5,
+            fontWeight: 500,
+            cursor: 'pointer',
+            fontFamily: fonts.body,
+          }}
+          title="Chỉ hoạt động khi OFFICE_GEOFENCES chưa cấu hình trên server (test mode)"
+        >
+          Bỏ qua GPS — chấm công (test mode)
+        </button>
       )}
 
       <div style={{ marginTop: 14, fontSize: 11, color: colors.textMuted, lineHeight: 1.5 }}>

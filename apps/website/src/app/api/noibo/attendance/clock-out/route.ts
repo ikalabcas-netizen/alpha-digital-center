@@ -15,14 +15,17 @@ export async function POST(req: NextRequest) {
   const lat = typeof body.lat === 'number' ? body.lat : null;
   const lng = typeof body.lng === 'number' ? body.lng : null;
 
-  if (lat === null || lng === null) return badRequest('Cần truyền lat và lng');
+  const geofenceConfigured = !!process.env.OFFICE_GEOFENCES?.trim();
 
-  const geoCheck = checkInsideAnyOffice(lat, lng);
-  if (!geoCheck.ok) {
-    return NextResponse.json(
-      { error: 'OUT_OF_OFFICE', message: geoCheck.message, distanceM: geoCheck.distanceM },
-      { status: 403 }
-    );
+  if (geofenceConfigured) {
+    if (lat === null || lng === null) return badRequest('Cần truyền lat và lng');
+    const geoCheck = checkInsideAnyOffice(lat, lng);
+    if (!geoCheck.ok) {
+      return NextResponse.json(
+        { error: 'OUT_OF_OFFICE', message: geoCheck.message, distanceM: geoCheck.distanceM },
+        { status: 403 }
+      );
+    }
   }
 
   const ipCheck = checkIpWhitelist(req);
